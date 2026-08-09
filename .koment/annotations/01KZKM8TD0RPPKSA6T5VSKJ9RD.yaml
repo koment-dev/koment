@@ -1,0 +1,39 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/koment-dev/koment/main/schema/v1alpha/annotation.schema.json
+apiVersion: koment.dev/v1alpha
+kind: Annotation
+metadata:
+  id: 01KZKM8TD0RPPKSA6T5VSKJ9RD
+  created: "2026-08-09T16:04:08Z"
+spec:
+  target:
+    file: editors/vscode/package-vsix.sh
+  type: why
+  body: |-
+    Usage: package-vsix.sh <version> <archive-directory> <output-directory>
+
+    Builds one VSIX per platform carrying the released koment binary for that
+    platform, plus a universal VSIX that carries none. Archives are the
+    canonical release artifacts and are verified against the release checksum
+    manifest before anything is packaged (ADR 0109, ADR 0113).
+  anchor:
+    scope: excerpt
+    excerpt: set -euo pipefail
+    before: '#!/usr/bin/env bash'
+    after: |2-
+
+      version=${1:?version}
+      archives=$(cd "${2:?archive directory}" && pwd)
+  author:
+    name: janpuc
+    email: janpuc@proton.me
+    kind: agent
+    source: git-config
+  git:
+    commit: f3b11be6187f9922ce35a22562fe2ef4d0592361
+    path: editors/vscode/package-vsix.sh
+    line: 8
+status:
+  lastSeenLine: 2
+  resolution: ok
+  resolvedAt: "2026-08-09T16:04:08Z"
+  resolvedCommit: f3b11be6187f9922ce35a22562fe2ef4d0592361

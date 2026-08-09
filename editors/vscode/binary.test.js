@@ -40,9 +40,6 @@ test('windows carries the executable suffix', () => {
   assert.strictEqual(bundledBinary('/ext', 'darwin'), path.join('/ext', 'bin', 'koment'));
 });
 
-// A VSIX is a zip, and the extension host is not required to restore the
-// executable bit when it expands one. A bundled server that cannot be executed
-// looks exactly like a missing server, so the bit is asserted before spawning.
 test('a bundled binary without the executable bit is repaired', () => {
   const chmodded = [];
   const repaired = ensureExecutable('/ext/bin/koment', {

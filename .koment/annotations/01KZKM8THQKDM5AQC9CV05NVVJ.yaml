@@ -1,0 +1,35 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/koment-dev/koment/main/schema/v1alpha/annotation.schema.json
+apiVersion: koment.dev/v1alpha
+kind: Annotation
+metadata:
+  id: 01KZKM8THQKDM5AQC9CV05NVVJ
+  created: "2026-08-09T16:04:08Z"
+spec:
+  target:
+    file: editors/vscode/panel.test.js
+  type: why
+  body: The panel exists to remove truncation, so a long body has to arrive whole.
+  anchor:
+    scope: excerpt
+    excerpt: test('the whole body is rendered, however long', () => {
+    before: |2
+        assert.ok(html.includes('&lt;b&gt;why&lt;/b&gt;'));
+      });
+    after: |2-
+        const body = 'word '.repeat(400).trim();
+        const html = render([{ kind: 'invariant', status: 'ok', line: 9, body }]);
+        assert.ok(html.includes(body), 'the body was shortened somewhere');
+  author:
+    name: janpuc
+    email: janpuc@proton.me
+    kind: agent
+    source: git-config
+  git:
+    commit: f3b11be6187f9922ce35a22562fe2ef4d0592361
+    path: editors/vscode/panel.test.js
+    line: 45
+status:
+  lastSeenLine: 44
+  resolution: ok
+  resolvedAt: "2026-08-09T16:04:08Z"
+  resolvedCommit: f3b11be6187f9922ce35a22562fe2ef4d0592361

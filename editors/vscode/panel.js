@@ -35,9 +35,6 @@ function entry(item, index) {
 </li>`;
 }
 
-// The panel exists because a body is a paragraph and every inline surface VS
-// Code offers is one line (ADR 0114). Rendering prose is the whole job, so the
-// markup is prose, not rows.
 function panelHTML({ items, file, nonce, styleNonce }) {
   const list = items.length
     ? `<ul>${items.map(entry).join('')}</ul>`

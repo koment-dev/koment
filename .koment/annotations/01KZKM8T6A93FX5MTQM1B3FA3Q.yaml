@@ -1,0 +1,40 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/koment-dev/koment/main/schema/v1alpha/annotation.schema.json
+apiVersion: koment.dev/v1alpha
+kind: Annotation
+metadata:
+  id: 01KZKM8T6A93FX5MTQM1B3FA3Q
+  created: "2026-08-09T16:04:08Z"
+spec:
+  target:
+    file: .github/renovate-entrypoint.sh
+  type: why
+  body: |-
+    The shared home-operations preset attaches helm-docs as a post-upgrade task
+    and Renovate's container does not carry it, while `mise run generate-check`
+    fails on a chart README that was not regenerated. The version is pinned and
+    Renovate updates it here like any other dependency.
+  anchor:
+    scope: excerpt
+    excerpt: HELM_DOCS_VERSION=1.14.2
+    before: |2-
+
+
+      # renovate: datasource=github-releases depName=norwoodj/helm-docs
+    after: |-
+      curl -fsSL \
+          "https://github.com/norwoodj/helm-docs/releases/download/v${HELM_DOCS_VERSION#v}/helm-docs_${HELM_DOCS_VERSION#v}_Linux_x86_64.tar.gz" \
+          | tar -xz -C /usr/local/bin helm-docs
+  author:
+    name: janpuc
+    email: janpuc@proton.me
+    kind: agent
+    source: git-config
+  git:
+    commit: f3b11be6187f9922ce35a22562fe2ef4d0592361
+    path: .github/renovate-entrypoint.sh
+    line: 10
+status:
+  lastSeenLine: 6
+  resolution: ok
+  resolvedAt: "2026-08-09T16:04:08Z"
+  resolvedCommit: f3b11be6187f9922ce35a22562fe2ef4d0592361

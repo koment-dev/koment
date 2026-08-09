@@ -1,10 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# The shared home-operations preset attaches helm-docs as a post-upgrade task
-# and Renovate's container does not carry it, while `mise run generate-check`
-# fails on a chart README that was not regenerated. The version is pinned and
-# Renovate updates it here like any other dependency.
 
 # renovate: datasource=github-releases depName=norwoodj/helm-docs
 HELM_DOCS_VERSION=1.14.2

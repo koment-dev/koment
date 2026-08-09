@@ -1,0 +1,27 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/koment-dev/koment/main/schema/v1alpha/annotation.schema.json
+apiVersion: koment.dev/v1alpha
+kind: Annotation
+metadata:
+  id: 01KZJNMXM12PNQ7RPMTD2YY8HV
+  created: "2026-08-09T07:08:58Z"
+spec:
+  target:
+    file: internal/commentpolicy/syntax.go
+  type: why
+  body: |-
+    Prose and data formats carry no comment syntax to find. Scanning them would
+    read every Markdown heading as a violation.
+  anchor:
+    scope: excerpt
+    excerpt: var uncommentableExtensions = map[string]bool{
+    before: "\tline: []string{\"#\", \"//\"},\n}\n"
+    after: "\t\".md\": true, \".markdown\": true, \".mdx\": true, \".mdc\": true,\n\t\".rst\": true, \".txt\": true, \".adoc\": true,\n\t\".json\": true, \".lock\": true, \".sum\": true,"
+  author:
+    name: claude-code
+    kind: agent
+    source: session
+status:
+  lastSeenLine: 108
+  resolution: ok
+  resolvedAt: "2026-08-09T07:08:58Z"
+  resolvedCommit: f3b11be6187f9922ce35a22562fe2ef4d0592361

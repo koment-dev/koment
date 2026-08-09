@@ -1,0 +1,34 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/koment-dev/koment/main/schema/v1alpha/annotation.schema.json
+apiVersion: koment.dev/v1alpha
+kind: Annotation
+metadata:
+  id: 01KZKM8T80FK3KPRK0KGZQR0CV
+  created: "2026-08-09T16:04:08Z"
+spec:
+  target:
+    file: .gitignore
+  type: why
+  body: Assembled into the extension at package time from the canonical release.
+  anchor:
+    scope: excerpt
+    excerpt: /editors/vscode/bin/
+    before: |
+      /dist/
+      /bin/
+    after: |
+      /editors/vscode/icon.png
+      /editors/vscode/LICENSE
+  author:
+    name: janpuc
+    email: janpuc@proton.me
+    kind: agent
+    source: git-config
+  git:
+    commit: f3b11be6187f9922ce35a22562fe2ef4d0592361
+    path: .gitignore
+    line: 6
+status:
+  lastSeenLine: 5
+  resolution: ok
+  resolvedAt: "2026-08-09T16:04:08Z"
+  resolvedCommit: f3b11be6187f9922ce35a22562fe2ef4d0592361

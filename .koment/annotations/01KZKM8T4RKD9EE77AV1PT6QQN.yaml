@@ -1,0 +1,34 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/koment-dev/koment/main/schema/v1alpha/annotation.schema.json
+apiVersion: koment.dev/v1alpha
+kind: Annotation
+metadata:
+  id: 01KZKM8T4RKD9EE77AV1PT6QQN
+  created: "2026-08-09T16:04:07Z"
+spec:
+  target:
+    file: .github/CODEOWNERS
+  type: why
+  body: The parts a mistake cannot be taken back from.
+  anchor:
+    scope: excerpt
+    excerpt: /docs/decisions/ @janpuc
+    before: |
+      * @janpuc
+    after: |-
+      /docs/releasing.md @janpuc
+      /schema/ @janpuc
+      /.github/workflows/ @janpuc
+  author:
+    name: janpuc
+    email: janpuc@proton.me
+    kind: agent
+    source: git-config
+  git:
+    commit: f3b11be6187f9922ce35a22562fe2ef4d0592361
+    path: .github/CODEOWNERS
+    line: 4
+status:
+  lastSeenLine: 3
+  resolution: ok
+  resolvedAt: "2026-08-09T16:04:07Z"
+  resolvedCommit: f3b11be6187f9922ce35a22562fe2ef4d0592361

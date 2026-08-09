@@ -1,0 +1,33 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/koment-dev/koment/main/schema/v1alpha/annotation.schema.json
+apiVersion: koment.dev/v1alpha
+kind: Annotation
+metadata:
+  id: 01KZJNM8QYHNBVPGE1J43PZGGP
+  created: "2026-08-09T07:08:37Z"
+spec:
+  target:
+    file: internal/commentpolicy/comments.go
+  type: invariant
+  body: |-
+    stillParses guards the one language koment can parse. Removing a comment
+    from a file it cannot parse is still safe: the marker scan never reports a
+    span that is not wholly a comment, so the remaining bytes are untouched
+    code.
+  anchor:
+    scope: excerpt
+    excerpt: func stillParses(file string, converted []byte) error {
+    before: "\treturn converted, start\n}\n"
+    after: "\tif !strings.HasSuffix(file, \".go\") {\n\t\treturn nil\n\t}"
+  author:
+    name: claude-code
+    kind: agent
+    source: session
+  git:
+    commit: f3b11be6187f9922ce35a22562fe2ef4d0592361
+    path: internal/commentpolicy/comments.go
+    line: 442
+status:
+  lastSeenLine: 439
+  resolution: ok
+  resolvedAt: "2026-08-09T07:08:37Z"
+  resolvedCommit: f3b11be6187f9922ce35a22562fe2ef4d0592361

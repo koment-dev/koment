@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/koment-dev/koment/main/schema/v1alpha/annotation.schema.json
+apiVersion: koment.dev/v1alpha
+kind: Annotation
+metadata:
+  id: 01KZJNM2F8HWZHE1JVYQK6081Z
+  created: "2026-08-09T07:08:31Z"
+spec:
+  target:
+    file: internal/commentpolicy/syntax.go
+  type: why
+  body: |-
+    `--` is deliberately absent. It is a comment in Lua, SQL and Haskell, which
+    declare it, and a YAML document separator or Markdown frontmatter fence
+    everywhere else. Guessing it for unknown filetypes reads `---` as rationale.
+  anchor:
+    scope: excerpt
+    excerpt: var fallbackSyntax = commentSyntax{
+    before: "\t\".vim\": {line: []string{`\"`}},\n}\n"
+    after: "\tline: []string{\"#\", \"//\"},\n}\n"
+  author:
+    name: claude-code
+    kind: agent
+    source: session
+status:
+  lastSeenLine: 104
+  resolution: ok
+  resolvedAt: "2026-08-09T07:08:31Z"
+  resolvedCommit: f3b11be6187f9922ce35a22562fe2ef4d0592361

@@ -1,0 +1,35 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/koment-dev/koment/main/schema/v1alpha/annotation.schema.json
+apiVersion: koment.dev/v1alpha
+kind: Annotation
+metadata:
+  id: 01KZKM8TG6GP63M3M9DM70BB91
+  created: "2026-08-09T16:04:08Z"
+spec:
+  target:
+    file: editors/vscode/panel.test.js
+  type: gotcha
+  body: A webview without a restrictive policy is a browser tab inside the editor.
+  anchor:
+    scope: excerpt
+    excerpt: test('the document restricts itself to its own nonces', () => {
+    before: |2
+        assert.ok(html.includes('status failing'));
+      });
+    after: |2-
+        const html = render([{ kind: 'why', status: 'ok', line: 1, body: 'a' }]);
+        assert.ok(html.includes("default-src 'none'"));
+        assert.ok(html.includes("script-src 'nonce-n1'"));
+  author:
+    name: janpuc
+    email: janpuc@proton.me
+    kind: agent
+    source: git-config
+  git:
+    commit: f3b11be6187f9922ce35a22562fe2ef4d0592361
+    path: editors/vscode/panel.test.js
+    line: 83
+status:
+  lastSeenLine: 82
+  resolution: ok
+  resolvedAt: "2026-08-09T16:04:08Z"
+  resolvedCommit: f3b11be6187f9922ce35a22562fe2ef4d0592361

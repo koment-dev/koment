@@ -1,0 +1,37 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/koment-dev/koment/main/schema/v1alpha/annotation.schema.json
+apiVersion: koment.dev/v1alpha
+kind: Annotation
+metadata:
+  id: 01KZKM8TKBDS1T0ND6QB50YC20
+  created: "2026-08-09T16:04:08Z"
+spec:
+  target:
+    file: editors/vscode/panel.test.js
+  type: gotcha
+  body: |-
+    An annotation body is prose from the repository, and the panel puts it in a
+    document. Anything that reaches the markup unescaped executes there.
+  anchor:
+    scope: excerpt
+    excerpt: test('a body cannot inject markup or script', () => {
+    before: |2
+        assert.ok(html.includes('&lt;img src=x'));
+      });
+    after: |2-
+        const html = render([
+          { kind: 'why', status: 'ok', line: 3, body: '<script>alert(1)</script> & "quoted" <img src=x onerror=y>' }
+        ]);
+  author:
+    name: janpuc
+    email: janpuc@proton.me
+    kind: agent
+    source: git-config
+  git:
+    commit: f3b11be6187f9922ce35a22562fe2ef4d0592361
+    path: editors/vscode/panel.test.js
+    line: 28
+status:
+  lastSeenLine: 26
+  resolution: ok
+  resolvedAt: "2026-08-09T16:04:08Z"
+  resolvedCommit: f3b11be6187f9922ce35a22562fe2ef4d0592361
