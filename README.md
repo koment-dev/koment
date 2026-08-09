@@ -258,8 +258,8 @@ file renders every annotation to static HTML plus `annotations.json` and
 database or authentication to design.
 
 ```yaml
-- uses: actions/checkout@v5
-- uses: koment-dev/koment@v0.2.0
+- uses: actions/checkout@v7
+- uses: koment-dev/koment@v3
 - run: koment check
 - run: koment site --out dist
 ```

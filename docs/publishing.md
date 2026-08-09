@@ -37,8 +37,8 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-      - uses: koment-dev/koment@v0.2.0
+      - uses: actions/checkout@v7
+      - uses: koment-dev/koment@v3
       - run: |
           koment check
           koment comments check
@@ -56,26 +56,48 @@ jobs:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v5
-      - uses: koment-dev/koment@v0.2.0
+      - uses: actions/checkout@v7
+      - uses: koment-dev/koment@v3
 
       - run: |
           koment site --out dist \
             --commit-link "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}"
 
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v4
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: dist
       - id: deploy
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
 ```
 
 That is the whole thing. Push it, and the site appears at
 `https://<you>.github.io/<repo>/`.
 
-Pin the `uses:` lines to commit SHAs if your organisation requires it — this
-repository does, and [its own workflows](../.github/workflows/) show the form.
+### About those version pins
+
+This example is deliberately written to keep working without you editing it.
+
+`koment-dev/koment@v3` is a **moving major tag**: it is re-pointed at every
+3.x release, so you receive fixes without touching the file, and a breaking
+change cannot arrive without you changing the `3`. Separately, the action's
+`version` input defaults to `latest`, so the CLI it installs is the newest
+koment release regardless of which action ref you pin. Two independent
+dials — the action wrapper, and the binary it fetches:
+
+```yaml
+      - uses: koment-dev/koment@v3
+        with:
+          version: 3.1.0        # pin the CLI exactly; omit for the latest release
+```
+
+**This is an example, not what koment does to itself.** koment pins every
+`uses:` to a full commit SHA, because a moving tag is a supply-chain trust
+decision: whoever can move the tag can change what runs in your pipeline.
+Auto-updating is the right default for getting started and the wrong default
+for a repository that publishes artifacts. If your organisation requires SHA
+pins, take the form from [koment's own workflows](../.github/workflows/) and
+let Renovate keep them current.
 
 ## What each part is doing
 
@@ -170,7 +192,7 @@ command.
 
 ## The action
 
-`koment-dev/koment@v0.2.0` downloads a released binary, verifies it against the
+`koment-dev/koment@v3` downloads a released binary, verifies it against the
 release's published checksums, and puts it on `PATH`. It supports Linux and
 macOS runners. Windows runners should install the checksum-listed release
 archive directly.
@@ -179,7 +201,7 @@ The tag on `uses:` picks the *action*; the `version` input picks the *koment
 release* it installs, and defaults to the latest.
 
 ```yaml
-- uses: koment-dev/koment@v0.2.0
+- uses: koment-dev/koment@v3
   with:
     version: 0.2.0   # pin the CLI too, so a new release cannot change your build
 ```
