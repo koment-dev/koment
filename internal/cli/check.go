@@ -8,8 +8,8 @@ import (
 
 func runCheck(args []string, env Environment) int {
 	flags := flagSet("check", env)
-	if err := flags.Parse(args); err != nil {
-		return ExitUsage
+	if code, ok := parse(flags, args); !ok {
+		return code
 	}
 
 	service, annotations, err := openApplication()

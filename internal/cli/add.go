@@ -18,9 +18,9 @@ func runAdd(args []string, env Environment) int {
 	body := flags.String("body", "", "the rationale; - reads it from stdin")
 	author := flags.String("author", "", `override the git identity; "Name" or "Name <email>"`)
 	byAgent := flags.Bool("agent", false, "record this as written by an agent, not a person")
-	target, ok := onePositional("add", "a file", flags, args, env)
+	target, code, ok := onePositional("add", "a file", flags, args, env)
 	if !ok {
-		return ExitUsage
+		return code
 	}
 
 	parsedKind, err := store.ParseType(*kind)

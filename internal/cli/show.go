@@ -8,9 +8,9 @@ import (
 
 func runShow(args []string, env Environment) int {
 	flags := flagSet("show", env)
-	target, ok := onePositional("show", "a file", flags, args, env)
+	target, code, ok := onePositional("show", "a file", flags, args, env)
 	if !ok {
-		return ExitUsage
+		return code
 	}
 
 	service, annotations, err := openApplication()

@@ -19,8 +19,8 @@ func runBootstrap(args []string, env Environment) int {
 	all := flags.Bool("all", false, "install every supported adapter")
 	policyOnly := flags.Bool("policy-only", false, "install the policy only; do not refresh any adapter")
 	nonInteractive := flags.Bool("non-interactive", false, "do not prompt; require explicit --agents, --all or --policy-only")
-	if err := flags.Parse(args); err != nil {
-		return ExitUsage
+	if code, ok := parse(flags, args); !ok {
+		return code
 	}
 	if flags.NArg() != 0 {
 		return misuse(env, "bootstrap takes no arguments")

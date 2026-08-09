@@ -8,9 +8,9 @@ import (
 
 func runSearch(args []string, env Environment) int {
 	flags := flagSet("search", env)
-	query, ok := onePositional("search", "a query", flags, args, env)
+	query, code, ok := onePositional("search", "a query", flags, args, env)
 	if !ok {
-		return ExitUsage
+		return code
 	}
 
 	service, _, err := openApplication()

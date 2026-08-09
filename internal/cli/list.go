@@ -9,8 +9,8 @@ import (
 func runList(args []string, env Environment) int {
 	flags := flagSet("list", env)
 	kind := flags.String("kind", "", "show only this kind")
-	if err := flags.Parse(args); err != nil {
-		return ExitUsage
+	if code, ok := parse(flags, args); !ok {
+		return code
 	}
 
 	wanted := store.Type("")

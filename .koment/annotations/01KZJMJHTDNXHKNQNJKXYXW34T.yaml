@@ -1,0 +1,38 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/koment-dev/koment/main/schema/v1alpha/annotation.schema.json
+apiVersion: koment.dev/v1alpha
+kind: Annotation
+metadata:
+  id: 01KZJMJHTDNXHKNQNJKXYXW34T
+  created: "2026-08-09T06:50:12Z"
+spec:
+  target:
+    file: internal/cli/cli.go
+  type: why
+  title: Asking for help exits 0; failing to parse exits 2
+  body: |-
+    parse exists so that one decision is made in one place: asking for help is a
+    successful invocation, and failing to parse is not. flag.Parse reports both
+    through the same error, and the obvious `if err != nil { return ExitUsage }`
+    silently makes `koment add --help` exit 2 — which breaks any script or CI
+    step that asks a command how it works.
+
+    Every command routes through here rather than calling flags.Parse directly,
+    so a new command cannot reintroduce the difference by accident.
+  anchor:
+    scope: excerpt
+    excerpt: func parse(flags *flag.FlagSet, args []string) (int, bool) {
+    before: "\treturn flags\n}\n"
+    after: "\terr := flags.Parse(args)\n\tswitch {\n\tcase err == nil:"
+  author:
+    name: claude-code
+    kind: agent
+    source: session
+  git:
+    commit: f3b11be6187f9922ce35a22562fe2ef4d0592361
+    path: internal/cli/cli.go
+    line: 121
+status:
+  lastSeenLine: 119
+  resolution: ok
+  resolvedAt: "2026-08-09T06:50:12Z"
+  resolvedCommit: f3b11be6187f9922ce35a22562fe2ef4d0592361

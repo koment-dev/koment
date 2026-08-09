@@ -11,9 +11,9 @@ func runReanchor(args []string, env Environment) int {
 	excerpt := flags.String("excerpt", "", "verbatim snippet to anchor to in the target file")
 	destination := flags.String("file", "", "move the annotation to this file")
 
-	id, ok := onePositional("reanchor", "an annotation id", flags, args, env)
+	id, code, ok := onePositional("reanchor", "an annotation id", flags, args, env)
 	if !ok {
-		return ExitUsage
+		return code
 	}
 	if *excerpt == "" && *destination == "" {
 		return misuse(env, "reanchor needs --excerpt, --file, or both")
