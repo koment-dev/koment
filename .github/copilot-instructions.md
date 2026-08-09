@@ -37,6 +37,19 @@ Partial compliance is a bug.
   with `acknowledge_inline_comment: true` and a human-readable body.
   The acknowledgement is auditable.
 
+## Anchoring an annotation
+
+- `excerpt` is the anchor. It must match the file byte for byte,
+  including indentation, and it has NO line limit. If an excerpt is
+  rejected as matching several places, extend the excerpt itself with
+  adjacent lines until it is unique.
+- `before` and `after` are context hints only, capped at three
+  lines each. They do NOT disambiguate a repeated excerpt, so widening
+  them is never the fix for an ambiguous anchor.
+- If an excerpt is reported missing but you believe it is present, the
+  difference is whitespace: indentation, a trailing space, or CRLF
+  endings. koment says so when it can detect it.
+
 ## Before you stop
 
 - You MUST run `koment check`, `koment comments check` and
