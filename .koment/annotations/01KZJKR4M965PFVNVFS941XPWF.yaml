@@ -1,0 +1,39 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/koment-dev/koment/main/schema/v1alpha/annotation.schema.json
+apiVersion: koment.dev/v1alpha
+kind: Annotation
+metadata:
+  id: 01KZJKR4M965PFVNVFS941XPWF
+  created: "2026-08-09T06:35:47Z"
+spec:
+  target:
+    file: internal/policy/policy.go
+  type: gotcha
+  title: Kept to refuse v1 by name, not to read it
+  body: |-
+    The policy twin of the constant in internal/store/record.go, kept for the
+    same reason and easy to mistake for the same kind of leftover.
+
+    koment stopped migrating the flat `version: 1` policy in 3.0.0 (ADR 0130).
+    Recognition survives migration so that decode can refuse an old policy with
+    an error naming the binary that will rewrite it, instead of reporting it as
+    a file with no apiVersion — which reads as "this is not a koment policy"
+    and sends the user looking for the wrong problem.
+  anchor:
+    scope: excerpt
+    excerpt: "\tLegacyVersion = 1"
+    before: "\t// carried. koment no longer reads that shape; the constant survives so a\n\t// policy still carrying it is refused by name rather than mistaken for a\n\t// malformed file (ADR 0130)."
+    after: "\n\tModeStrict = \"strict\"\n\tFileName   = \".koment/policy.yaml\""
+  author:
+    name: janpuc
+    email: janpuc@proton.me
+    kind: agent
+    source: git-config
+  git:
+    commit: f3b11be6187f9922ce35a22562fe2ef4d0592361
+    path: internal/policy/policy.go
+    line: 30
+status:
+  lastSeenLine: 30
+  resolution: ok
+  resolvedAt: "2026-08-09T06:35:47Z"
+  resolvedCommit: f3b11be6187f9922ce35a22562fe2ef4d0592361

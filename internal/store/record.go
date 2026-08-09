@@ -15,6 +15,12 @@ const APIVersion = api.Version
 // KindAnnotation is the resource kind of an annotation record.
 const KindAnnotation = "Annotation"
 
+// LegacyRecordVersion is the only value the pre-v1alpha `version` field ever
+// carried. koment no longer reads that shape; the constant survives so a
+// record still carrying it is refused by name rather than mistaken for a
+// malformed file (ADR 0130).
+const LegacyRecordVersion = 1
+
 // TitleLimit keeps a title short enough to render beside code without being
 // shortened, which is the only reason it exists (ADR 0115).
 const TitleLimit = 72
@@ -221,7 +227,10 @@ func validTitle(id, title string) error {
 		return fmt.Errorf("annotation %s: a title is one line", id)
 	}
 	if count := len([]rune(title)); count > TitleLimit {
-		return fmt.Errorf("annotation %s: title is %d characters, the limit is %d so it never needs shortening", id, count, TitleLimit)
+		return fmt.Errorf(
+			"annotation %s: title is %d characters and the limit is %d, so it always renders beside the code unshortened. "+
+				"Shorten it, or leave it empty and let the first sentence of the body stand as the headline",
+			id, count, TitleLimit)
 	}
 	return nil
 }

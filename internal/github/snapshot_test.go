@@ -72,7 +72,26 @@ func (fixture *githubFixture) ServeHTTP(writer http.ResponseWriter, request *htt
 }
 
 func annotationFixture() []byte {
-	return []byte("version: 1\nid: 01JQ8ZK3M4N5P6R7S8T9V0W1X2\nfile: src/main.go\nkind: why\nbody: The remote value is the compatibility default.\ncreated: 2026-08-03\nanchor:\n  scope: excerpt\n  excerpt: var Remote = true\n  last_seen_line: 3\nauthor:\n  name: Test Agent\n  kind: agent\n  source: explicit\n")
+	return []byte(`apiVersion: koment.dev/v1alpha
+kind: Annotation
+metadata:
+  id: 01JQ8ZK3M4N5P6R7S8T9V0W1X2
+  created: "2026-08-03T00:00:00Z"
+spec:
+  target:
+    file: src/main.go
+  type: why
+  body: The remote value is the compatibility default.
+  anchor:
+    scope: excerpt
+    excerpt: var Remote = true
+  author:
+    name: Test Agent
+    kind: agent
+    source: explicit
+status:
+  lastSeenLine: 3
+`)
 }
 
 func encodedBlob(content []byte) map[string]any {

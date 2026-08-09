@@ -23,6 +23,12 @@ const (
 	// KindPolicy is the resource kind of a repository policy.
 	KindPolicy = "Policy"
 
+	// LegacyVersion is the only value the pre-v1alpha `version` field ever
+	// carried. koment no longer reads that shape; the constant survives so a
+	// policy still carrying it is refused by name rather than mistaken for a
+	// malformed file (ADR 0130).
+	LegacyVersion = 1
+
 	ModeStrict = "strict"
 	FileName   = ".koment/policy.yaml"
 	SchemaURL  = api.SchemaBase + "policy.schema.json"
@@ -110,8 +116,8 @@ func Default() Policy {
 					IntrinsicToolchain, IntrinsicGeneratedMarker, IntrinsicUpstreamLink,
 					IntrinsicDeprecated, IntrinsicPublicAPI,
 				},
-				GeneratedPaths: []string{"**/*.gen.go", "**/*.generated.go"},
-				VendoredPaths:  []string{"vendor/**"},
+				GeneratedPaths: DefaultGeneratedPaths(),
+				VendoredPaths:  DefaultVendoredPaths(),
 			},
 			Agents: AgentsPolicy{
 				Adapters: []Adapter{
@@ -139,17 +145,12 @@ func Load(rootPath string) (configured Policy, returnedError error) {
 	if err != nil {
 		return Policy{}, fmt.Errorf("reading %s: %w", FileName, err)
 	}
-	configured, upgraded, err := decode(content)
-	if err != nil {
-		return Policy{}, err
+	configured, decodeErr := decode(content)
+	if decodeErr != nil {
+		return Policy{}, decodeErr
 	}
 	if err := configured.Validate(); err != nil {
 		return Policy{}, fmt.Errorf("in %s: %w", FileName, err)
-	}
-	if upgraded {
-		if err := writeTo(root, configured); err != nil {
-			return Policy{}, err
-		}
 	}
 	return configured, nil
 }
@@ -159,30 +160,29 @@ type policyShape struct {
 	Version    *int   `yaml:"version"`
 }
 
-func decode(content []byte) (Policy, bool, error) {
+func decode(content []byte) (Policy, error) {
 	var shape policyShape
 	if err := yaml.Unmarshal(content, &shape); err != nil {
-		return Policy{}, false, fmt.Errorf("parsing %s: %w", FileName, err)
+		return Policy{}, fmt.Errorf("parsing %s: %w", FileName, err)
 	}
 	switch {
 	case shape.APIVersion == APIVersion:
 		var configured Policy
 		if err := decodeOneDocument(content, &configured); err != nil {
-			return Policy{}, false, err
+			return Policy{}, err
 		}
-		return configured, false, nil
+		return configured, nil
 	case shape.APIVersion != "":
-		return Policy{}, false, fmt.Errorf(
+		return Policy{}, fmt.Errorf(
 			"incompatible %s: apiVersion %q is not supported; this binary reads %s (ADR 0121)",
 			FileName, shape.APIVersion, APIVersion)
 	case shape.Version != nil && *shape.Version == LegacyVersion:
-		var legacy legacyPolicy
-		if err := decodeOneDocument(content, &legacy); err != nil {
-			return Policy{}, false, err
-		}
-		return upgradeLegacy(legacy), true, nil
+		return Policy{}, fmt.Errorf(
+			"incompatible %s: this policy is in the pre-v1alpha `version: %d` shape, which koment no longer reads (ADR 0130). "+
+				"Read this repository once with koment 2.x, which rewrites it in the %s shape, then retry",
+			FileName, LegacyVersion, APIVersion)
 	default:
-		return Policy{}, false, fmt.Errorf(
+		return Policy{}, fmt.Errorf(
 			"incompatible %s: no apiVersion; a koment policy starts with `apiVersion: %s` (ADR 0121)",
 			FileName, APIVersion)
 	}
@@ -314,6 +314,29 @@ func (p Policy) Allows(intrinsic Intrinsic) bool {
 		}
 	}
 	return false
+}
+
+// DefaultGeneratedPaths lists the machine-written files no author is
+// accountable for, across the languages koment reads (ADR 0132).
+func DefaultGeneratedPaths() []string {
+	return []string{
+		"**/*.gen.go", "**/*.generated.go", "**/*.pb.go",
+		"**/*_pb2.py", "**/*_pb2.pyi",
+		"**/*.min.js", "**/*.min.css", "**/*.bundle.js",
+	}
+}
+
+// DefaultVendoredPaths lists the dependency and build directories that hold
+// somebody else's code. Scanning them reports tens of thousands of comments
+// nobody in this repository can act on (ADR 0132).
+func DefaultVendoredPaths() []string {
+	return []string{
+		"**/vendor/**", "**/node_modules/**", "**/third_party/**",
+		"**/.venv/**", "**/venv/**", "**/__pycache__/**", "**/.tox/**",
+		"**/target/**", "**/build/**", "**/dist/**", "**/out/**",
+		"**/.gradle/**", "**/.next/**", "**/.cache/**",
+		".koment/**", "**/.koment/**",
+	}
 }
 
 // Excludes reports whether a generated or vendored path is outside enforcement.

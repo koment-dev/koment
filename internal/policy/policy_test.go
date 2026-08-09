@@ -102,7 +102,7 @@ func TestPolicyAllowedAnnotationsMatchAndPersist(t *testing.T) {
 	}
 }
 
-func TestLoadUpgradesAFlatPolicyAndRewritesItInPlace(t *testing.T) {
+func TestLoadRefusesAFlatPolicyAndLeavesItUntouched(t *testing.T) {
 	root := t.TempDir()
 	if err := os.MkdirAll(filepath.Join(root, ".koment"), 0o755); err != nil {
 		t.Fatal(err)
@@ -125,23 +125,22 @@ agents:
 		t.Fatal(err)
 	}
 
-	loaded, err := Load(root)
-	if err != nil {
-		t.Fatalf("Load: %v", err)
+	_, err := Load(root)
+	if err == nil {
+		t.Fatal("a v1 policy was read by a binary that no longer migrates it")
 	}
-	if loaded.APIVersion != APIVersion || loaded.Kind != KindPolicy {
-		t.Fatalf("policy was not upgraded: %#v", loaded)
-	}
-	if !loaded.Excludes("nested/model.gen.go") || !loaded.Excludes("vendor/x/y.go") {
-		t.Error("upgraded globs stopped matching")
+	for _, want := range []string{"version: 1", "koment 2.x", APIVersion, "ADR 0130"} {
+		if !strings.Contains(err.Error(), want) {
+			t.Errorf("the refusal does not mention %q: %v", want, err)
+		}
 	}
 
-	rewritten, err := os.ReadFile(path)
+	after, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if strings.Contains(string(rewritten), "generated_paths") || !strings.Contains(string(rewritten), "generatedPaths") {
-		t.Errorf("the policy on disk was not rewritten:\n%s", rewritten)
+	if string(after) != legacy {
+		t.Errorf("reading a repository rewrote a policy it refused:\n%s", after)
 	}
 }
 
