@@ -1,0 +1,35 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/koment-dev/koment/main/schema/v1alpha/annotation.schema.json
+apiVersion: koment.dev/v1alpha
+kind: Annotation
+metadata:
+  id: 01KZKNVYCX9WY3G3QRNWRPTW10
+  created: "2026-08-09T16:32:03Z"
+spec:
+  target:
+    file: session/store.go
+  type: why
+  title: Ambiguous on purpose — two identical lock lines
+  body: |-
+    A demo fixture. This excerpt appears twice in store.go and carries no
+    surrounding context, so koment cannot say which one it means and reports
+    ambiguous rather than guessing. Extending the excerpt with an adjacent
+    line is what resolves it (ADR 0134).
+  anchor:
+    scope: excerpt
+    excerpt: "\ts.mu.RLock()"
+    before: "\ts.sessions[id] = token\n}\n"
+    after: "\ts.mu.RLock()\n\tdefer s.mu.RUnlock()\n\treturn len(s.sessions)"
+  author:
+    name: janpuc
+    email: janpuc@proton.me
+    kind: agent
+    source: git-config
+  git:
+    commit: f3b11be6187f9922ce35a22562fe2ef4d0592361
+    path: session/store.go
+    line: 25
+status:
+  lastSeenLine: 25
+  resolution: ok
+  resolvedAt: "2026-08-09T16:32:03Z"
+  resolvedCommit: f3b11be6187f9922ce35a22562fe2ef4d0592361
