@@ -140,7 +140,7 @@ func (s *Service) anchor(record *store.Annotation, file, excerpt string) error {
 		lines := anchor.ExcerptLines(content, excerpt)
 		switch len(lines) {
 		case 0:
-			return fmt.Errorf("excerpt not found in %s; it must match the file verbatim", file)
+			return fmt.Errorf("excerpt not found in %s; it must match the file verbatim%s", file, nearMissHint(content, excerpt))
 		default:
 			return fmt.Errorf("excerpt matches %d places in %s (lines %v); extend it until it is unique", len(lines), file, lines)
 		}
@@ -176,4 +176,64 @@ func (s *Service) captureGit(record *store.Annotation) []string {
 
 func recordPath(id string) string {
 	return path.Join(store.DirName, "annotations", id+".yaml")
+}
+
+func nearMissHint(content []byte, excerpt string) string {
+	wanted := collapseWhitespace(excerpt)
+	if wanted == "" || !strings.Contains(collapseWhitespace(string(content)), wanted) {
+		return ""
+	}
+	if strings.Contains(string(content), "\r\n") {
+		return ". The text is there once whitespace is ignored, and the file has CRLF line endings"
+	}
+	return ". The text is there once whitespace is ignored, so check indentation and trailing spaces"
+}
+
+func collapseWhitespace(text string) string {
+	return strings.Join(strings.Fields(text), " ")
+}
+
+// EditInput changes only the prose a person can improve later. Identity,
+// authorship, creation time and anchor are not editable here.
+type EditInput struct {
+	ID    string
+	Title *string
+	Body  *string
+}
+
+// Edit rewrites an annotation's headline or rationale in place.
+func (s *Service) Edit(input EditInput) (Mutation, error) {
+	record, err := s.store.FindByID(input.ID)
+	if err != nil {
+		return Mutation{}, err
+	}
+	if input.Title == nil && input.Body == nil {
+		return Mutation{}, fmt.Errorf("edit needs --title, --body, or both")
+	}
+	edited := *record
+	if input.Title != nil {
+		edited.Spec.Title = strings.TrimSpace(*input.Title)
+	}
+	if input.Body != nil {
+		edited.Spec.Body = store.WrapProse(*input.Body)
+	}
+	if err := edited.Validate(); err != nil {
+		return Mutation{}, err
+	}
+	if err := s.store.Save(&edited); err != nil {
+		return Mutation{}, err
+	}
+	return Mutation{Record: edited, Path: recordPath(edited.Metadata.ID)}, nil
+}
+
+// Forget deletes one annotation record. Git holds who removed it and why.
+func (s *Service) Forget(id string) (store.Annotation, error) {
+	record, err := s.store.FindByID(id)
+	if err != nil {
+		return store.Annotation{}, err
+	}
+	if err := s.store.Remove(id); err != nil {
+		return store.Annotation{}, err
+	}
+	return *record, nil
 }
