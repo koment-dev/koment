@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.0.0](https://github.com/koment-dev/koment/compare/v2.2.0...v3.0.0) (2026-08-10)
+
+
+### ⚠ BREAKING CHANGES
+
+* koment 3.0.0 — cut off v1 records and check comments in every language ([#94](https://github.com/koment-dev/koment/issues/94))
+
+### Features
+
+* koment 3.0.0 — cut off v1 records and check comments in every language ([#94](https://github.com/koment-dev/koment/issues/94)) ([e3fb37e](https://github.com/koment-dev/koment/commit/e3fb37e694f660b37fb122b8f4131f27638cee7e))
+
 ## [2.2.0](https://github.com/koment-dev/koment/compare/v2.1.0...v2.2.0) (2026-08-07)
 
 
