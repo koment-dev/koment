@@ -106,7 +106,7 @@ func TestReanchorMovesAnOrphanToItsNewFile(t *testing.T) {
 	if green.code != ExitOK {
 		t.Fatalf("check still failing after the move: %s", green.output())
 	}
-	if !strings.Contains(green.stdout, "across 1 files") {
+	if !strings.Contains(green.stdout, "across 1 file") {
 		t.Errorf("the old record should be gone:\n%s", green.stdout)
 	}
 	record, err := os.ReadFile(filepath.Join(root, ".koment", "annotations", id+".yaml"))

@@ -133,10 +133,10 @@ func Find(file string, content []byte, excerpt string) (SourceComment, error) {
 // Convert removes one comment and selects nearby code as its annotation anchor.
 func Convert(content []byte, comment SourceComment) (Conversion, error) {
 	converted, removedAt := remove(content, comment)
-	if _, err := parser.ParseFile(token.NewFileSet(), comment.File, converted, parser.SkipObjectResolution); err != nil {
-		return Conversion{}, fmt.Errorf("removing the comment would leave invalid Go source: %w", err)
+	if err := stillParses(comment.File, converted); err != nil {
+		return Conversion{}, err
 	}
-	excerpt, err := codeAnchor(converted, content, removedAt)
+	excerpt, err := codeAnchor(comment.File, converted, content, removedAt)
 	if err != nil {
 		return Conversion{}, err
 	}
@@ -172,7 +172,7 @@ type Detector interface {
 	Scan(file string, content []byte, configured policy.Policy) ([]SourceComment, []bool, error)
 }
 
-var detectors = []Detector{goDetector{}}
+var detectors = []Detector{goDetector{}, markerDetector{}}
 
 func detectorFor(file string) Detector {
 	for _, candidate := range detectors {
@@ -436,7 +436,35 @@ func remove(content []byte, comment SourceComment) ([]byte, int) {
 	return converted, start
 }
 
-func codeAnchor(content, original []byte, near int) (string, error) {
+func stillParses(file string, converted []byte) error {
+	if !strings.HasSuffix(file, ".go") {
+		return nil
+	}
+	if _, err := parser.ParseFile(token.NewFileSet(), file, converted, parser.SkipObjectResolution); err != nil {
+		return fmt.Errorf("removing the comment would leave invalid Go source: %w", err)
+	}
+	return nil
+}
+
+func startsComment(file, excerpt string) bool {
+	syntax, commentable := syntaxFor(file)
+	if !commentable {
+		return false
+	}
+	for _, marker := range append(append([]string{}, syntax.line...), "//", "/*") {
+		if strings.HasPrefix(excerpt, marker) {
+			return true
+		}
+	}
+	for _, block := range syntax.block {
+		if strings.HasPrefix(excerpt, block.open) {
+			return true
+		}
+	}
+	return false
+}
+
+func codeAnchor(file string, content, original []byte, near int) (string, error) {
 	starts := lineStarts(content)
 	line := lineOf(starts, min(near, max(0, len(content)-1)))
 	for distance := 0; distance < len(starts); distance++ {
@@ -450,7 +478,7 @@ func codeAnchor(content, original []byte, near int) (string, error) {
 			}
 			for radius := 0; radius <= 5 && candidate+radius < len(starts); radius++ {
 				excerpt := strings.TrimSpace(string(content[starts[candidate]:lineEnd(content, starts, candidate+radius)]))
-				if excerpt == "" || strings.HasPrefix(excerpt, "//") || strings.HasPrefix(excerpt, "/*") {
+				if excerpt == "" || startsComment(file, excerpt) {
 					continue
 				}
 				if _, _, err := anchor.Capture(content, excerpt); err == nil {

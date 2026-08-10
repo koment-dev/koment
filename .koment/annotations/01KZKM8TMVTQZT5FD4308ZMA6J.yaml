@@ -1,0 +1,37 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/koment-dev/koment/main/schema/v1alpha/annotation.schema.json
+apiVersion: koment.dev/v1alpha
+kind: Annotation
+metadata:
+  id: 01KZKM8TMVTQZT5FD4308ZMA6J
+  created: "2026-08-09T16:04:08Z"
+spec:
+  target:
+    file: editors/vscode/panel.test.js
+  type: why
+  body: |-
+    The title is what the editor shows beside the code; the panel is where the
+    body it stands for is actually read, so both have to be present.
+  anchor:
+    scope: excerpt
+    excerpt: test('an entry carries its title above its body', () => {
+    before: |2
+
+      const render = (items) => panelHTML({ items, file: 'internal/store/ulid.go', nonce: 'n1', styleNonce: 's1' });
+    after: |2-
+        const html = render([
+          { kind: 'why', status: 'ok', line: 4, title: 'Retry once before giving up', body: 'The upstream closes idle connections.' }
+        ]);
+  author:
+    name: janpuc
+    email: janpuc@proton.me
+    kind: agent
+    source: git-config
+  git:
+    commit: f3b11be6187f9922ce35a22562fe2ef4d0592361
+    path: editors/vscode/panel.test.js
+    line: 11
+status:
+  lastSeenLine: 9
+  resolution: ok
+  resolvedAt: "2026-08-09T16:04:08Z"
+  resolvedCommit: f3b11be6187f9922ce35a22562fe2ef4d0592361

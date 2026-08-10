@@ -134,7 +134,7 @@ func documentDiagnostics(file workspaceFile) ([]diagnostic, error) {
 			})
 		}
 	}
-	if filepath.Ext(file.relative) != ".go" {
+	if !commentpolicy.Detects(file.relative) {
 		return diagnostics, nil
 	}
 	configured, err := policy.Load(file.root)

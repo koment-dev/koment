@@ -1,10 +1,4 @@
 #!/usr/bin/env bash
-# Usage: package-vsix.sh <version> <archive-directory> <output-directory>
-#
-# Builds one VSIX per platform carrying the released koment binary for that
-# platform, plus a universal VSIX that carries none. Archives are the canonical
-# release artifacts and are verified against the release checksum manifest
-# before anything is packaged (ADR 0109, ADR 0113).
 set -euo pipefail
 
 version=${1:?version}
@@ -34,8 +28,6 @@ verify() {
   )
 }
 
-# vsce target -> koment archive platform. Every koment archive has exactly one
-# VS Code target, so a platform that stops being built stops being packaged.
 targets="linux-x64:linux_amd64 linux-arm64:linux_arm64 darwin-x64:darwin_amd64 darwin-arm64:darwin_arm64 win32-x64:windows_amd64 win32-arm64:windows_arm64"
 
 for pair in $targets; do

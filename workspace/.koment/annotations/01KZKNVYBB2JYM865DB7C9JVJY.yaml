@@ -1,0 +1,35 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/koment-dev/koment/main/schema/v1alpha/annotation.schema.json
+apiVersion: koment.dev/v1alpha
+kind: Annotation
+metadata:
+  id: 01KZKNVYBB2JYM865DB7C9JVJY
+  created: "2026-08-09T16:32:03Z"
+spec:
+  target:
+    file: session/token.go
+  type: anti-pattern
+  title: Do not expose remaining as API
+  body: |-
+    remaining is unexported on purpose. Callers that branch on a raw duration
+    reimplement the renewal policy at each call site, and they drift apart the
+    moment the window changes. Ask Renewable instead: the policy lives in one
+    place and the constant beside it.
+  anchor:
+    scope: excerpt
+    excerpt: func (t Token) remaining(now time.Time) time.Duration {
+    before: "\treturn t.Expiry.Before(now.Add(-clockSkew))\n}\n"
+    after: "\treturn t.Expiry.Sub(now)\n}\n"
+  author:
+    name: janpuc
+    email: janpuc@proton.me
+    kind: agent
+    source: git-config
+  git:
+    commit: f3b11be6187f9922ce35a22562fe2ef4d0592361
+    path: session/token.go
+    line: 18
+status:
+  lastSeenLine: 18
+  resolution: ok
+  resolvedAt: "2026-08-09T16:32:03Z"
+  resolvedCommit: f3b11be6187f9922ce35a22562fe2ef4d0592361

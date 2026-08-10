@@ -1,0 +1,33 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/koment-dev/koment/main/schema/v1alpha/annotation.schema.json
+apiVersion: koment.dev/v1alpha
+kind: Annotation
+metadata:
+  id: 01KZKNWTJB9TMPZ1WFHSHQRJ66
+  created: "2026-08-09T16:32:32Z"
+spec:
+  target:
+    file: session/expiry.go
+  type: invariant
+  title: Orphaned on purpose — the file was deleted
+  body: placeholder
+  anchor:
+    scope: excerpt
+    excerpt: const renewalWindow = time.Hour
+    before: |2
+
+      const clockSkew = 30 * time.Second
+    after: "\ntype Token struct {\n\tSubject string"
+  author:
+    name: janpuc
+    email: janpuc@proton.me
+    kind: agent
+    source: git-config
+  git:
+    commit: f3b11be6187f9922ce35a22562fe2ef4d0592361
+    path: session/token.go
+    line: 7
+status:
+  lastSeenLine: 7
+  resolution: ok
+  resolvedAt: "2026-08-09T16:32:32Z"
+  resolvedCommit: f3b11be6187f9922ce35a22562fe2ef4d0592361

@@ -29,8 +29,8 @@ func runAgents(args []string, env Environment) int {
 
 func runAgentsInstall(args []string, env Environment) int {
 	flags := flagSet("agents install", env)
-	if err := flags.Parse(args); err != nil {
-		return ExitUsage
+	if code, ok := parse(flags, args); !ok {
+		return code
 	}
 	if flags.NArg() != 0 {
 		return misuse(env, "agents install takes no arguments")
@@ -61,8 +61,8 @@ func runAgentsInstall(args []string, env Environment) int {
 
 func runAgentsCheck(args []string, env Environment) int {
 	flags := flagSet("agents check", env)
-	if err := flags.Parse(args); err != nil {
-		return ExitUsage
+	if code, ok := parse(flags, args); !ok {
+		return code
 	}
 	if flags.NArg() != 0 {
 		return misuse(env, "agents check takes no arguments")

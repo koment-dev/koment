@@ -20,8 +20,8 @@ jobs:
   koment:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-      - uses: koment-dev/koment@v0.2.0
+      - uses: actions/checkout@v7
+      - uses: koment-dev/koment@v3
       - run: koment check
       - run: koment comments check
       - run: koment agents check

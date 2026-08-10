@@ -14,15 +14,15 @@ import (
 
 const (
 	addDescription         = "Create one attributed koment annotation. Use this for local rationale instead of adding an explanatory inline comment. The author is the connected MCP client and is recorded as an agent."
-	reanchorDescription    = "Explicitly confirm a new file or excerpt for an existing annotation while preserving its stable id, author and creation date."
-	convertDescription     = "Convert one complete Go comment group into an attributed koment annotation. The annotation is written before the comment is removed from source."
-	acknowledgeDescription = "Retain one exceptional Go comment by creating an exact, attributable policy acknowledgement. acknowledge_inline_comment must be true; ordinary explanatory comments should use koment_convert_comment."
+	reanchorDescription    = "Explicitly confirm a new file or excerpt for an existing annotation while preserving its stable id, author and creation date. To fix an anchor that matches several places, extend the excerpt; anchor context is capped at three lines and cannot disambiguate."
+	convertDescription     = "Convert one complete comment group into an attributed koment annotation, in any language koment detects. The annotation is written before the comment is removed from source."
+	acknowledgeDescription = "Retain one exceptional comment by creating an exact, attributable policy acknowledgement. acknowledge_inline_comment must be true; ordinary explanatory comments should use koment_convert_comment."
 )
 
 type AddInput struct {
 	Repository string `json:"repository,omitempty" jsonschema:"repository id; required when several repositories are served"`
 	File       string `json:"file" jsonschema:"source path relative to the repository root"`
-	Excerpt    string `json:"excerpt,omitempty" jsonschema:"verbatim code excerpt; omit for a file-scoped annotation"`
+	Excerpt    string `json:"excerpt,omitempty" jsonschema:"verbatim code excerpt, matched byte for byte including indentation; no line limit, so extend it with adjacent lines when it matches more than one place. Omit for a file-scoped annotation"`
 	Kind       string `json:"kind" jsonschema:"one of why, gotcha, invariant, anti-pattern"`
 	Title      string `json:"title,omitempty" jsonschema:"optional headline shown beside the code; one line, at most 72 characters. When empty, the first sentence of the body is shown (ADR 0115)"`
 	Body       string `json:"body" jsonschema:"the rationale to record"`
@@ -32,7 +32,7 @@ type ReanchorInput struct {
 	Repository string `json:"repository,omitempty" jsonschema:"repository id; required when several repositories are served"`
 	ID         string `json:"id" jsonschema:"stable annotation id"`
 	File       string `json:"file,omitempty" jsonschema:"new repository-relative source path"`
-	Excerpt    string `json:"excerpt,omitempty" jsonschema:"new verbatim code excerpt"`
+	Excerpt    string `json:"excerpt,omitempty" jsonschema:"new verbatim code excerpt, matched byte for byte; extend it with adjacent lines when it matches more than one place"`
 }
 
 type ConvertCommentInput struct {

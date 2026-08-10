@@ -1,6 +1,6 @@
 [tools]
 actionlint = "1.7.12"
-"github:koment-dev/koment" = "1.0.0"
+"github:koment-dev/koment" = "2.2.0"
 go = "1.26.5"
 "go:golang.org/x/vuln/cmd/govulncheck" = "1.6.0"
 golangci-lint = "2.12.2"
@@ -24,6 +24,15 @@ run = "govulncheck ./..."
 [tasks.test]
 description = "Run tests with the race detector and coverage"
 run = "go test -race -covermode=atomic -coverprofile=coverage.out ./..."
+
+[tasks.fuzz]
+description = "Fuzz the parsers that read bytes koment did not write"
+run = """
+seconds="${KOMENT_FUZZTIME:-30s}"
+go test ./internal/commentpolicy -run FuzzScanSpansStaysInsideTheContent -fuzz FuzzScanSpansStaysInsideTheContent -fuzztime "$seconds"
+go test ./internal/commentpolicy -run FuzzScanNeverPanicsOnAnyFile -fuzz FuzzScanNeverPanicsOnAnyFile -fuzztime "$seconds"
+go test ./internal/store -run FuzzDecodeAnnotationRejectsRatherThanPanics -fuzz FuzzDecodeAnnotationRejectsRatherThanPanics -fuzztime "$seconds"
+"""
 
 [tasks.fmt]
 description = "Format Go source"

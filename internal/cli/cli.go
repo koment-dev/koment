@@ -2,6 +2,7 @@
 package cli
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -18,30 +19,6 @@ const (
 	ExitFailure = 1
 	ExitUsage   = 2
 )
-
-const usage = `koment — out-of-band code annotations
-
-  koment bootstrap [--agents <list>] [--all] [--policy-only] [--non-interactive]
-  koment add <file> [--excerpt <text>] --kind <kind> --body <text|->
-  koment show <file>
-  koment check [path...]
-  koment list [--kind <kind>]
-  koment search <query>
-  koment reanchor <id> [--excerpt <text>] [--file <path>]
-  koment comments check [path...]
-  koment comments convert <file> --excerpt <comment> [--kind <kind>]
-  koment comments acknowledge <file> --excerpt <comment> --body <text|-> --acknowledge-inline-comment
-  koment agents install|check
-  koment ui [--listen <addr>] [--write]
-  koment serve --config <repositories.yaml>
-  koment site --out <dir>            render one repository to static HTML
-  koment mcp [--write | --http <addr> | --streamable-http <addr>]
-  koment lsp                          editor protocol over stdio
-  koment version
-
-check exits non-zero when an annotation is ambiguous, drifted or orphaned.
-reanchor is how you fix one while keeping its id.
-`
 
 type Environment struct {
 	Stdin  io.Reader
@@ -66,7 +43,7 @@ type Servers struct {
 // Run dispatches a subcommand.
 func Run(args []string, env Environment, servers Servers) int {
 	if len(args) == 0 {
-		fmt.Fprint(env.Stderr, usage)
+		writeUsage(env.Stderr)
 		return ExitUsage
 	}
 
@@ -78,6 +55,8 @@ func Run(args []string, env Environment, servers Servers) int {
 		"show":      runShow,
 		"check":     runCheck,
 		"comments":  runComments,
+		"edit":      runEdit,
+		"forget":    runForget,
 		"list":      runList,
 		"search":    runSearch,
 		"reanchor":  runReanchor,
@@ -113,11 +92,12 @@ func Run(args []string, env Environment, servers Servers) int {
 		}
 		return ExitOK
 	case command == "help", command == "-h", command == "--help":
-		fmt.Fprint(env.Stdout, usage)
+		writeUsage(env.Stdout)
 		return ExitOK
 	}
 
-	fmt.Fprintf(env.Stderr, "koment: unknown command %q\n\n%s", command, usage)
+	fmt.Fprintf(env.Stderr, "koment: unknown command %q\n\n", command)
+	writeUsage(env.Stderr)
 	return ExitUsage
 }
 
@@ -134,13 +114,26 @@ func misuse(env Environment, format string, args ...any) int {
 func flagSet(name string, env Environment) *flag.FlagSet {
 	flags := flag.NewFlagSet(name, flag.ContinueOnError)
 	flags.SetOutput(env.Stderr)
+	flags.Usage = func() { writeCommandUsage(env.Stderr, name, flags) }
 	return flags
 }
 
-func onePositional(command, what string, flags *flag.FlagSet, args []string, env Environment) (string, bool) {
+func parse(flags *flag.FlagSet, args []string) (int, bool) {
+	err := flags.Parse(args)
+	switch {
+	case err == nil:
+		return ExitOK, true
+	case errors.Is(err, flag.ErrHelp):
+		return ExitOK, false
+	default:
+		return ExitUsage, false
+	}
+}
+
+func onePositional(command, what string, flags *flag.FlagSet, args []string, env Environment) (string, int, bool) {
 	value, rest := leadingNonFlag(args)
-	if err := flags.Parse(rest); err != nil {
-		return "", false
+	if code, ok := parse(flags, rest); !ok {
+		return "", code, false
 	}
 
 	switch {
@@ -148,14 +141,14 @@ func onePositional(command, what string, flags *flag.FlagSet, args []string, env
 		value = flags.Arg(0)
 	case flags.NArg() > 0:
 		misuse(env, "%s takes one %s, also got %s", command, what, strings.Join(flags.Args(), " "))
-		return "", false
+		return "", ExitUsage, false
 	}
 
 	if value == "" {
 		misuse(env, "%s needs %s", command, what)
-		return "", false
+		return "", ExitUsage, false
 	}
-	return value, true
+	return value, ExitOK, true
 }
 
 func leadingNonFlag(args []string) (string, []string) {

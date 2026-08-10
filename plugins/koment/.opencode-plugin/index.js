@@ -94,7 +94,6 @@ function startMCP(directory) {
       try {
         child.stdin.end();
       } catch {
-        // swallow: child.stdin may already be closed by an earlier exit
       }
     },
   };

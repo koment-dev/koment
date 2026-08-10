@@ -94,7 +94,9 @@ func validateContext(name, context string) error {
 		return nil
 	}
 	if strings.Count(strings.TrimSuffix(context, "\n"), "\n") >= 3 {
-		return fmt.Errorf("anchor.%s contains more than three lines", name)
+		return fmt.Errorf(
+			"anchor.%s contains more than three lines; context is a hint, not the anchor — "+
+				"to disambiguate a repeated excerpt, extend anchor.excerpt itself, which has no line limit", name)
 	}
 	return nil
 }

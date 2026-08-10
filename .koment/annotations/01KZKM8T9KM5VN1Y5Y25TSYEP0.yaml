@@ -1,0 +1,38 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/koment-dev/koment/main/schema/v1alpha/annotation.schema.json
+apiVersion: koment.dev/v1alpha
+kind: Annotation
+metadata:
+  id: 01KZKM8T9KM5VN1Y5Y25TSYEP0
+  created: "2026-08-09T16:04:08Z"
+spec:
+  target:
+    file: editors/vscode/binary.test.js
+  type: gotcha
+  body: |-
+    A VSIX is a zip, and the extension host is not required to restore the
+    executable bit when it expands one. A bundled server that cannot be executed
+    looks exactly like a missing server, so the bit is asserted before spawning.
+  anchor:
+    scope: excerpt
+    excerpt: test('a bundled binary without the executable bit is repaired', () => {
+    before: |2
+        assert.strictEqual(bundledBinary('/ext', 'darwin'), path.join('/ext', 'bin', 'koment'));
+      });
+    after: |2-
+        const chmodded = [];
+        const repaired = ensureExecutable('/ext/bin/koment', {
+          platform: 'linux',
+  author:
+    name: janpuc
+    email: janpuc@proton.me
+    kind: agent
+    source: git-config
+  git:
+    commit: f3b11be6187f9922ce35a22562fe2ef4d0592361
+    path: editors/vscode/binary.test.js
+    line: 46
+status:
+  lastSeenLine: 43
+  resolution: ok
+  resolvedAt: "2026-08-09T16:04:08Z"
+  resolvedCommit: f3b11be6187f9922ce35a22562fe2ef4d0592361

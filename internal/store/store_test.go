@@ -207,12 +207,16 @@ func TestLoadRejectsUnknownFields(t *testing.T) {
 	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 		t.Fatal(err)
 	}
-	record := "version: 1\nid: " + firstID + "\nfile: a.go\nkind: why\nbody: b\ncreated: 2026-07-31\nanchor:\n  scope: file\nauthor:\n  name: Test\n  kind: human\n  source: explicit\nconfidence: high\n"
-	if err := os.WriteFile(path, []byte(record), 0o644); err != nil {
+	record := fileAnnotation(firstID, "a.go")
+	encoded, err := EncodeAnnotation(&record)
+	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := annotations.Load(firstID); err == nil {
-		t.Fatal("want an error for an unknown field")
+	if err := os.WriteFile(path, append(encoded, "confidence: high\n"...), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := annotations.Load(firstID); err == nil || !strings.Contains(err.Error(), "confidence") {
+		t.Fatalf("want an error naming the unknown field, got %v", err)
 	}
 }
 
@@ -245,8 +249,11 @@ func TestLoadRejectsRecordStoredUnderTheWrongID(t *testing.T) {
 	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 		t.Fatal(err)
 	}
-	content := "version: 1\nid: " + record.Metadata.ID + "\nfile: a.go\nkind: why\nbody: body\ncreated: 2026-07-31\nanchor:\n  scope: file\nauthor:\n  name: Test\n  kind: human\n  source: explicit\n"
-	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
+	content, err := EncodeAnnotation(&record)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(path, content, 0o644); err != nil {
 		t.Fatal(err)
 	}
 	_, err = annotations.Load(firstID)
@@ -256,9 +263,12 @@ func TestLoadRejectsRecordStoredUnderTheWrongID(t *testing.T) {
 }
 
 func TestDecodeAnnotationChecksRemoteRecordIdentity(t *testing.T) {
-	content := "version: 1\nid: " + secondID + "\nfile: a.go\nkind: why\nbody: body\ncreated: 2026-07-31\nanchor:\n  scope: file\nauthor:\n  name: Test\n  kind: human\n  source: explicit\n"
-	_, err := DecodeAnnotation(firstID, []byte(content))
-	if err == nil || !strings.Contains(err.Error(), "filename claims") {
+	record := fileAnnotation(secondID, "a.go")
+	content, err := EncodeAnnotation(&record)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := DecodeAnnotation(firstID, content); err == nil || !strings.Contains(err.Error(), "filename claims") {
 		t.Fatalf("err = %v", err)
 	}
 }

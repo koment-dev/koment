@@ -6,7 +6,7 @@ client. Pick yours:
 | Client | Config file | Page |
 |---|---|---|
 | Claude Code | `.mcp.json` | [claude-code.md](claude-code.md) |
-| Hermes Agent | `config.yaml` | [hermes.md](hermes.md) |
+| Hermes Agent | `config.yaml` + plugin | [hermes.md](hermes.md) |
 | OpenClaw | OpenClaw config (JSON5) | [openclaw.md](openclaw.md) |
 | opencode | `opencode.json` | [opencode.md](opencode.md) |
 | Codex CLI | `~/.codex/config.toml` | [codex.md](codex.md) |

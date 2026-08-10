@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/koment-dev/koment/main/schema/v1alpha/annotation.schema.json
+apiVersion: koment.dev/v1alpha
+kind: Annotation
+metadata:
+  id: 01KZJNM0HMQT1F28ZEFQ71Y4B9
+  created: "2026-08-09T07:08:29Z"
+spec:
+  target:
+    file: internal/commentpolicy/marker.go
+  type: gotcha
+  body: |-
+    koment writes its own managed regions into adapter config files. Reporting
+    them would make `koment agents install` produce a repository that fails
+    `koment comments check`.
+  anchor:
+    scope: excerpt
+    excerpt: func isManagedRegionMarker(body string) bool {
+    before: "\t}\n}\n"
+    after: "\treturn strings.HasPrefix(strings.TrimSpace(body), \"koment:managed-\")\n}\n"
+  author:
+    name: claude-code
+    kind: agent
+    source: session
+status:
+  lastSeenLine: 212
+  resolution: ok
+  resolvedAt: "2026-08-09T07:08:29Z"
+  resolvedCommit: f3b11be6187f9922ce35a22562fe2ef4d0592361

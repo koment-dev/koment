@@ -200,6 +200,85 @@ jobs:
             dist/koment_*_checksums.sigstore.json dist/koment.rb dist/koment-scoop.json \
             --clobber
 
+  tap:
+    name: publish the homebrew formula
+    needs: [please, binaries]
+    if: needs.please.outputs.released == 'true'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ github.repository_owner }}/homebrew-tap
+          ssh-key: ${{ secrets.HOMEBREW_TAP_DEPLOY_KEY }}
+          persist-credentials: true
+
+      - name: take the formula this release published
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ needs.please.outputs.tag }}
+          SOURCE_REPOSITORY: ${{ github.repository }}
+        run: |
+          mkdir -p Formula
+          gh release download "$RELEASE_TAG" --repo "$SOURCE_REPOSITORY" \
+            --pattern koment.rb --output Formula/koment.rb --clobber
+
+      - name: reject a formula that does not carry this version
+        env:
+          VERSION: ${{ needs.please.outputs.version }}
+        run: |
+          grep -q "version \"${VERSION}\"" Formula/koment.rb || {
+            echo "the downloaded formula does not declare ${VERSION}"
+            head -5 Formula/koment.rb
+            exit 1
+          }
+
+      - name: commit the formula
+        env:
+          VERSION: ${{ needs.please.outputs.version }}
+        run: |
+          if git diff --quiet -- Formula/koment.rb; then
+            echo "the tap already carries ${VERSION}"
+            exit 0
+          fi
+          git config user.name "koment-release[bot]"
+          git config user.email "koment-release[bot]@users.noreply.github.com"
+          git add Formula/koment.rb
+          git commit -m "chore: koment ${VERSION}"
+          git push
+
+  alias:
+    name: move the major version tag
+    needs: [please, verify]
+    if: needs.please.outputs.released == 'true'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: point the major tag at this release
+        env:
+          RELEASE_TAG: ${{ needs.please.outputs.tag }}
+          VERSION: ${{ needs.please.outputs.version }}
+        run: |
+          case "$VERSION" in
+            *[!0-9.]*)
+              echo "$VERSION is not a plain X.Y.Z release; leaving the major alias where it is"
+              exit 0
+              ;;
+          esac
+          major="v${VERSION%%.*}"
+          echo "pointing ${major} at ${RELEASE_TAG}"
+          git config user.name "koment-release[bot]"
+          git config user.email "koment-release[bot]@users.noreply.github.com"
+          git tag -f "$major" "$RELEASE_TAG"
+          git push --force origin "refs/tags/${major}"
+
   verify:
     name: verify the published release
     needs: [please, binaries]
@@ -263,6 +342,7 @@ jobs:
           tags: |
             type=semver,pattern={{version}},value=${{ needs.please.outputs.tag }}
             type=semver,pattern={{major}}.{{minor}},value=${{ needs.please.outputs.tag }}
+            type=semver,pattern={{major}},value=${{ needs.please.outputs.tag }}
             type=raw,value=latest
 
       - id: build

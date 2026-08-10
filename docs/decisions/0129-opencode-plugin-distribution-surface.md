@@ -1,4 +1,4 @@
-# 0127 — OpenCode plugin as a first-class installable
+# 0129 — OpenCode plugin as a first-class installable
 
 Date: 2026-08-07
 Status: Accepted
@@ -117,8 +117,8 @@ plugin therefore does not shell out for the pre-tool gate.
   exits non-zero. The job does not silently swallow errors.
 - The MCP tool `koment_pre_tool` is part of the read-only surface. The
   pre-tool decision does not mutate state, so the tool belongs in the
-  base set rather than the write set. ADR 0127 records this; future
-  readers adding hooks or checks should keep the same split.
+  base set rather than the write set. This ADR records the split; future
+  readers adding hooks or checks should keep it.
 
 ## Alternatives rejected
 

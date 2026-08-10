@@ -48,7 +48,21 @@ the approved destination.
 - [0121 — Every committed koment file is a resource, and its schema is pinned to the API version](0121-every-committed-koment-file-is-a-resource-with-a-pinned-schema.md)
 - [0122 — Run Renovate on GitHub runners behind an app we own](0122-run-renovate-on-github-runners-behind-our-own-app.md)
 - [0123 — A published path never begins with a dot](0123-a-published-path-never-begins-with-a-dot.md)
+- [0124 — `koment bootstrap`, a stronger agent contract, and a user-configurable comment allow-list](0124-koment-bootstrap-and-allowed-comment-patterns.md)
+- [0125 — Decouple the `ci` aggregate from the `setup-action` smoke](0125-decouple-ci-aggregate-from-setup-action.md)
+- [0126 — Fix the VS Code extension marketplace name to `koment-dev`](0126-fix-vscode-marketplace-extension-name.md)
+- [0127 — Change the VS Code extension `displayName` to `koment-dev`](0127-fix-vscode-marketplace-display-name.md)
 - [0128 — Enforce Conventional Commits 1.0.0 subjects](0128-enforce-conventional-commit-names.md)
+- [0129 — OpenCode plugin as a first-class installable](0129-opencode-plugin-distribution-surface.md)
+- [0130 — Delete the v1 auto-migrate path and refuse `version: 1`](0130-delete-the-v1-auto-migrate-path.md)
+- [0131 — One registry drives the command help](0131-one-registry-drives-the-command-help.md)
+- [0132 — Comment detection covers every file, with an opinionated catch-all](0132-comment-detection-covers-every-file.md)
+- [0133 — An annotation can be edited and forgotten](0133-an-annotation-can-be-edited-and-forgotten.md)
+- [0134 — The demo workspace shows every state koment can produce](0134-the-demo-workspace-shows-every-state.md)
+- [0135 — Floating major aliases for consumers, SHA pins for ourselves](0135-floating-major-aliases-for-consumers.md)
+- [0136 — Documentation stays in the repository and is served from elsewhere](0136-docs-stay-in-the-repository-and-are-served-elsewhere.md)
+- [0137 — A feature is not done until its documentation is true](0137-a-feature-is-not-done-until-its-documentation-is-true.md)
+- [0138 — Documentation has four sections, and every page belongs to one](0138-documentation-has-four-sections.md)
 
 Use [0000-template.md](0000-template.md) for a new decision. A new dependency or
 a structural change still requires its own ADR when these decisions do not

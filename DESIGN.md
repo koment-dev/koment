@@ -155,11 +155,12 @@ file in front of it. `status.resolvedCommit` exists so that a reader can see how
 old the recorded observation is, and `status.resolvedAt` answers "since when has
 this been true" rather than "when did a command last run".
 
-A record written before ADR 0119 carried a flat `version: 1` shape. Any binary
-from 1.0.0 onward rewrites such a record in the current shape the first time it
-reads it. The rewrite is atomic and idempotent; a repository mounted read-only
-still reads correctly, because the upgrade happens in memory and only the
-rewrite is skipped.
+A record written before ADR 0119 carried a flat `version: 1` shape. Binaries
+from the 1.x and 2.x lines rewrote such a record in the current shape the first
+time they read it. From 3.0.0 that migration is gone (ADR 0130): koment
+recognises the old shape and refuses it, naming koment 2.x as the binary that
+will rewrite the repository. Reading is now purely a read — no load path writes
+to the repository under any circumstance.
 
 Types remain deliberately constrained:
 

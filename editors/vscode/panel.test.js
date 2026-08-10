@@ -6,8 +6,6 @@ const { escape, panelHTML, paragraphs } = require('./panel');
 
 const render = (items) => panelHTML({ items, file: 'internal/store/ulid.go', nonce: 'n1', styleNonce: 's1' });
 
-// The title is what the editor shows beside the code; the panel is where the
-// body it stands for is actually read, so both have to be present.
 test('an entry carries its title above its body', () => {
   const html = render([
     { kind: 'why', status: 'ok', line: 4, title: 'Retry once before giving up', body: 'The upstream closes idle connections.' }
@@ -23,8 +21,6 @@ test('a title cannot inject markup either', () => {
   assert.ok(html.includes('&lt;img src=x'));
 });
 
-// An annotation body is prose from the repository, and the panel puts it in a
-// document. Anything that reaches the markup unescaped executes there.
 test('a body cannot inject markup or script', () => {
   const html = render([
     { kind: 'why', status: 'ok', line: 3, body: '<script>alert(1)</script> & "quoted" <img src=x onerror=y>' }
@@ -41,7 +37,6 @@ test('a kind or status cannot inject either', () => {
   assert.ok(html.includes('&lt;b&gt;why&lt;/b&gt;'));
 });
 
-// The panel exists to remove truncation, so a long body has to arrive whole.
 test('the whole body is rendered, however long', () => {
   const body = 'word '.repeat(400).trim();
   const html = render([{ kind: 'invariant', status: 'ok', line: 9, body }]);
@@ -79,7 +74,6 @@ test('a failing status is toned apart from a healthy one', () => {
   assert.ok(html.includes('status failing'));
 });
 
-// A webview without a restrictive policy is a browser tab inside the editor.
 test('the document restricts itself to its own nonces', () => {
   const html = render([{ kind: 'why', status: 'ok', line: 1, body: 'a' }]);
   assert.ok(html.includes("default-src 'none'"));

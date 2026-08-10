@@ -1,0 +1,46 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/koment-dev/koment/main/schema/v1alpha/annotation.schema.json
+apiVersion: koment.dev/v1alpha
+kind: Annotation
+metadata:
+  id: 01KZJKQWD4BTEDYSPMX5AJ47AR
+  created: "2026-08-09T06:35:38Z"
+spec:
+  target:
+    file: internal/store/record.go
+  type: gotcha
+  title: Kept to refuse v1 by name, not to read it
+  body: |-
+    This constant outlived the code that used it, deliberately. koment stopped
+    migrating `version: 1` records in 3.0.0 (ADR 0130), and nothing reads the v1
+    shape any more — so this looks like dead weight and is not.
+
+    It exists so decodeShape can recognise a v1 record and refuse it with an
+    error that names the way forward, rather than letting it fall through to the
+    generic "no apiVersion" branch. That branch tells the reader their file is
+    not a koment record, when in fact koment wrote it. Delete this and a user
+    with an old repository gets a misleading error instead of an instruction.
+  anchor:
+    scope: excerpt
+    excerpt: const LegacyRecordVersion = 1
+    before: |-
+      // carried. koment no longer reads that shape; the constant survives so a
+      // record still carrying it is refused by name rather than mistaken for a
+      // malformed file (ADR 0130).
+    after: |2-
+
+      // TitleLimit keeps a title short enough to render beside code without being
+      // shortened, which is the only reason it exists (ADR 0115).
+  author:
+    name: janpuc
+    email: janpuc@proton.me
+    kind: agent
+    source: git-config
+  git:
+    commit: f3b11be6187f9922ce35a22562fe2ef4d0592361
+    path: internal/store/record.go
+    line: 22
+status:
+  lastSeenLine: 22
+  resolution: ok
+  resolvedAt: "2026-08-09T06:35:38Z"
+  resolvedCommit: f3b11be6187f9922ce35a22562fe2ef4d0592361

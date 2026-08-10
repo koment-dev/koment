@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
-	"log/slog"
 	"os"
 	"path"
 	"path/filepath"
@@ -190,31 +189,12 @@ func (s *Store) Load(id string) (_ *Annotation, returnedError error) {
 	if err != nil {
 		return nil, err
 	}
-	annotation, upgraded, err := decodeAnnotation(id, content)
-	if err != nil {
-		return nil, err
-	}
-	if upgraded {
-		persistUpgrade(root, name, annotation)
-	}
-	return annotation, nil
+	return decodeAnnotation(id, content)
 }
 
-func persistUpgrade(root *os.Root, name string, annotation *Annotation) {
-	encoded, err := EncodeAnnotation(annotation)
-	if err == nil {
-		err = writeAtomically(root, name, encoded)
-	}
-	if err != nil {
-		slog.Warn("koment left a record in the v1 shape", "record", name, "error", err)
-	}
-}
-
-// DecodeAnnotation validates one record read from a non-filesystem source. A
-// v1 record is upgraded in memory; only Store.Load writes the upgrade back.
+// DecodeAnnotation validates one record read from a non-filesystem source.
 func DecodeAnnotation(id string, content []byte) (*Annotation, error) {
-	annotation, _, err := decodeAnnotation(id, content)
-	return annotation, err
+	return decodeAnnotation(id, content)
 }
 
 type recordShape struct {
@@ -222,50 +202,48 @@ type recordShape struct {
 	Version    *int   `yaml:"version"`
 }
 
-func decodeAnnotation(id string, content []byte) (*Annotation, bool, error) {
+func decodeAnnotation(id string, content []byte) (*Annotation, error) {
 	name, err := recordName(id)
 	if err != nil {
-		return nil, false, err
+		return nil, err
 	}
 	var shape recordShape
 	if err := yaml.Unmarshal(content, &shape); err != nil {
-		return nil, false, fmt.Errorf("parsing %s: %w", name, err)
+		return nil, fmt.Errorf("parsing %s: %w", name, err)
 	}
 
-	annotation, upgraded, err := decodeShape(name, shape, content)
+	annotation, err := decodeShape(name, shape, content)
 	if err != nil {
-		return nil, false, err
+		return nil, err
 	}
 	if err := annotation.Validate(); err != nil {
-		return nil, false, fmt.Errorf("in %s: %w", name, err)
+		return nil, fmt.Errorf("in %s: %w", name, err)
 	}
 	if annotation.Metadata.ID != id {
-		return nil, false, fmt.Errorf("in %s: record claims id %s but filename claims %s", name, annotation.Metadata.ID, id)
+		return nil, fmt.Errorf("in %s: record claims id %s but filename claims %s", name, annotation.Metadata.ID, id)
 	}
-	return annotation, upgraded, nil
+	return annotation, nil
 }
 
-func decodeShape(name string, shape recordShape, content []byte) (*Annotation, bool, error) {
+func decodeShape(name string, shape recordShape, content []byte) (*Annotation, error) {
 	switch {
 	case shape.APIVersion == APIVersion:
 		var annotation Annotation
 		if err := decodeOneDocument(name, content, &annotation); err != nil {
-			return nil, false, err
+			return nil, err
 		}
-		return &annotation, false, nil
+		return &annotation, nil
 	case shape.APIVersion != "":
-		return nil, false, fmt.Errorf(
+		return nil, fmt.Errorf(
 			"incompatible %s: apiVersion %q is not supported; this binary reads %s (ADR 0119)",
 			name, shape.APIVersion, APIVersion)
 	case shape.Version != nil && *shape.Version == LegacyRecordVersion:
-		var legacy legacyRecord
-		if err := decodeOneDocument(name, content, &legacy); err != nil {
-			return nil, false, err
-		}
-		upgraded := upgradeLegacy(legacy)
-		return &upgraded, true, nil
+		return nil, fmt.Errorf(
+			"incompatible %s: this record is in the pre-v1alpha `version: %d` shape, which koment no longer reads (ADR 0130). "+
+				"Read this repository once with koment 2.x, which rewrites every record in the %s shape, then retry",
+			name, LegacyRecordVersion, APIVersion)
 	default:
-		return nil, false, fmt.Errorf(
+		return nil, fmt.Errorf(
 			"incompatible %s: no apiVersion; a koment record starts with `apiVersion: %s` (ADR 0119)",
 			name, APIVersion)
 	}

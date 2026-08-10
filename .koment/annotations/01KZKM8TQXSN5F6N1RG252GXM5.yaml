@@ -1,0 +1,41 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/koment-dev/koment/main/schema/v1alpha/annotation.schema.json
+apiVersion: koment.dev/v1alpha
+kind: Annotation
+metadata:
+  id: 01KZKM8TQXSN5F6N1RG252GXM5
+  created: "2026-08-09T16:04:08Z"
+spec:
+  target:
+    file: scripts/commitlint.sh
+  type: why
+  body: |-
+    Spec-listed types: feat, fix, docs, style, refactor, test, chore, perf, ci,
+    build, revert. release-please ignores style and revert; that is a
+    changelog-policy decision, not a gate decision. A single ! may appear after
+    the type OR after the scope. Scope, when present, is lowercase
+    alphanumerics, dot, dash, space. Description is non-empty. No requirement on
+    case or trailing punctuation.
+  anchor:
+    scope: excerpt
+    excerpt: 're=''^(feat|fix|docs|style|refactor|test|chore|perf|ci|build|revert)(!)?(\([a-z0-9 .\-]+\))?!?: .+'''
+    before: |2
+
+      set -euo pipefail
+    after: |2-
+
+      failed=0
+      while IFS= read -r subject; do
+  author:
+    name: janpuc
+    email: janpuc@proton.me
+    kind: agent
+    source: git-config
+  git:
+    commit: f3b11be6187f9922ce35a22562fe2ef4d0592361
+    path: scripts/commitlint.sh
+    line: 21
+status:
+  lastSeenLine: 15
+  resolution: ok
+  resolvedAt: "2026-08-09T16:04:08Z"
+  resolvedCommit: f3b11be6187f9922ce35a22562fe2ef4d0592361

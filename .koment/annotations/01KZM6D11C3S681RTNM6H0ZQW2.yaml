@@ -1,0 +1,33 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/koment-dev/koment/main/schema/v1alpha/annotation.schema.json
+apiVersion: koment.dev/v1alpha
+kind: Annotation
+metadata:
+  id: 01KZM6D11C3S681RTNM6H0ZQW2
+  created: "2026-08-09T21:21:00Z"
+spec:
+  target:
+    file: plugins/koment/.hermes-plugin/__init__.py
+  type: why
+  body: |-
+    Hermes tool name -> (path argument, content arguments in priority order).
+    koment reads an opencode_edit shape, which ADR 0118 defined so that one
+    comment walker serves every client; translating here means no koment change.
+  anchor:
+    scope: excerpt
+    excerpt: '_WRITE_TOOLS: Dict[str, tuple] = {'
+    before: |
+      PRE_TOOL_TIMEOUT_SECONDS = 10
+      VERIFY_TIMEOUT_SECONDS = 120
+    after: |2-
+          "write_file": ("path", ("content",)),
+          "patch": ("path", ("new_string", "patch")),
+      }
+  author:
+    name: claude-code
+    kind: agent
+    source: session
+status:
+  lastSeenLine: 37
+  resolution: ok
+  resolvedAt: "2026-08-09T21:21:00Z"
+  resolvedCommit: 58b8dbd2222eeef1553a840a03a9492fc32c997a

@@ -1,0 +1,35 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/koment-dev/koment/main/schema/v1alpha/annotation.schema.json
+apiVersion: koment.dev/v1alpha
+kind: Annotation
+metadata:
+  id: 01KZKNVYEBPZFNNX9RT9YHD8WW
+  created: "2026-08-09T16:32:03Z"
+spec:
+  target:
+    file: session/store.go
+  type: gotcha
+  title: Drifted on purpose — the signature changed
+  body: |-
+    A demo fixture. This annotation was written when NewStore took a limit.
+    The parameter went away and the excerpt no longer matches anything, so
+    koment reports drifted instead of quietly pointing at the wrong line.
+    This is the failure the tool exists to catch (ADR 0134).
+  anchor:
+    scope: excerpt
+    excerpt: func NewStore(limit int) *Store {
+    before: "\tsessions map[string]Token\n}\n"
+    after: "\treturn &Store{sessions: make(map[string]Token)}\n}\n"
+  author:
+    name: janpuc
+    email: janpuc@proton.me
+    kind: agent
+    source: git-config
+  git:
+    commit: f3b11be6187f9922ce35a22562fe2ef4d0592361
+    path: session/store.go
+    line: 15
+status:
+  lastSeenLine: 15
+  resolution: ok
+  resolvedAt: "2026-08-09T16:32:03Z"
+  resolvedCommit: f3b11be6187f9922ce35a22562fe2ef4d0592361

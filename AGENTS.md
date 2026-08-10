@@ -39,6 +39,19 @@ Partial compliance is a bug.
   with `acknowledge_inline_comment: true` and a human-readable body.
   The acknowledgement is auditable.
 
+## Anchoring an annotation
+
+- `excerpt` is the anchor. It must match the file byte for byte,
+  including indentation, and it has NO line limit. If an excerpt is
+  rejected as matching several places, extend the excerpt itself with
+  adjacent lines until it is unique.
+- `before` and `after` are context hints only, capped at three
+  lines each. They do NOT disambiguate a repeated excerpt, so widening
+  them is never the fix for an ambiguous anchor.
+- If an excerpt is reported missing but you believe it is present, the
+  difference is whitespace: indentation, a trailing space, or CRLF
+  endings. koment says so when it can detect it.
+
 ## Before you stop
 
 - You MUST run `koment check`, `koment comments check` and
@@ -183,6 +196,48 @@ buries the part that mattered.
 Configuration is flags with a `KOMENT_` environment fallback, wired through
 `internal/config`. Anything a person might reasonably want to change should be
 settable both ways; adding a flag gets the environment variable for free.
+
+### Documentation is part of the change (ADR 0137)
+
+A feature is not done until the prose describing it is true. This project
+exists because descriptions rot silently; it has no standing to ship a manual
+that has stopped matching the code.
+
+- **Adding a user-visible capability includes its documentation, in the same
+  commit.** A new command, flag, environment variable, hook or published
+  artifact that touches no file under `docs/` or `README.md` is incomplete.
+- **Removing one includes removing every description of it.** Grep the name
+  before you call the removal finished. A deleted feature with a surviving
+  paragraph is the worst kind of rot, because nothing errors.
+- **A version, command or flag in an example is a claim.** It must work against
+  the current version when written. Where an example must name a version, use
+  the floating alias (ADR 0135) so it stays true without edits.
+- **Quote real output; never paraphrase it.** Terminal output in documentation
+  is copied from an actual run. Invented output looks authoritative and differs
+  from what the reader will see.
+
+The bar is the one already set for rationale: if a future reader could
+reasonably be misled, the change is not done.
+
+### Where a documentation page goes (ADR 0138)
+
+`docs/` has four sections and every page belongs to exactly one. Name the
+section before writing the page; if it is not obvious, the page is doing more
+than one job and should be split.
+
+| section | the reader is | voice |
+|---|---|---|
+| `start/` | getting running for the first time | imperative, sequential, no alternatives |
+| `guides/` | doing one specific task, already running | goal in the title, choices allowed |
+| `reference/` | looking up a flag, command, status or schema | exhaustive, neutral, no narrative |
+| `explanation/` | asking why it works this way | argues; `decisions/` (ADRs) lives here |
+
+Reference is the only section that may be generated, and should be where the
+code can produce it faithfully. The root `README.md` is not part of this
+structure: it advertises and links, it does not duplicate.
+
+The existing files predate this and have not been moved yet; place new pages
+correctly and do not add to the flat pile.
 
 ## 8. Git discipline
 

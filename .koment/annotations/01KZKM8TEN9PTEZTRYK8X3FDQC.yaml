@@ -1,0 +1,38 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/koment-dev/koment/main/schema/v1alpha/annotation.schema.json
+apiVersion: koment.dev/v1alpha
+kind: Annotation
+metadata:
+  id: 01KZKM8TEN9PTEZTRYK8X3FDQC
+  created: "2026-08-09T16:04:08Z"
+spec:
+  target:
+    file: editors/vscode/panel.js
+  type: why
+  body: |-
+    The panel exists because a body is a paragraph and every inline surface VS
+    Code offers is one line (ADR 0114). Rendering prose is the whole job, so the
+    markup is prose, not rows.
+  anchor:
+    scope: excerpt
+    excerpt: function panelHTML({ items, file, nonce, styleNonce }) {
+    before: |
+      </li>`;
+      }
+    after: |2-
+        const list = items.length
+          ? `<ul>${items.map(entry).join('')}</ul>`
+          : `<p class="empty">No annotations in this file.</p>`;
+  author:
+    name: janpuc
+    email: janpuc@proton.me
+    kind: agent
+    source: git-config
+  git:
+    commit: f3b11be6187f9922ce35a22562fe2ef4d0592361
+    path: editors/vscode/panel.js
+    line: 41
+status:
+  lastSeenLine: 38
+  resolution: ok
+  resolvedAt: "2026-08-09T16:04:08Z"
+  resolvedCommit: f3b11be6187f9922ce35a22562fe2ef4d0592361

@@ -25,8 +25,8 @@ func runComments(args []string, env Environment) int {
 
 func runCommentsCheck(args []string, env Environment) int {
 	flags := flagSet("comments check", env)
-	if err := flags.Parse(args); err != nil {
-		return ExitUsage
+	if code, ok := parse(flags, args); !ok {
+		return code
 	}
 	service, annotations, err := openApplication()
 	if err != nil {
@@ -58,9 +58,9 @@ func runCommentsConvert(args []string, env Environment) int {
 	kind := flags.String("kind", string(store.TypeWhy), "one of why, gotcha, invariant, anti-pattern")
 	author := flags.String("author", "", `override the git identity; "Name" or "Name <email>"`)
 	byAgent := flags.Bool("agent", false, "record this as written by an agent, not a person")
-	target, ok := onePositional("comments convert", "a file", flags, args, env)
+	target, code, ok := onePositional("comments convert", "a file", flags, args, env)
 	if !ok {
-		return ExitUsage
+		return code
 	}
 	if *excerpt == "" {
 		return misuse(env, "comments convert needs --excerpt")
@@ -98,9 +98,9 @@ func runCommentsAcknowledge(args []string, env Environment) int {
 	acknowledged := flags.Bool("acknowledge-inline-comment", false, "explicitly waive the normal koment procedure")
 	author := flags.String("author", "", `override the git identity; "Name" or "Name <email>"`)
 	byAgent := flags.Bool("agent", false, "record this as written by an agent, not a person")
-	target, ok := onePositional("comments acknowledge", "a file", flags, args, env)
+	target, code, ok := onePositional("comments acknowledge", "a file", flags, args, env)
 	if !ok {
-		return ExitUsage
+		return code
 	}
 	if *excerpt == "" {
 		return misuse(env, "comments acknowledge needs --excerpt")

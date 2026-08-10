@@ -71,6 +71,12 @@ func Run(ctx context.Context, input io.Reader, output io.Writer, stderr io.Write
 			if err := server.transport.respond(message.ID, result, responseError); err != nil {
 				return err
 			}
+			continue
+		}
+		if handleErr != nil {
+			if err := server.report(message.Method, handleErr); err != nil {
+				return err
+			}
 		}
 	}
 }
@@ -410,4 +416,13 @@ func ensureSaved(file workspaceFile) error {
 		return errors.New("save the document before changing koment annotations")
 	}
 	return nil
+}
+
+const messageTypeError = 1
+
+func (s *server) report(method string, failure error) error {
+	return s.transport.notify("window/showMessage", map[string]any{
+		"type":    messageTypeError,
+		"message": fmt.Sprintf("koment could not handle %s: %v", method, failure),
+	})
 }

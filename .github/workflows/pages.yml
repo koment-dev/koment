@@ -42,9 +42,24 @@ jobs:
             --repository-links "koment=index.html,workspace=r/workspace/index.html" \
             --banner "Annotations about the code that implements koment."
 
-      - name: check maintained workspace
+      - name: assert the demo still shows every state
         working-directory: workspace
-        run: ../koment check
+        env:
+          EXPECTED: "8 annotations across 3 files: 5 ok, 1 ambiguous, 1 drifted, 1 orphaned"
+        run: |
+          tally="$(../koment check | tail -1)"
+          echo "$tally"
+          test "$tally" = "$EXPECTED" || {
+            echo "the demo workspace changed shape; it must keep one of every kind and status (ADR 0134)"
+            echo "expected: $EXPECTED"
+            exit 1
+          }
+          for kind in why gotcha invariant anti-pattern; do
+            grep -q "^  type: $kind\$" .koment/annotations/*.yaml || {
+              echo "no $kind annotation left in the demo (ADR 0134)"
+              exit 1
+            }
+          done
 
       - name: render maintained workspace
         working-directory: workspace

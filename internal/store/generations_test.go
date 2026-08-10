@@ -42,49 +42,30 @@ func writeRecordFile(t *testing.T, annotations *Store, id, content string) strin
 	return path
 }
 
-func TestLoadUpgradesAVersionOneRecordAndRewritesItInPlace(t *testing.T) {
+func TestLoadRefusesAVersionOneRecordAndNamesTheWayForward(t *testing.T) {
 	annotations := newTestStore(t)
-	path := writeRecordFile(t, annotations, firstID, legacyRecordYAML)
+	writeRecordFile(t, annotations, firstID, legacyRecordYAML)
 
-	loaded, err := annotations.Load(firstID)
-	if err != nil {
-		t.Fatalf("Load: %v", err)
+	_, err := annotations.Load(firstID)
+	if err == nil {
+		t.Fatal("a v1 record was read by a binary that no longer migrates it")
 	}
-	if loaded.APIVersion != APIVersion || loaded.Kind != KindAnnotation {
-		t.Fatalf("record was not upgraded: %+v", loaded)
-	}
-	if loaded.Spec.Target.File != "internal/session/token.go" || loaded.Spec.Type != TypeInvariant {
-		t.Errorf("spec did not carry the v1 fields: %+v", loaded.Spec)
-	}
-	if loaded.Status.LastSeenLine != 42 {
-		t.Errorf("last_seen_line became status.lastSeenLine as %d", loaded.Status.LastSeenLine)
-	}
-	if loaded.Status.Resolution != "" {
-		t.Errorf("upgrading is not resolving, but a resolution was recorded: %q", loaded.Status.Resolution)
-	}
-	if want := time.Date(2026, 8, 3, 0, 0, 0, 0, time.UTC); !loaded.Metadata.Created.Equal(want) {
-		t.Errorf("created = %s, want %s", loaded.Metadata.Created, want)
-	}
-
-	rewritten := readFile(t, path)
-	if strings.Contains(rewritten, "version: 1") || !strings.Contains(rewritten, "apiVersion: "+APIVersion) {
-		t.Fatalf("the record on disk was not rewritten:\n%s", rewritten)
+	for _, want := range []string{"version: 1", "koment 2.x", APIVersion, "ADR 0130"} {
+		if !strings.Contains(err.Error(), want) {
+			t.Errorf("the refusal does not mention %q: %v", want, err)
+		}
 	}
 }
 
-func TestUpgradingARecordTwiceChangesNothingTheSecondTime(t *testing.T) {
+func TestRefusingAVersionOneRecordLeavesItUntouched(t *testing.T) {
 	annotations := newTestStore(t)
 	path := writeRecordFile(t, annotations, firstID, legacyRecordYAML)
 
-	if _, err := annotations.Load(firstID); err != nil {
-		t.Fatal(err)
+	if _, err := annotations.Load(firstID); err == nil {
+		t.Fatal("a v1 record was accepted")
 	}
-	upgraded := readFile(t, path)
-	if _, err := annotations.Load(firstID); err != nil {
-		t.Fatal(err)
-	}
-	if again := readFile(t, path); again != upgraded {
-		t.Errorf("a second read changed the record\n first:\n%s\nsecond:\n%s", upgraded, again)
+	if after := readFile(t, path); after != legacyRecordYAML {
+		t.Errorf("reading a repository rewrote a record it refused\n before:\n%s\nafter:\n%s", legacyRecordYAML, after)
 	}
 }
 

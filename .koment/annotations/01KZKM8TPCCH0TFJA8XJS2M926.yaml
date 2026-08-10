@@ -1,0 +1,42 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/koment-dev/koment/main/schema/v1alpha/annotation.schema.json
+apiVersion: koment.dev/v1alpha
+kind: Annotation
+metadata:
+  id: 01KZKM8TPCCH0TFJA8XJS2M926
+  created: "2026-08-09T16:04:08Z"
+spec:
+  target:
+    file: plugins/koment/.opencode-plugin/index.js
+  type: why
+  body: 'swallow: child.stdin may already be closed by an earlier exit'
+  anchor:
+    scope: excerpt
+    excerpt: |-
+      }
+          },
+        };
+      }
+
+      function run(cmd, args, { cwd, stdin } = {}) {
+    before: |2-
+            try {
+              child.stdin.end();
+            } catch {
+    after: |2-
+        return new Promise((resolve, reject) => {
+          const child = spawn(cmd, args, {
+            cwd,
+  author:
+    name: janpuc
+    email: janpuc@proton.me
+    kind: agent
+    source: git-config
+  git:
+    commit: f3b11be6187f9922ce35a22562fe2ef4d0592361
+    path: plugins/koment/.opencode-plugin/index.js
+    line: 98
+status:
+  lastSeenLine: 97
+  resolution: ok
+  resolvedAt: "2026-08-09T16:04:08Z"
+  resolvedCommit: f3b11be6187f9922ce35a22562fe2ef4d0592361

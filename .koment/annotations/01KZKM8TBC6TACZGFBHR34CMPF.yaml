@@ -1,0 +1,37 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/koment-dev/koment/main/schema/v1alpha/annotation.schema.json
+apiVersion: koment.dev/v1alpha
+kind: Annotation
+metadata:
+  id: 01KZKM8TBC6TACZGFBHR34CMPF
+  created: "2026-08-09T16:04:08Z"
+spec:
+  target:
+    file: editors/vscode/package-vsix.sh
+  type: why
+  body: |-
+    vsce target -> koment archive platform. Every koment archive has exactly one
+    VS Code target, so a platform that stops being built stops being packaged.
+  anchor:
+    scope: excerpt
+    excerpt: targets="linux-x64:linux_amd64 linux-arm64:linux_arm64 darwin-x64:darwin_amd64 darwin-arm64:darwin_arm64 win32-x64:windows_amd64 win32-arm64:windows_arm64"
+    before: |2
+        )
+      }
+    after: |2-
+
+      for pair in $targets; do
+        target=${pair%%:*}
+  author:
+    name: janpuc
+    email: janpuc@proton.me
+    kind: agent
+    source: git-config
+  git:
+    commit: f3b11be6187f9922ce35a22562fe2ef4d0592361
+    path: editors/vscode/package-vsix.sh
+    line: 39
+status:
+  lastSeenLine: 37
+  resolution: ok
+  resolvedAt: "2026-08-09T16:04:08Z"
+  resolvedCommit: f3b11be6187f9922ce35a22562fe2ef4d0592361

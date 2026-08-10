@@ -10,11 +10,24 @@ spec:
       - upstream-link
       - deprecated
       - public-api
+    allowedAnnotations:
+      - '^v\d+(\.\d+)*$'
+      - '^--\s'
+      - '^renovate:'
+      - '^checkov:'
     generatedPaths:
       - '**/*.gen.go'
       - '**/*.generated.go'
+      - '**/*.min.js'
     vendoredPaths:
-      - vendor/**
+      - '**/vendor/**'
+      - '**/node_modules/**'
+      - '**/third_party/**'
+      - '**/target/**'
+      - '**/dist/**'
+      - '**/build/**'
+      - '.koment/**'
+      - '**/.koment/**'
   agents:
     adapters:
       - agents
