@@ -219,6 +219,26 @@ that has stopped matching the code.
 The bar is the one already set for rationale: if a future reader could
 reasonably be misled, the change is not done.
 
+### Where a documentation page goes (ADR 0138)
+
+`docs/` has four sections and every page belongs to exactly one. Name the
+section before writing the page; if it is not obvious, the page is doing more
+than one job and should be split.
+
+| section | the reader is | voice |
+|---|---|---|
+| `start/` | getting running for the first time | imperative, sequential, no alternatives |
+| `guides/` | doing one specific task, already running | goal in the title, choices allowed |
+| `reference/` | looking up a flag, command, status or schema | exhaustive, neutral, no narrative |
+| `explanation/` | asking why it works this way | argues; `decisions/` (ADRs) lives here |
+
+Reference is the only section that may be generated, and should be where the
+code can produce it faithfully. The root `README.md` is not part of this
+structure: it advertises and links, it does not duplicate.
+
+The existing files predate this and have not been moved yet; place new pages
+correctly and do not add to the flat pile.
+
 ## 8. Git discipline
 
 - **Never commit or push unless explicitly asked.** Leave work in the tree.
