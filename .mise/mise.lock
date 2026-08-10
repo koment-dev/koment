@@ -26,6 +26,21 @@ provenance = "github-attestations"
 version = "2.2.0"
 backend = "github:koment-dev/koment"
 
+[tools."github:koment-dev/koment"."platforms.linux-arm64"]
+checksum = "sha256:a54b921842fdde63d50e3801d49e11a48d90c9e086b0ac9e38c1665b08d865a8"
+url = "https://github.com/koment-dev/koment/releases/download/v2.2.0/koment_2.2.0_linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/koment-dev/koment/releases/assets/504978665"
+
+[tools."github:koment-dev/koment"."platforms.linux-x64"]
+checksum = "sha256:d7f7622e48c5b652c7242b286e0d1ca32056b5363e245ab0279b0a4a0e3ad48b"
+url = "https://github.com/koment-dev/koment/releases/download/v2.2.0/koment_2.2.0_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/koment-dev/koment/releases/assets/504978667"
+
+[tools."github:koment-dev/koment"."platforms.macos-arm64"]
+checksum = "sha256:1ad288e592765ebe5af09c79e92c6e1b8cc32290d1efde144a8c8c5dead9f399"
+url = "https://github.com/koment-dev/koment/releases/download/v2.2.0/koment_2.2.0_darwin_arm64.tar.gz"
+url_api = "https://api.github.com/repos/koment-dev/koment/releases/assets/504978663"
+
 [[tools.go]]
 version = "1.26.5"
 backend = "core:go"
