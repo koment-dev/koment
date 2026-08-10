@@ -15,25 +15,111 @@
 
 </div>
 
-Readable code answers *what*. It cannot answer *why this and not the obvious
-alternative*, *what bit us here before*, or *what breaks if you "simplify" this*.
-Comments are the usual home for that and they rot — they duplicate the code,
-drift from it silently, and nothing ever tells you they have stopped being true.
+## The problem
 
-koment puts that reasoning **beside** the code instead: prose anchored to a
-verbatim snippet, stored in `.koment/` in git, reviewable in the same pull
-request as the change that motivated it. Then it **checks** the anchor. When the
-annotated code changes, `koment check` fails the build rather than serving a note
-that no longer describes anything.
+Someone wrote `retry 5 times` instead of 3, and there was a good reason. Six
+months later nobody remembers it, so it gets "simplified" back to 3 and the bug
+returns.
 
-Your agents read it too. One MCP server gives Claude Code, Cursor, Codex, Zed,
-Hermes and the rest the same reasoning through the same interface — because an
-agent that cannot see why something was built a certain way will happily
-refactor the reason away.
+A comment was supposed to prevent that. Comments rot: they sit next to the code
+without being attached to it, and when the code changes nothing tells you the
+comment just became a lie. Your AI agent then reads that lie and acts on it.
 
-**[See it running →](https://why.koment.dev/)** — koment's own
-annotations, rendered by koment onto GitHub Pages by [the workflow you can
-copy](docs/publishing.md).
+## What koment does
+
+You record the reason **outside** the source, anchored to the exact lines it
+explains. Then koment watches those lines. Change them, and it says so:
+
+```console
+$ koment check
+internal/auth/token.go
+  drifted   gotcha        internal/auth/token.go  01KZN63VC5SZASDYJBMPDC03WB
+    Without it, clients whose clock runs fast get logged out mid-request. Bit
+    us in #412.
+1 annotation across 1 file: 1 drifted
+koment: 1 annotation no longer resolves; revisit it or update the anchor
+```
+
+Exit code 1. The build stops. Nobody silently inherits a reason that no longer
+describes the code.
+
+The records are YAML in `.koment/`, in your git repository. No database, no
+service, no account. They review in the same pull request as the change that
+motivated them.
+
+**[See it running →](https://why.koment.dev/)** — koment's own annotations,
+published by [a workflow you can copy](docs/publishing.md).
+
+## For AI agents
+
+This is where it earns its keep. Agents write explanatory comments constantly,
+and they edit code without reading why it was written that way. koment makes
+both of those fail *immediately*, while the agent is still working:
+
+- **It writes a comment** → the edit is refused, with instructions to record the
+  reasoning as an annotation instead.
+- **It edits annotated code without checking** → the turn cannot finish until
+  the annotation is revisited.
+
+One MCP server serves Claude Code, Cursor, Codex, opencode, Hermes, Zed and the
+rest, so every agent reads the same reasoning through the same interface.
+[Set yours up →](docs/agents/)
+
+Humans get the same loop in the editor: a squiggle under the comment, and a
+quick fix offering *convert to annotation* or *keep it, on the record*.
+
+## Install
+
+```bash
+brew install koment-dev/tap/koment
+```
+
+<details>
+<summary>Other ways</summary>
+
+```bash
+mise use -g github:koment-dev/koment          # mise
+go install github.com/koment-dev/koment/cmd/koment@latest
+docker run --rm -v "$PWD:/repo" -w /repo ghcr.io/koment-dev/koment:3 check
+```
+
+In GitHub Actions, `uses: koment-dev/koment@v3`. Or take a checksum-listed
+binary for Linux, macOS or Windows on amd64/arm64 from the
+[latest release](https://github.com/koment-dev/koment/releases/latest) — every
+other channel is built from those same artifacts.
+
+</details>
+
+## Try it in a minute
+
+From inside any git repository:
+
+```bash
+koment bootstrap
+```
+
+That sets up `.koment/` and wires whichever agents you use. Now record a reason
+and watch it get checked:
+
+```bash
+koment add src/auth.go \
+  --excerpt 'if token.Expiry.Before(now.Add(-clockSkew)) {' \
+  --kind gotcha \
+  --title 'Skew subtraction keeps fast clocks logged in' \
+  --body 'Without it, clients whose clock runs fast get logged out
+          mid-request. Bit us in #412.'
+
+koment check     # ok
+```
+
+**Now edit that line and run `koment check` again.** It fails, and tells you
+which reasoning no longer matches its code. That is the entire product; the rest
+is delivering it to the people and agents who need it.
+
+```bash
+koment ui        # read them in a browser
+koment show src/auth.go
+```
 
 ## How it works
 
@@ -80,35 +166,6 @@ so there is nothing to export, import or back up.
 | **local** | the CLI, `koment ui --write`, and `koment mcp --write` | humans and agents read and write the same checked records. Nothing to host. |
 | **published** | [one workflow file](docs/publishing.md) → GitHub Pages | everyone reads the annotations in a browser. No server, no auth to design, no cost. |
 | **served** | the container or the [Helm chart](#kubernetes) | authenticated, commit-stamped GitHub snapshots for several repositories, cross-repository search, reviewed annotation PRs, metrics |
-
-## Quick start
-
-Install from the [latest release](https://github.com/koment-dev/koment/releases/latest).
-Every release carries checksum-listed binaries for Linux, macOS and Windows on
-amd64 and arm64. The setup Action, mise, container, Helm chart, editor package,
-and registry metadata all consume those same release artifacts. With mise:
-
-```bash
-mise use -g github:koment-dev/koment
-```
-
-```bash
-cd ~/your-project
-koment agents install
-koment add src/auth.go \
-  --excerpt 'if token.Expiry.Before(now.Add(-clockSkew)) {' \
-  --kind gotcha \
-  --body 'The skew subtraction is deliberate. Without it, clients whose clock
-          runs fast get logged out mid-request. Bit us in #412.'
-
-koment check
-koment comments check
-koment ui --write
-```
-
-Now edit that line and run `koment check` again. It fails — because the reasoning
-you wrote no longer describes the code, and silently keeping it is exactly how
-comments rot.
 
 ## Several repositories
 

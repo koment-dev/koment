@@ -26,10 +26,16 @@ func runCheck(args []string, env Environment) int {
 	}
 
 	counted := tallyOf(resolved)
-	fmt.Fprintf(env.Stdout, "%d annotations across %d files: %s\n", counted.total(), len(resolved), counted)
+	fmt.Fprintf(env.Stdout, "%s across %s: %s\n",
+		plural(counted.total(), "annotation"), plural(len(resolved), "file"), counted)
 
-	if counted.failures() > 0 {
-		fmt.Fprintf(env.Stderr, "koment: %d annotations no longer resolve; revisit them or update the anchor\n", counted.failures())
+	if failures := counted.failures(); failures > 0 {
+		subject, pronoun := "no longer resolves", "it"
+		if failures > 1 {
+			subject, pronoun = "no longer resolve", "them"
+		}
+		fmt.Fprintf(env.Stderr, "koment: %s %s; revisit %s or update the anchor\n",
+			plural(failures, "annotation"), subject, pronoun)
 		return ExitFailure
 	}
 	return ExitOK

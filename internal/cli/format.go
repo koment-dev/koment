@@ -64,3 +64,10 @@ func wrapParagraph(paragraph string, width int) []string {
 	}
 	return append(lines, current)
 }
+
+func plural(count int, noun string) string {
+	if count == 1 {
+		return fmt.Sprintf("%d %s", count, noun)
+	}
+	return fmt.Sprintf("%d %ss", count, noun)
+}

@@ -172,7 +172,7 @@ func TestCheckNarrowsToTheGivenPaths(t *testing.T) {
 	}
 
 	narrowed := koment(t, "check", "internal")
-	if !strings.Contains(narrowed.stdout, "1 annotations across 1 files") {
+	if !strings.Contains(narrowed.stdout, "1 annotation across 1 file") {
 		t.Errorf("check did not narrow to the given path:\n%s", narrowed.stdout)
 	}
 
