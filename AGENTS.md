@@ -197,6 +197,28 @@ Configuration is flags with a `KOMENT_` environment fallback, wired through
 `internal/config`. Anything a person might reasonably want to change should be
 settable both ways; adding a flag gets the environment variable for free.
 
+### Documentation is part of the change (ADR 0137)
+
+A feature is not done until the prose describing it is true. This project
+exists because descriptions rot silently; it has no standing to ship a manual
+that has stopped matching the code.
+
+- **Adding a user-visible capability includes its documentation, in the same
+  commit.** A new command, flag, environment variable, hook or published
+  artifact that touches no file under `docs/` or `README.md` is incomplete.
+- **Removing one includes removing every description of it.** Grep the name
+  before you call the removal finished. A deleted feature with a surviving
+  paragraph is the worst kind of rot, because nothing errors.
+- **A version, command or flag in an example is a claim.** It must work against
+  the current version when written. Where an example must name a version, use
+  the floating alias (ADR 0135) so it stays true without edits.
+- **Quote real output; never paraphrase it.** Terminal output in documentation
+  is copied from an actual run. Invented output looks authoritative and differs
+  from what the reader will see.
+
+The bar is the one already set for rationale: if a future reader could
+reasonably be misled, the change is not done.
+
 ## 8. Git discipline
 
 - **Never commit or push unless explicitly asked.** Leave work in the tree.

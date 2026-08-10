@@ -60,6 +60,8 @@ the approved destination.
 - [0133 — An annotation can be edited and forgotten](0133-an-annotation-can-be-edited-and-forgotten.md)
 - [0134 — The demo workspace shows every state koment can produce](0134-the-demo-workspace-shows-every-state.md)
 - [0135 — Floating major aliases for consumers, SHA pins for ourselves](0135-floating-major-aliases-for-consumers.md)
+- [0136 — Documentation stays in the repository and is served from elsewhere](0136-docs-stay-in-the-repository-and-are-served-elsewhere.md)
+- [0137 — A feature is not done until its documentation is true](0137-a-feature-is-not-done-until-its-documentation-is-true.md)
 
 Use [0000-template.md](0000-template.md) for a new decision. A new dependency or
 a structural change still requires its own ADR when these decisions do not
