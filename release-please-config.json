@@ -15,6 +15,10 @@
           "path": "charts/koment/Chart.yaml"
         },
         {
+          "type": "generic",
+          "path": "plugins/koment/.hermes-plugin/plugin.yaml"
+        },
+        {
           "type": "json",
           "path": "editors/vscode/package.json",
           "jsonpath": "$.version"

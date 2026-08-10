@@ -4,6 +4,29 @@
 self-hosted agent. It reads MCP servers from `mcp_servers` in its `config.yaml`,
 typically at `~/.hermes/hermes-agent/config.yaml`.
 
+There are two halves, and you want both. The **plugin** enforces the policy:
+it refuses a write that adds an explanatory comment and refuses to let a turn
+finish while the repository gates are failing. The **MCP server** lets Hermes
+read the reasoning that is already recorded. Neither substitutes for the other.
+
+## Install the plugin
+
+```sh
+hermes plugins install koment-dev/koment-hermes
+```
+
+```yaml
+plugins:
+  enabled:
+    - koment
+```
+
+It hooks `pre_tool_call` and `pre_verify`, shelling out to the `koment` binary
+so that the decision is the same one CI and every other editor integration
+makes. Set `KOMENT_PLUGIN_DISABLED=1` to silence it without uninstalling; it
+also stays quiet when `koment` is not on the `PATH`. See
+[the plugin README](https://github.com/koment-dev/koment/tree/main/plugins/koment/.hermes-plugin).
+
 ## Configure — local
 
 ```yaml
