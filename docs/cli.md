@@ -117,6 +117,65 @@ At least one is required. The surrounding context and last seen line are
 recaptured from source, never typed. The new excerpt is validated exactly as
 `add` validates one. Ids come from `check` output, ready to paste.
 
+## edit
+
+Rewrites the prose of an existing annotation, keeping everything else.
+
+```sh
+koment edit 01KZN63VC5SZASDYJBMPDC03WB --title 'A better headline, written later'
+echo 'Rewritten rationale.' | koment edit 01KZN63VC5SZASDYJBMPDC03WB --body -
+```
+
+| flag | |
+|---|---|
+| `--title <text>` | replace the headline shown beside the code |
+| `--body <text>` | replace the rationale. `-` reads stdin |
+
+At least one is required. Identity, author, creation date and the anchor are
+not editable here — the anchor belongs to `reanchor`, and the rest is
+provenance. Titles are still capped at 72 characters; `edit` exists so that
+limit stops being permanent (ADR 0133).
+
+## forget
+
+Deletes an annotation.
+
+```sh
+koment forget 01KZN63VC5SZASDYJBMPDC03WB
+```
+
+There is no tombstone and no `--reason`. Git already records who removed it,
+when, and the full prior content, so duplicating that inside the data would
+leave every retired annotation in `list`, `search` and the published site
+forever. The command prints the headline it removed and the exact
+`git checkout --` that brings it back (ADR 0133).
+
+## bootstrap
+
+Sets koment up in a repository: creates `.koment/`, writes the policy, and
+installs the agent adapters you choose.
+
+```sh
+koment bootstrap                       # asks which agents you use
+koment bootstrap --all --non-interactive
+koment bootstrap --policy-only
+```
+
+| flag | |
+|---|---|
+| `--agents <list>` | comma-separated adapters to install |
+| `--all` | every adapter koment knows |
+| `--policy-only` | write `.koment/policy.yaml` and nothing else |
+| `--non-interactive` | never prompt; requires one of the three above |
+
+## version
+
+Prints the release, the source revision, the Go toolchain and the platform.
+
+```sh
+koment version
+```
+
 ## site
 
 Renders a repository snapshot to static HTML — the published tier

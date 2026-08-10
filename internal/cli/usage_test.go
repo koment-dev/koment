@@ -3,6 +3,8 @@ package cli
 import (
 	"bytes"
 	"io"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -112,5 +114,26 @@ func TestSummariesLineUpInOneColumn(t *testing.T) {
 	}
 	if rows != len(listed) {
 		t.Fatalf("matched %d command rows, want %d", rows, len(listed))
+	}
+}
+
+func TestEveryCommandIsDocumented(t *testing.T) {
+	reference, err := os.ReadFile(filepath.Join("..", "..", "docs", "cli.md"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	documented := map[string]bool{}
+	for _, line := range strings.Split(string(reference), "\n") {
+		if heading, found := strings.CutPrefix(line, "## "); found {
+			documented[strings.TrimSpace(heading)] = true
+		}
+	}
+
+	for _, group := range sections {
+		for _, entry := range group.commands {
+			if !documented[entry.name] {
+				t.Errorf("koment %s has no section in docs/cli.md (ADR 0137)", entry.name)
+			}
+		}
 	}
 }
