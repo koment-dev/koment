@@ -137,6 +137,11 @@ jobs:
       - name: Run tests
         run: mise run test
 
+      - name: Fuzz the parsers
+        env:
+          KOMENT_FUZZTIME: 30s
+        run: mise run fuzz
+
       - name: Report coverage
         run: go tool cover -func=coverage.out | tail -1
 

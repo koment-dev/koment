@@ -25,6 +25,15 @@ run = "govulncheck ./..."
 description = "Run tests with the race detector and coverage"
 run = "go test -race -covermode=atomic -coverprofile=coverage.out ./..."
 
+[tasks.fuzz]
+description = "Fuzz the parsers that read bytes koment did not write"
+run = """
+seconds="${KOMENT_FUZZTIME:-30s}"
+go test ./internal/commentpolicy -run FuzzScanSpansStaysInsideTheContent -fuzz FuzzScanSpansStaysInsideTheContent -fuzztime "$seconds"
+go test ./internal/commentpolicy -run FuzzScanNeverPanicsOnAnyFile -fuzz FuzzScanNeverPanicsOnAnyFile -fuzztime "$seconds"
+go test ./internal/store -run FuzzDecodeAnnotationRejectsRatherThanPanics -fuzz FuzzDecodeAnnotationRejectsRatherThanPanics -fuzztime "$seconds"
+"""
+
 [tasks.fmt]
 description = "Format Go source"
 run = "gofmt -w ."
