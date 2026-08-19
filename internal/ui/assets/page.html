@@ -29,6 +29,7 @@
 
 <div class="app">
   <input type="checkbox" id="drawer" class="drawer-state" hidden>
+  <label for="drawer" class="drawer-scrim" aria-hidden="true"></label>
 
   <nav class="rail" aria-label="Annotated files">
     <div class="brand">
@@ -199,6 +200,12 @@
   {{end}}{{end}}
 
   {{range .Body}}<p class="body">{{.}}</p>{{end}}
+  {{if .Rest}}
+    <details class="note-more">
+      <summary>Show the rest</summary>
+      {{range .Rest}}<p class="body">{{.}}</p>{{end}}
+    </details>
+  {{end}}
 
   {{if .Warning}}<div class="warn">{{.Warning}}</div>{{end}}
   <div class="note-foot"><span>{{.Created}}</span><span class="note-id">{{.ID}}</span></div>

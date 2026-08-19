@@ -1,0 +1,46 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/koment-dev/koment/main/schema/v1alpha/annotation.schema.json
+apiVersion: koment.dev/v1alpha
+kind: Annotation
+metadata:
+  id: 01M0CY7JRPHHA0FRRWNH86PCJR
+  created: "2026-08-19T11:59:14Z"
+spec:
+  target:
+    file: internal/ui/assets/koment.js
+  type: why
+  title: The column has no height of its own; this is where it gets one
+  body: |-
+    Every note in the aligned layout is `position: absolute`, so the gloss has
+    zero intrinsic height and `.reading` — a grid with `align-items: start`
+    — sizes its row from the code column alone.
+
+    Without this line the notes simply hang below the code once their stacked
+    height exceeds the file's, with an empty column beside them and only
+    `.reading`'s bottom padding absorbing any of it. On a short file carrying
+    long rationale that is most of the page.
+
+    `floor` is already the exact bottom of the last placed note, so the
+    container can be told what it is rather than measured again.
+  anchor:
+    scope: excerpt
+    excerpt: '      gloss.style.height = floor + "px";'
+    before: |2
+              floor = placed + note.offsetHeight + noteGap;
+            });
+    after: |2-
+          }
+
+          function schedule() {
+  author:
+    name: claude-code
+    kind: agent
+    source: session
+  git:
+    commit: c44fa3fe356b82bd28e785f1387df8b4a62ab91f
+    path: internal/ui/assets/koment.js
+    line: 230
+status:
+  lastSeenLine: 230
+  resolution: ok
+  resolvedAt: "2026-08-19T11:59:14Z"
+  resolvedCommit: c44fa3fe356b82bd28e785f1387df8b4a62ab91f

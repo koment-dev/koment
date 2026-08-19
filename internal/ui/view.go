@@ -3,6 +3,7 @@ package ui
 import (
 	"net/url"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/koment-dev/koment/internal/anchor"
 	"github.com/koment-dev/koment/internal/application"
@@ -115,6 +116,7 @@ type note struct {
 	Status  anchor.Status
 	Line    int
 	Body    []string
+	Rest    []string
 	Created string
 	Excerpt string
 	Stale   bool
@@ -236,16 +238,51 @@ func buildFile(file application.FileSnapshot) *fileView {
 
 func describe(annotation application.AnnotationView) note {
 	stale := annotation.Status.IsFailure()
+	shown, folded := splitBody(store.Paragraphs(annotation.Record.Spec.Body))
 	return note{
 		ID:      annotation.Record.Metadata.ID,
 		Kind:    string(annotation.Record.Spec.Type),
 		Status:  annotation.Status,
 		Line:    annotation.Line,
 		Title:   annotation.Record.Headline(),
-		Body:    store.Paragraphs(annotation.Record.Spec.Body),
+		Body:    shown,
+		Rest:    folded,
 		Created: annotation.Record.Metadata.Created.Format("2006-01-02"),
 		Excerpt: annotation.Record.Spec.Anchor.Excerpt,
 		Stale:   stale,
 		Warning: annotation.Warning,
 	}
+}
+
+const (
+	visibleBodyBudget   = 600
+	shortestWorthHiding = 160
+)
+
+func splitBody(paragraphs []string) (shown, folded []string) {
+	if len(paragraphs) < 2 {
+		return paragraphs, nil
+	}
+	spent := utf8.RuneCountInString(paragraphs[0])
+	for index := 1; index < len(paragraphs); index++ {
+		paragraphLength := utf8.RuneCountInString(paragraphs[index])
+		if spent+paragraphLength <= visibleBodyBudget {
+			spent += paragraphLength
+			continue
+		}
+		tail := paragraphs[index:]
+		if lengthOf(tail) < shortestWorthHiding {
+			return paragraphs, nil
+		}
+		return paragraphs[:index], tail
+	}
+	return paragraphs, nil
+}
+
+func lengthOf(paragraphs []string) int {
+	total := 0
+	for _, paragraph := range paragraphs {
+		total += utf8.RuneCountInString(paragraph)
+	}
+	return total
 }

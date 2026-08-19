@@ -167,8 +167,32 @@
     var notes = Array.prototype.slice.call(gloss.querySelectorAll(".note[data-for]"));
     if (!notes.length) return;
 
+    var code = reading.querySelector(".code");
     var narrow = window.matchMedia("(max-width: 900px)");
     var scheduled = null;
+    var interleaved = false;
+    var noteGap = 12;
+
+    function interleave() {
+      if (interleaved || !code) return;
+      var last = {};
+      notes.forEach(function (note) {
+        var row = document.getElementById("L" + note.dataset.for);
+        if (!row || row.parentNode !== code) return;
+        var behind = last[note.dataset.for] || row;
+        code.insertBefore(note, behind.nextSibling);
+        last[note.dataset.for] = note;
+      });
+      gloss.classList.add("interleaved");
+      interleaved = true;
+    }
+
+    function column() {
+      if (!interleaved) return;
+      notes.forEach(function (note) { gloss.appendChild(note); });
+      gloss.classList.remove("interleaved");
+      interleaved = false;
+    }
 
     function place() {
       scheduled = null;
@@ -176,15 +200,20 @@
       if (narrow.matches) {
         notes.forEach(function (note) { note.style.transform = ""; });
         gloss.classList.remove("aligned");
+        gloss.style.height = "";
+        interleave();
         return;
       }
 
-      var top = gloss.getBoundingClientRect().top;
-      var floor = 0;
-
+      column();
+      gloss.classList.add("aligned");
+      gloss.style.height = "";
       notes.forEach(function (note) {
         note.style.transform = "";
       });
+
+      var top = gloss.getBoundingClientRect().top;
+      var floor = 0;
 
       notes.forEach(function (note) {
         var row = document.getElementById("L" + note.dataset.for);
@@ -195,10 +224,10 @@
         var placed = Math.max(wanted, floor);
 
         note.style.transform = "translateY(" + (placed - resting) + "px)";
-        floor = placed + note.offsetHeight + 12;
+        floor = placed + note.offsetHeight + noteGap;
       });
 
-      gloss.classList.add("aligned");
+      gloss.style.height = floor + "px";
     }
 
     function schedule() {
@@ -208,6 +237,7 @@
 
     place();
     window.addEventListener("resize", schedule);
+    reading.addEventListener("toggle", schedule, true);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(schedule);
 
     notes.forEach(function (note) {
