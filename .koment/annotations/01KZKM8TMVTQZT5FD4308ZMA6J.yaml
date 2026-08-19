@@ -6,7 +6,7 @@ metadata:
   created: "2026-08-09T16:04:08Z"
 spec:
   target:
-    file: editors/vscode/panel.test.js
+    file: integrations/editors/vscode/panel.test.js
   type: why
   body: |-
     The title is what the editor shows beside the code; the panel is where the

@@ -118,7 +118,7 @@ func TestSummariesLineUpInOneColumn(t *testing.T) {
 }
 
 func TestEveryCommandIsDocumented(t *testing.T) {
-	reference, err := os.ReadFile(filepath.Join("..", "..", "docs", "cli.md"))
+	reference, err := os.ReadFile(filepath.Join("..", "..", "docs", "reference", "cli.md"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -132,7 +132,7 @@ func TestEveryCommandIsDocumented(t *testing.T) {
 	for _, group := range sections {
 		for _, entry := range group.commands {
 			if !documented[entry.name] {
-				t.Errorf("koment %s has no section in docs/cli.md (ADR 0137)", entry.name)
+				t.Errorf("koment %s has no section in docs/reference/cli.md (ADR 0137)", entry.name)
 			}
 		}
 	}

@@ -11,11 +11,11 @@ spec:
   body: The parts a mistake cannot be taken back from.
   anchor:
     scope: excerpt
-    excerpt: /docs/decisions/ @janpuc
+    excerpt: /docs/explanation/decisions/ @janpuc
     before: |
       * @janpuc
     after: |-
-      /docs/releasing.md @janpuc
+      /docs/guides/release-koment.md @janpuc
       /schema/ @janpuc
       /.github/workflows/ @janpuc
   author:

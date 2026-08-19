@@ -1,0 +1,41 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/koment-dev/koment/main/schema/v1alpha/annotation.schema.json
+apiVersion: koment.dev/v1alpha
+kind: Annotation
+metadata:
+  id: 01M0CXN9YCWZZEVYYE8G56YJJW
+  created: "2026-08-19T11:49:15Z"
+spec:
+  target:
+    file: internal/commentpolicy/support.go
+  type: why
+  title: These exports have one caller, and it is the manual
+  body: |-
+    Nothing in koment's own execution path calls these. They exist so
+    `internal/commentpolicy/gen` can render docs/reference/languages.md from the
+    tables that decide behaviour rather than from someone's memory of them (ADR
+    0140).
+
+    That makes them look like dead code to a reader trimming the API surface.
+    They are not: deleting one breaks `go generate ./...`, which the
+    `generate-check` task runs and which fails CI on a dirty tree.
+
+    Every accessor copies before returning. A caller that mutated the result
+    would be editing the live comment policy, and support_test.go asserts the
+    copy.
+  anchor:
+    scope: excerpt
+    excerpt: |-
+      // DetectedFiletypes reports every extension the syntax table names, sorted by
+      // extension.
+      func DetectedFiletypes() []FiletypeSupport {
+    before: "\tDirectives []string\n}\n"
+    after: "\tsupported := make([]FiletypeSupport, 0, len(syntaxByExtension))\n\tfor extension, syntax := range syntaxByExtension {\n\t\tsupported = append(supported, describe(extension, syntax))"
+  author:
+    name: claude-code
+    kind: agent
+    source: session
+status:
+  lastSeenLine: 26
+  resolution: ok
+  resolvedAt: "2026-08-19T11:49:15Z"
+  resolvedCommit: c44fa3fe356b82bd28e785f1387df8b4a62ab91f

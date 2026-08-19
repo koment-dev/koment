@@ -6,7 +6,7 @@ metadata:
   created: "2026-08-09T16:04:08Z"
 spec:
   target:
-    file: editors/vscode/panel.test.js
+    file: integrations/editors/vscode/panel.test.js
   type: gotcha
   body: |-
     An annotation body is prose from the repository, and the panel puts it in a

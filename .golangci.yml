@@ -78,7 +78,6 @@ linters:
         text: "G301|G306"
         linters:
           - gosec
-
 formatters:
   enable:
     - gofmt

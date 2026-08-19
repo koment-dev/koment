@@ -8,14 +8,25 @@ spec:
   target:
     file: internal/ui/assets/koment.js
   type: why
-  title: On narrow screens notes sit in source order; transforms are cleared
+  title: On a narrow screen the note is moved to sit under its line
   body: |-
-    On a narrow screen the note already sits directly under the line it
-    annotates, in source order, and the code has the full width. Translating
-    notes toward a line would break that reading order to chase an alignment
-    there is no room for. The transforms are cleared rather than left stale,
-    because a resize from wide to narrow would otherwise keep the wide-layout
-    offsets.
+    This branch used to leave the notes where the server put them — after the
+    whole code block — and the annotation here claimed they "already sit
+    directly under the line". They did not. The template emits every note in the
+    gloss aside, which follows the entire code element, so on a phone you
+    scrolled the whole file before reaching any rationale. The claim was wrong
+    from the day the single-column breakpoint was added.
+
+    Now the notes are moved. Wide layout keeps them in their own column and
+    translates them toward their line; narrow layout has no column to align to,
+    so each note is relocated to sit immediately after its row, and the gloss is
+    hidden because it is empty.
+
+    Both are enhancements. With scripting off the page still serves code first
+    and a labelled column of notes in line order — complete, less precise, and
+    exactly what ADR 0026 requires of the published tier. The relocation is
+    idempotent and reversed on the way back to a wide viewport, so a resize
+    cannot leave a note orphaned inside the code element.
   anchor:
     scope: excerpt
     excerpt: '      if (narrow.matches) {'

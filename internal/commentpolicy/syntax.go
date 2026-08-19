@@ -28,12 +28,14 @@ func withDirectives(base commentSyntax, directives ...string) commentSyntax {
 	return base
 }
 
+//go:generate go run ./gen -out ../../docs/reference/languages.md
+
 var syntaxByExtension = map[string]commentSyntax{
 	".yaml": withDirectives(hashOnly, "yaml-language-server:", "yamllint", "renovate:", "noqa",
 		"zizmor:", "x-release-please", "checkov:", "kubeconform", "helm-docs"),
 	".yml": withDirectives(hashOnly, "yaml-language-server:", "yamllint", "renovate:", "noqa",
 		"zizmor:", "x-release-please", "checkov:", "kubeconform", "helm-docs"),
-	".toml": withDirectives(hashOnly, "schema:", "renovate:"),
+	".toml": withDirectives(hashOnly, "schema:", "renovate:", "x-release-please"),
 	".ini":  hashOnly,
 	".cfg":  hashOnly,
 	".conf": hashOnly,
@@ -127,12 +129,14 @@ func syntaxFor(file string) (commentSyntax, bool) {
 	return fallbackSyntax, true
 }
 
+var scriptFilenames = []string{
+	"makefile", "dockerfile", "justfile", "rakefile", "gemfile", "brewfile", "vagrantfile",
+}
+
 func looksLikeScript(file string) bool {
-	base := strings.ToLower(filepath.Base(file))
-	for _, known := range []string{"makefile", "dockerfile", "justfile", "rakefile", "gemfile", "brewfile", "vagrantfile"} {
-		if base == known || strings.HasPrefix(base, known+".") {
-			return true
-		}
+	if hasScriptFilename(file) {
+		return true
 	}
+	base := strings.ToLower(filepath.Base(file))
 	return strings.HasPrefix(base, ".") && !strings.Contains(base[1:], ".")
 }

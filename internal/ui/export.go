@@ -36,7 +36,7 @@ const exportUsage = `koment site renders a repository snapshot to static HTML.
 
 This is the published tier (ADR 0103): everyone reads the annotations in a
 browser, with no server to run and no authentication to design. Point it at a
-directory, commit a workflow, and GitHub Pages serves it — see docs/publishing.md.
+directory, commit a workflow, and GitHub Pages serves it — see docs/guides/publish-annotations.md.
 
 It renders a snapshot of one commit rather than your working tree, and every
 page says which commit. Read your own tree with koment ui instead, which

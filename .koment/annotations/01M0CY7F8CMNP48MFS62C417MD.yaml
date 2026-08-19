@@ -1,0 +1,55 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/koment-dev/koment/main/schema/v1alpha/annotation.schema.json
+apiVersion: koment.dev/v1alpha
+kind: Annotation
+metadata:
+  id: 01M0CY7F8CMNP48MFS62C417MD
+  created: "2026-08-19T11:59:10Z"
+spec:
+  target:
+    file: internal/ui/assets/koment.js
+  type: gotcha
+  title: Add .aligned before measuring, or the first paint is wrong
+  body: |-
+    The order of these three lines is load-bearing and looks arbitrary.
+
+    `resting` below is `note.offsetTop`, and what that returns depends on
+    whether `.aligned` is already on the gloss. Without it the notes are in flow
+    and `offsetTop` is their stacked position; with it they are absolute, their
+    static position collapses to roughly zero, and `offsetTop` reports that
+    instead.
+
+    This used to add `.aligned` at the *end*, after measuring. Every offset was
+    therefore computed against the flow layout and then applied to the absolute
+    one, so the first paint placed each note at `placed - resting` rather than
+    `placed`. It self-corrected on the second run, which `document.fonts.ready`
+    happens to trigger — meaning the bug showed as a visible jump rather than
+    a wrong layout, and only when a font was still loading.
+
+    The height is cleared before measuring for the same reason: a height left
+    over from the previous run must not be part of the layout being measured.
+  anchor:
+    scope: excerpt
+    excerpt: |2-
+            column();
+            gloss.classList.add("aligned");
+            gloss.style.height = "";
+    before: |2
+              return;
+            }
+    after: |2-
+            notes.forEach(function (note) {
+              note.style.transform = "";
+            });
+  author:
+    name: claude-code
+    kind: agent
+    source: session
+  git:
+    commit: c44fa3fe356b82bd28e785f1387df8b4a62ab91f
+    path: internal/ui/assets/koment.js
+    line: 208
+status:
+  lastSeenLine: 208
+  resolution: ok
+  resolvedAt: "2026-08-19T11:59:10Z"
+  resolvedCommit: c44fa3fe356b82bd28e785f1387df8b4a62ab91f

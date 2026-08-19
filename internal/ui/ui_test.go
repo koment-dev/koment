@@ -166,6 +166,89 @@ func crowd(t *testing.T, annotations *store.Store, extra int) {
 	}
 }
 
+func TestALongBodyFoldsItsTailBehindADisclosure(t *testing.T) {
+	annotations := annotatedRepository(t)
+	tail := "The part that only matters once you have decided to keep reading. It runs past the length below which a disclosure would cost the reader more than it saves, so it is genuinely folded away."
+	saveBody(t, annotations, strings.Repeat("A leading paragraph that carries the point. ", 15)+"\n\n"+tail)
+
+	_, body := get(t, annotations, "/f/main.go")
+
+	if !strings.Contains(body, `<details class="note-more">`) {
+		t.Fatal("a long body rendered without a disclosure, so one note can outrun the whole file")
+	}
+	folded := between(t, body, `<details class="note-more">`, "</details>")
+	if !strings.Contains(folded, tail) {
+		t.Error("the folded tail is not inside the disclosure")
+	}
+	if !strings.Contains(body, "Show the rest") {
+		t.Error("the disclosure has no summary, so there is nothing to click")
+	}
+}
+
+func TestFoldingHidesNothingFromAReaderWithoutScripting(t *testing.T) {
+	annotations := annotatedRepository(t)
+	tail := "The reasoning that would be lost if folding removed it from the document instead of collapsing it. It is long enough to clear the threshold below which the tail stays visible."
+	saveBody(t, annotations, strings.Repeat("A leading paragraph that carries the point. ", 15)+"\n\n"+tail)
+
+	_, body := get(t, annotations, "/f/main.go")
+
+	if !strings.Contains(body, tail) {
+		t.Fatal("folded text is absent from the served HTML; <details> must collapse it, never omit it")
+	}
+	disclosure := between(t, body, `<details class="note-more">`, "</details>")
+	if strings.Contains(disclosure, "hidden") || strings.Contains(disclosure, "data-") {
+		t.Error("the disclosure carries an attribute that hides it from a reader without scripting")
+	}
+}
+
+func TestAShortBodyGetsNoDisclosure(t *testing.T) {
+	annotations := annotatedRepository(t)
+	_, body := get(t, annotations, "/f/main.go")
+
+	if strings.Contains(body, "note-more") {
+		t.Errorf("a %d character body was folded; only long ones should be", len(rationale))
+	}
+}
+
+func TestTheDrawerCanBeClosedByTappingAwayFromIt(t *testing.T) {
+	annotations := annotatedRepository(t)
+	_, body := get(t, annotations, "/f/main.go")
+
+	if !strings.Contains(body, `<label for="drawer" class="drawer-scrim"`) {
+		t.Fatal("the mobile drawer has no scrim, so tapping outside it cannot close it")
+	}
+	if !strings.Contains(body, `<input type="checkbox" id="drawer"`) {
+		t.Fatal("the scrim is bound to a checkbox that does not exist")
+	}
+	if strings.Index(body, `id="drawer"`) > strings.Index(body, `class="drawer-scrim"`) {
+		t.Error("the scrim precedes the checkbox, so the sibling selector that shows it cannot match")
+	}
+}
+
+func saveBody(t *testing.T, annotations *store.Store, prose string) {
+	t.Helper()
+	id, err := store.NewID(time.Date(2026, 8, 19, 0, 0, 0, 0, time.UTC))
+	if err != nil {
+		t.Fatal(err)
+	}
+	record := store.Annotation{
+		APIVersion: store.APIVersion,
+		Kind:       store.KindAnnotation,
+		Metadata:   store.Metadata{ID: id, Created: store.Timestamp{Time: time.Date(2026, 8, 19, 0, 0, 0, 0, time.UTC)}},
+		Spec: store.Spec{
+			Target: store.Target{File: "main.go"},
+			Type:   store.TypeWhy,
+			Body:   prose,
+			Anchor: store.Anchor{Scope: store.ScopeExcerpt, Excerpt: "\tserve()"},
+			Author: store.Author{Name: "Test Human", Kind: store.AuthorHuman, Source: store.FromExplicit},
+		},
+		Status: store.Status{LastSeenLine: 4},
+	}
+	if err := annotations.Save(&record); err != nil {
+		t.Fatal(err)
+	}
+}
+
 func between(t *testing.T, body, from, to string) string {
 	t.Helper()
 	start := strings.Index(body, from)

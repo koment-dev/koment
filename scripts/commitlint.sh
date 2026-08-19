@@ -22,7 +22,7 @@ Commit subjects MUST follow Conventional Commits 1.0.0:
   <type>(<scope>)?!: <description>
 Types: feat, fix, docs, style, refactor, test, chore, perf, ci, build, revert
 Use ! after the type (or after the scope) for breaking changes.
-See https://www.conventionalcommits.org/ and docs/decisions/0128.
+See https://www.conventionalcommits.org/ and docs/explanation/decisions/0128.
 MSG
   exit 1
 fi

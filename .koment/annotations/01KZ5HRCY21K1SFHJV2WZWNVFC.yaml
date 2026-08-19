@@ -6,7 +6,7 @@ metadata:
   created: "2026-08-04T00:00:00Z"
 spec:
   target:
-    file: packaging/naming_test.go
+    file: distribution/package-managers/naming_test.go
   type: gotcha
   title: Each package manager derives its URL from the archive name
   body: |-
@@ -16,7 +16,7 @@ spec:
     scope: excerpt
     excerpt: var consumers = map[string]string{
     before: "\treturn \"tar.gz\"\n}\n"
-    after: "\t\"the Homebrew tap\":  \"packaging/homebrew/koment.rb.tmpl\",\n\t\"the Scoop bucket\":  \"packaging/scoop/koment.json.tmpl\",\n\t\"the WinGet bundle\": \"packaging/winget/JanPuc.Koment.installer.yaml.tmpl\","
+    after: "\t\"the Homebrew tap\":  \"distribution/package-managers/homebrew/koment.rb.tmpl\",\n\t\"the Scoop bucket\":  \"distribution/package-managers/scoop/koment.json.tmpl\",\n\t\"the WinGet bundle\": \"distribution/package-managers/winget/Koment.Koment.installer.yaml.tmpl\","
   author:
     name: janpuc
     email: janpuc@proton.me

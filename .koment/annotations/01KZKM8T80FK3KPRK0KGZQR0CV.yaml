@@ -11,13 +11,13 @@ spec:
   body: Assembled into the extension at package time from the canonical release.
   anchor:
     scope: excerpt
-    excerpt: /editors/vscode/bin/
+    excerpt: /integrations/editors/vscode/bin/
     before: |
       /dist/
       /bin/
     after: |
-      /editors/vscode/icon.png
-      /editors/vscode/LICENSE
+      /integrations/editors/vscode/icon.png
+      /integrations/editors/vscode/LICENSE
   author:
     name: janpuc
     email: janpuc@proton.me

@@ -6,7 +6,7 @@ metadata:
   created: "2026-08-04T00:00:00Z"
 spec:
   target:
-    file: editors/vscode/binary.js
+    file: integrations/editors/vscode/binary.js
   type: why
   title: Chmod is asserted; a VSIX expansion is not guaranteed executable
   body: |-

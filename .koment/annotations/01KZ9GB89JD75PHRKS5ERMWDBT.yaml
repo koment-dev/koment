@@ -23,7 +23,8 @@ spec:
     post-upgrade task therefore fails a required check and can never merge.
 
     The preset also attaches helm-schema, and it is deliberately absent here.
-    See the annotation on charts/koment/values.schema.json: permitting it
+    See the annotation on distribution/helm/koment/values.schema.json:
+    permitting it
     rewrote a hand-maintained strict schema into a permissive generated one on
     all six of Renovate's first pull requests. A command the preset offers is
     not thereby a command this repository wants.

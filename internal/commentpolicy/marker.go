@@ -16,6 +16,8 @@ func (markerDetector) Handles(file string) bool {
 	return commentable
 }
 
+func (markerDetector) Name() string { return "marker scan" }
+
 func (markerDetector) Scan(file string, content []byte, configured policy.Policy) ([]SourceComment, []bool, error) {
 	syntax, commentable := syntaxFor(file)
 	if !commentable || isBinary(content) {

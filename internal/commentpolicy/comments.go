@@ -164,11 +164,13 @@ func AcknowledgementExcerpt(content []byte, comment SourceComment) (string, erro
 	return "", fmt.Errorf("the retained comment cannot be anchored uniquely; make the comment or surrounding code more specific")
 }
 
-// Detector finds the comment groups one language exposes and says which of them
-// its toolchain requires. koment ships one, and the interface exists so a
-// second language is an implementation rather than a rewrite (ADR 0114).
+// Detector finds the comment groups one filetype exposes and says which of them
+// its toolchain requires. koment ships two: a Go parser that recognises godoc
+// on exported identifiers, and a marker scan over the syntax table that reaches
+// every other filetype (ADR 0114, ADR 0132).
 type Detector interface {
 	Handles(file string) bool
+	Name() string
 	Scan(file string, content []byte, configured policy.Policy) ([]SourceComment, []bool, error)
 }
 
@@ -198,7 +200,9 @@ func scan(file string, content []byte, configured policy.Policy) ([]SourceCommen
 
 type goDetector struct{}
 
-func (goDetector) Handles(file string) bool { return strings.HasSuffix(file, ".go") }
+func (goDetector) Handles(file string) bool { return strings.HasSuffix(file, goExtension) }
+
+func (goDetector) Name() string { return "go/ast" }
 
 func (goDetector) Scan(file string, content []byte, configured policy.Policy) ([]SourceComment, []bool, error) {
 	files := token.NewFileSet()

@@ -1,0 +1,130 @@
+{
+  "name": "koment-dev",
+  "displayName": "koment-dev",
+  "description": "Read and write out-of-band code annotations directly in the editor.",
+  "version": "3.0.0",
+  "publisher": "koment",
+  "license": "AGPL-3.0-or-later",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Linters",
+    "Other"
+  ],
+  "keywords": [
+    "comments",
+    "annotations",
+    "rationale",
+    "agents",
+    "lsp"
+  ],
+  "main": "./extension.js",
+  "extensionKind": [
+    "workspace"
+  ],
+  "activationEvents": [
+    "workspaceContains:**/.koment/policy.yaml",
+    "onCommand:koment.add",
+    "onCommand:koment.reanchor"
+  ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": false,
+      "description": "koment starts a workspace process and performs explicitly requested file mutations."
+    },
+    "virtualWorkspaces": {
+      "supported": false
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/koment-dev/koment.git",
+    "directory": "integrations/editors/vscode"
+  },
+  "homepage": "https://github.com/koment-dev/koment",
+  "bugs": {
+    "url": "https://github.com/koment-dev/koment/issues"
+  },
+  "galleryBanner": {
+    "color": "#4A56C4",
+    "theme": "dark"
+  },
+  "pricing": "Free",
+  "scripts": {
+    "test": "node --test protocol.test.js binary.test.js panel.test.js",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@vscode/vsce": "3.9.2",
+    "ovsx": "1.1.0"
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "koment.add",
+        "title": "koment: Add annotation"
+      },
+      {
+        "command": "koment.reanchor",
+        "title": "koment: Reanchor annotation"
+      },
+      {
+        "command": "koment.convertComment",
+        "title": "koment: Convert comment to annotation"
+      },
+      {
+        "command": "koment.acknowledgeComment",
+        "title": "koment: Keep inline comment with acknowledgement"
+      },
+      {
+        "command": "koment.toggleInlineDetail",
+        "title": "koment: Toggle full annotation text inline"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "koment.add",
+        "key": "ctrl+alt+k",
+        "mac": "cmd+alt+k",
+        "when": "editorTextFocus"
+      }
+    ],
+    "configuration": {
+      "title": "koment",
+      "properties": {
+        "koment.binaryPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to a koment binary. Leave empty to use the one bundled with this extension, falling back to `koment` on PATH when the universal package is installed."
+        },
+        "koment.promptOnCommentIntent": {
+          "type": "boolean",
+          "default": true,
+          "description": "Offer conversion after newly written explanatory comment prose is saved."
+        }
+      }
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "koment",
+          "title": "koment",
+          "icon": "icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "koment": [
+        {
+          "id": "koment.annotations",
+          "name": "Annotations",
+          "type": "webview",
+          "contextualTitle": "koment"
+        }
+      ]
+    }
+  },
+  "icon": "icon.png"
+}

@@ -1,0 +1,49 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/koment-dev/koment/main/schema/v1alpha/annotation.schema.json
+apiVersion: koment.dev/v1alpha
+kind: Annotation
+metadata:
+  id: 01M0CY7WVZWA9R6PSAMWA56YEJ
+  created: "2026-08-19T11:59:24Z"
+spec:
+  target:
+    file: internal/ui/view.go
+  type: why
+  title: 600 was measured against this repository, not picked
+  body: |-
+    Both numbers come from measuring the 124 annotation bodies in this
+    repository rather than from taste: median 385 characters, p90 822, longest
+    1235. At a 600 character budget 20 of 124 fold, which is the top sixth —
+    the ones that genuinely outrun the code they explain — and the median
+    annotation is left whole.
+
+    `shortestWorthHiding` stops a pointless disclosure. Without it a 700
+    character paragraph followed by a 40 character one produces a "Show the
+    rest" control that reveals one line, which costs the reader more attention
+    than it saves. 160 is just under the shortest body in the repository, so a
+    tail that would have been a legitimate annotation on its own is still worth
+    folding.
+
+    Folding never cuts a paragraph, so a single long one renders whole. Three
+    bodies here are shaped like that. That is deliberate: splitting mid-sentence
+    to hit a character count would be worse than a tall note, and the note can
+    no longer break the layout now that the column carries its own height.
+
+    Re-measure before changing either number.
+  anchor:
+    scope: excerpt
+    excerpt: "const (\n\tvisibleBodyBudget   = 600\n\tshortestWorthHiding = 160\n)"
+    before: "\t}\n}\n"
+    after: "\nfunc splitBody(paragraphs []string) (shown, folded []string) {\n\tif len(paragraphs) < 2 {"
+  author:
+    name: claude-code
+    kind: agent
+    source: session
+  git:
+    commit: c44fa3fe356b82bd28e785f1387df8b4a62ab91f
+    path: internal/ui/view.go
+    line: 256
+status:
+  lastSeenLine: 256
+  resolution: ok
+  resolvedAt: "2026-08-19T11:59:24Z"
+  resolvedCommit: c44fa3fe356b82bd28e785f1387df8b4a62ab91f

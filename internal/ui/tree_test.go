@@ -116,7 +116,7 @@ func TestOnlyThePathToTheCurrentFileStartsOpen(t *testing.T) {
 	tree, _ := buildTree(entriesFor(
 		"internal/ui/view.go",
 		"internal/store/record.go",
-		"docs/publishing.md",
+		"docs/guides/publish-annotations.md",
 	), "internal/ui/view.go")
 
 	internal, _ := find(tree, "internal")

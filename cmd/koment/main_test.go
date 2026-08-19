@@ -17,7 +17,9 @@ import (
 // wiring that every agent actually connects through.
 func TestServesOverRealStdio(t *testing.T) {
 	binary := filepath.Join(t.TempDir(), "koment")
-	build := exec.Command("go", "build", "-o", binary, ".")
+	build := exec.Command("go", "build",
+		"-ldflags=-X github.com/koment-dev/koment/internal/mcp.serverVersion=9.8.7",
+		"-o", binary, ".")
 	if output, err := build.CombinedOutput(); err != nil {
 		t.Fatalf("building koment: %v\n%s", err, output)
 	}
@@ -37,6 +39,9 @@ func TestServesOverRealStdio(t *testing.T) {
 		t.Fatalf("connecting over stdio: %v", err)
 	}
 	defer session.Close()
+	if got := session.InitializeResult().ServerInfo.Version; got != "9.8.7" {
+		t.Fatalf("MCP server reports version %q, want the release stamp", got)
+	}
 
 	tools, err := session.ListTools(ctx, nil)
 	if err != nil {

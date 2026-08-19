@@ -6,7 +6,7 @@ metadata:
   created: "2026-08-04T00:00:00Z"
 spec:
   target:
-    file: editors/vscode/binary.js
+    file: integrations/editors/vscode/binary.js
   type: gotcha
   title: koment.binaryPath defaults to empty so a user setting always wins
   body: |-

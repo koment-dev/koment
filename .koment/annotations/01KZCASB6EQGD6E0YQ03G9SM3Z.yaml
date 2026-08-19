@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/janpuc/koment/main/schema/v1alpha/annotation.schema.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/koment-dev/koment/main/schema/v1alpha/annotation.schema.json
 apiVersion: koment.dev/v1alpha
 kind: Annotation
 metadata:
@@ -8,21 +8,20 @@ spec:
   target:
     file: .github/workflows/release.yml
   type: why
-  title: Plugins publish in parallel with binaries
+  title: Plugins wait for canonical artifacts
   body: |-
-    Plugins are published alongside the release (like binaries and the image),
-    not gated on them. They depend only on please and id-token: write for cosign
-    — no binaries needed, no editor VSIX needed — and the tar.gz names are
-    derived from directory basename rather than the manifest's name field,
-    because name differs between plugins (koment vs koment-opencode) and the
-    downstream globs in the signing step match the filename pattern, not a field
-    value.
+    ADRs 0109 and 0129 require canonical artifacts to exist before downstream
+    channels publish. The plugin source does not consume the Go archives or
+    image, but npm and the agent archives still wait for both jobs so they can
+    never become the only successful artifacts for a broken release. The job
+    retains id-token: write because cosign keyless signing otherwise falls back
+    to an interactive device flow on a non-interactive runner.
   anchor:
     scope: excerpt
     excerpt: |-
       plugins:
           name: publish plugins
-          needs: please
+          needs: [please, binaries, image]
     before: |2
                 config-file: release-please-config.json
                 manifest-file: .release-please-manifest.json

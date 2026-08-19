@@ -6,7 +6,7 @@ metadata:
   created: "2026-08-09T16:04:08Z"
 spec:
   target:
-    file: editors/vscode/package-vsix.sh
+    file: integrations/editors/vscode/package-vsix.sh
   type: why
   body: |-
     Usage: package-vsix.sh <version> <archive-directory> <output-directory>

@@ -18,8 +18,7 @@ import (
 )
 
 const (
-	serverName    = "koment"
-	serverVersion = "0.1.0"
+	serverName = "koment"
 
 	getDescription = "Annotations recorded against a source file: why it is written this way, " +
 		"what bit someone here before, and which invariants must hold. Read this before editing " +
@@ -34,6 +33,8 @@ const (
 	repositoriesDescription = "The repositories this koment serves, with their annotation counts. " +
 		"Call this first when you do not know which repository a file belongs to."
 )
+
+var serverVersion = "unknown"
 
 func newServer(repositories *repository.Set, recorder metrics.Recorder, writes bool) *sdk.Server {
 	instructions := agentpolicy.Contract()

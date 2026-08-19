@@ -1,0 +1,51 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/koment-dev/koment/main/schema/v1alpha/annotation.schema.json
+apiVersion: koment.dev/v1alpha
+kind: Annotation
+metadata:
+  id: 01M0CYSQA2ZN70TGZFWWPD4PCB
+  created: "2026-08-19T12:09:08Z"
+spec:
+  target:
+    file: integrations/editors/zed/src/lib.rs
+  type: why
+  title: The context server borrows the path the language server found
+  body: |-
+    `language_server_command` is handed a `Worktree`, which has `which`. This is
+    handed a `Project`, whose entire WIT surface is `worktree-ids()` — no
+    `which`, no `shell-env`. So a context server genuinely cannot resolve a
+    binary for itself.
+
+    Falling back to the bare name `koment` would fail for exactly the user the
+    extension exists to help: a Zed started from the Finder or the Dock has no
+    shell `$PATH`. Reusing the path the language server already resolved fixes
+    that whenever the language server started first, which is the ordinary case
+    because opening a file in a listed language is what makes anyone notice
+    koment.
+
+    The ordering is not guaranteed, which is why `unwrap_or_else` still exists.
+    This is a best effort that strictly beats the alternative, not a guarantee
+    — the explicit `context_servers.koment.command.path` setting is the one
+    that always works, and the README says so.
+  anchor:
+    scope: excerpt
+    excerpt: |2-
+              let binary = Self::configured_for_context_server(context_server_id, project)
+                  .or_else(|| self.found.clone())
+                  .unwrap_or_else(|| BINARY.to_string());
+    before: |2-
+              context_server_id: &ContextServerId,
+              project: &Project,
+          ) -> Result<zed::Command> {
+    after: |2-
+
+              Ok(zed::Command {
+                  command: binary,
+  author:
+    name: claude-code
+    kind: agent
+    source: session
+status:
+  lastSeenLine: 68
+  resolution: ok
+  resolvedAt: "2026-08-19T12:09:08Z"
+  resolvedCommit: c44fa3fe356b82bd28e785f1387df8b4a62ab91f

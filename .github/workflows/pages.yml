@@ -43,11 +43,11 @@ jobs:
             --banner "Annotations about the code that implements koment."
 
       - name: assert the demo still shows every state
-        working-directory: workspace
+        working-directory: examples/annotated-workspace
         env:
           EXPECTED: "8 annotations across 3 files: 5 ok, 1 ambiguous, 1 drifted, 1 orphaned"
         run: |
-          tally="$(../koment check | tail -1)"
+          tally="$(../../koment check | tail -1)"
           echo "$tally"
           test "$tally" = "$EXPECTED" || {
             echo "the demo workspace changed shape; it must keep one of every kind and status (ADR 0134)"
@@ -62,14 +62,14 @@ jobs:
           done
 
       - name: render maintained workspace
-        working-directory: workspace
+        working-directory: examples/annotated-workspace
         run: |
-          ../koment site --out ../dist/r/workspace --name workspace \
+          ../../koment site --out ../../dist/r/workspace --name workspace \
             --commit "${GITHUB_SHA}" \
             --commit-link "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}" \
             --repository-links "koment=../../index.html,workspace=index.html" \
             --banner "A maintained session package used to verify koment end to end." \
-            --banner-link "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/tree/main/workspace"
+            --banner-link "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/tree/main/examples/annotated-workspace"
 
       - name: verify publication
         run: |

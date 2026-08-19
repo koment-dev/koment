@@ -51,5 +51,5 @@ hand-built artifact and never by re-pointing an existing tag.
 
 Every release artifact is signed with Sigstore and carries build provenance.
 Verification steps for the binaries, the container image and the chart are in
-[docs/publishing.md](docs/publishing.md). If a signature does not verify, treat
+[the publishing guide](docs/guides/publish-annotations.md). If a signature does not verify, treat
 the artifact as hostile and report it here rather than installing it.

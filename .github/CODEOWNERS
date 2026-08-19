@@ -1,7 +1,7 @@
 * @janpuc
 
-/docs/decisions/ @janpuc
-/docs/releasing.md @janpuc
+/docs/explanation/decisions/ @janpuc
+/docs/guides/release-koment.md @janpuc
 /schema/ @janpuc
 /.github/workflows/ @janpuc
 /release-please-config.json @janpuc

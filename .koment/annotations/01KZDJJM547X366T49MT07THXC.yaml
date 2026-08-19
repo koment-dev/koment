@@ -6,7 +6,7 @@ metadata:
   created: "2026-08-07T07:39:05Z"
 spec:
   target:
-    file: plugins/koment/.opencode-plugin/index.js
+    file: integrations/agent-plugins/opencode/index.js
   type: why
   title: Hand-rolled JSON-RPC client over stdio
   body: |-

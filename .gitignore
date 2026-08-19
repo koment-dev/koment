@@ -2,9 +2,10 @@
 /dist/
 /bin/
 
-/editors/vscode/bin/
-/editors/vscode/icon.png
-/editors/vscode/LICENSE
+/integrations/editors/zed/target/
+/integrations/editors/vscode/bin/
+/integrations/editors/vscode/icon.png
+/integrations/editors/vscode/LICENSE
 
 *.test
 *.out
