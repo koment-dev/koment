@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-ARG GO_VERSION=1.26.5
+ARG GO_VERSION=1.26.6
 
 FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine AS build
 
@@ -20,7 +20,7 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
     CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} \
     go build -trimpath \
-      -ldflags="-s -w -X main.releaseVersion=${VERSION} -X main.sourceRevision=${REVISION}" \
+      -ldflags="-s -w -X main.releaseVersion=${VERSION} -X main.sourceRevision=${REVISION} -X github.com/koment-dev/koment/internal/mcp.serverVersion=${VERSION}" \
       -o /out/koment ./cmd/koment
 
 FROM gcr.io/distroless/static-debian12:nonroot@sha256:f5b485ea962d9bd1186b2f6b3a061191539b905b82ec395de78cbfae51f20e35
