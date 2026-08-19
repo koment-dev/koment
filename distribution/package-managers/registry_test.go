@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"testing"
 
@@ -23,7 +24,7 @@ type registryServer struct {
 
 func publishedServer(t *testing.T) registryServer {
 	t.Helper()
-	content, err := os.ReadFile(filepath.Join("..", "server.json"))
+	content, err := os.ReadFile(filepath.Join("..", "..", "server.json"))
 	if err != nil {
 		t.Fatalf("read server.json: %v", err)
 	}
@@ -92,11 +93,21 @@ func TestEveryDistributionManifestAgreesOnTheVersion(t *testing.T) {
 	}
 
 	for manifest, path := range map[string]string{
-		"the Claude plugin":   "plugins/koment/.claude-plugin/plugin.json",
-		"the VS Code package": "editors/vscode/package.json",
+		"the Claude plugin":     "integrations/agent-plugins/claude/.claude-plugin/plugin.json",
+		"the Hermes plugin":     "integrations/agent-plugins/hermes/plugin.yaml",
+		"the OpenCode manifest": "integrations/agent-plugins/opencode/plugin.json",
+		"the OpenCode package":  "integrations/agent-plugins/opencode/package.json",
+		"the VS Code package":   "integrations/editors/vscode/package.json",
+		"the Zed extension":     "integrations/editors/zed/extension.toml",
 	} {
-		if declared := versionField(t, path); declared != release {
+		if declared := declaredVersion(t, path); declared != release {
 			t.Errorf("%s (%s) says %q, the release manifest says %q", manifest, path, declared, release)
+		}
+	}
+
+	for field, declared := range vscodeLockVersions(t) {
+		if declared != release {
+			t.Errorf("the VS Code lock %s says %q, the release manifest says %q", field, declared, release)
 		}
 	}
 
@@ -109,6 +120,27 @@ func TestEveryDistributionManifestAgreesOnTheVersion(t *testing.T) {
 	}
 }
 
+func TestEveryReleaseBuildStampsTheMCPServerVersion(t *testing.T) {
+	stamp := "-X github.com/koment-dev/koment/internal/mcp.serverVersion=VERSION"
+	for _, path := range []string{".github/workflows/release.yml", "Dockerfile"} {
+		if content := repositoryFile(t, path); !strings.Contains(content, stamp) {
+			t.Errorf("%s does not stamp the MCP server with the released version", path)
+		}
+	}
+}
+
+func TestPluginPublicationUsesTheLockedNodeVersion(t *testing.T) {
+	locked := regexp.MustCompile(`(?m)^node = "([^"]+)"$`).FindStringSubmatch(
+		repositoryFile(t, "integrations/editors/vscode/mise.toml"))
+	if locked == nil {
+		t.Fatal("integrations/editors/vscode/mise.toml has no locked Node version")
+	}
+	workflow := repositoryFile(t, ".github/workflows/release.yml")
+	if want := "node-version: '" + locked[1] + "'"; !strings.Contains(workflow, want) {
+		t.Errorf("plugin publication does not use the locked Node %s toolchain", locked[1])
+	}
+}
+
 func helmChart(t *testing.T) struct {
 	Version    string `yaml:"version"`
 	AppVersion string `yaml:"appVersion"`
@@ -118,7 +150,7 @@ func helmChart(t *testing.T) struct {
 		Version    string `yaml:"version"`
 		AppVersion string `yaml:"appVersion"`
 	}
-	content, err := os.ReadFile(filepath.Join("..", "charts", "koment", "Chart.yaml"))
+	content, err := os.ReadFile(filepath.Join("..", "helm", "koment", "Chart.yaml"))
 	if err != nil {
 		t.Fatalf("read Chart.yaml: %v", err)
 	}
@@ -139,8 +171,22 @@ func releasedVersion(t *testing.T) string {
 	return release
 }
 
-func versionField(t *testing.T, path string) string {
+func declaredVersion(t *testing.T, path string) string {
 	t.Helper()
+	if filepath.Ext(path) == ".toml" {
+		match := regexp.MustCompile(`(?m)^version = "([^"]+)"$`).FindStringSubmatch(repositoryFile(t, path))
+		if match == nil {
+			t.Fatalf("%s has no version field", path)
+		}
+		return match[1]
+	}
+	if filepath.Ext(path) == ".yaml" {
+		var declared struct {
+			Version string `yaml:"version"`
+		}
+		decodeRepositoryYAML(t, path, &declared)
+		return declared.Version
+	}
 	var declared struct {
 		Version string `json:"version"`
 	}
@@ -148,13 +194,39 @@ func versionField(t *testing.T, path string) string {
 	return declared.Version
 }
 
+func vscodeLockVersions(t *testing.T) map[string]string {
+	t.Helper()
+	var lock struct {
+		Version  string `json:"version"`
+		Packages map[string]struct {
+			Version string `json:"version"`
+		} `json:"packages"`
+	}
+	decodeRepositoryJSON(t, "integrations/editors/vscode/package-lock.json", &lock)
+	return map[string]string{
+		"root version":         lock.Version,
+		"root package version": lock.Packages[""].Version,
+	}
+}
+
 func decodeRepositoryJSON(t *testing.T, path string, into any) {
 	t.Helper()
-	content, err := os.ReadFile(filepath.Join("..", filepath.FromSlash(path)))
+	content, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(path)))
 	if err != nil {
 		t.Fatalf("read %s: %v", path, err)
 	}
 	if err := json.Unmarshal(content, into); err != nil {
+		t.Fatalf("decode %s: %v", path, err)
+	}
+}
+
+func decodeRepositoryYAML(t *testing.T, path string, into any) {
+	t.Helper()
+	content, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(path)))
+	if err != nil {
+		t.Fatalf("read %s: %v", path, err)
+	}
+	if err := yaml.Unmarshal(content, into); err != nil {
 		t.Fatalf("decode %s: %v", path, err)
 	}
 }

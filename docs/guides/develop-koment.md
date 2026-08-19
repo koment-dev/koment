@@ -21,15 +21,16 @@ mise run commitlint
 
 `.mise/config.toml` and `.mise/mise.lock` are the toolchain source of truth.
 The Go version there must match `go.mod`. `mise install` also installs the
-Lefthook pre-commit checks. CI runs these tasks plus the setup action, container
-and Helm smoke checks, then reports one required `ci` status; every job is named
-after its id, so a red check names the job that produced it.
+Lefthook pre-commit checks. CI runs the required product, integration and
+distribution checks, then reports one required `ci` status. The setup-action and
+Windows archive jobs remain advisory because they exercise the last published
+release rather than the change under review.
 
 ## Working on koment inside koment
 
 `mise install` puts a released `koment` on `PATH`, which is what `.mcp.json` and
 `.vscode/mcp.json` invoke. Opening the repository in VS Code recommends the
-`koment.koment` extension; it carries its own binary, so it needs nothing else.
+`koment.koment-dev` extension; it carries its own binary, so it needs nothing else.
 
 Both of those run the **released** koment. The gates do not: `mise run
 annotations`, `comments` and `agent-policy` all run `go run ./cmd/koment`, so
@@ -38,20 +39,9 @@ changing the record format or a mutation surface — CI is the one that is right
 
 ## Layout
 
-```
-cmd/koment/          entrypoint, flag parsing only
-internal/cli/        add, show, check, list, reanchor
-internal/application/ shared snapshot and mutation service
-internal/agentpolicy/ generated instructions, client adapters and hooks
-internal/store/      read/write .koment/annotations, ULIDs, prose wrapping
-internal/anchor/     resolution and drift status
-internal/commentpolicy/ deterministic source-comment classification
-internal/policy/      strict repository policy
-internal/listen/     bind address resolution, shared by both servers
-internal/mcp/        MCP server — stdio and HTTP
-internal/ui/         local web view and atomic static publication
-docs/decisions/      ADRs
-```
+The generated [repository layout reference](../reference/repository-layout.md)
+names every architectural area and root exception. `mise run layout-check`
+rejects paths outside that contract.
 
 Dependency direction is one-way: `store` depends on nothing internal, `anchor`
 on `store`, everything else on those. `cli` deliberately imports neither `mcp`
@@ -60,7 +50,7 @@ keeps the MCP SDK out of the CLI's link graph.
 
 ## Conventions
 
-Read [AGENTS.md](../AGENTS.md). It applies to humans too; it is addressed to
+Read [AGENTS.md](../../AGENTS.md). It applies to humans too; it is addressed to
 agents because that is who mostly writes here.
 
 The short version:
@@ -72,9 +62,9 @@ place — and then it explains *why*, never *what*. Godoc on exported identifier
 is API documentation and doesn't count.
 
 **Rationale goes in an ADR or an annotation.** Project-wide reasoning becomes an
-ADR in `docs/decisions/`. Reasoning bound to a place in the code becomes a
+ADR in `docs/explanation/decisions/`. Reasoning bound to a place in the code becomes a
 koment annotation. This repository is koment's own first user — see
-[ADR 0107](decisions/0107-dogfood-the-comment-free-thesis.md).
+[ADR 0107](../explanation/decisions/0107-dogfood-the-comment-free-thesis.md).
 
 **Every dependency needs an ADR.** Standard library first; a small
 well-understood module over a framework. The bar for another direct dependency
@@ -83,7 +73,7 @@ is high.
 **Active ADRs are immutable.** Changed your mind? Write a new one that
 supersedes the old and mark the old one. The owner-authorized pre-deployment
 reset that created the 0100 series is recorded in the
-[decision index](decisions/README.md); it is not the normal workflow.
+[decision index](../explanation/decisions/README.md); it is not the normal workflow.
 
 **Design before code.** For anything beyond a bugfix, update `DESIGN.md` first
 and get it agreed. Don't open a large diff that also invents the design.
@@ -121,7 +111,7 @@ the annotation:
 ## Commits
 
 Conventional Commits 1.0.0 subjects are MANDATORY. See
-[ADR 0128](decisions/0128-enforce-conventional-commit-names.md); the
+[ADR 0128](../explanation/decisions/0128-enforce-conventional-commit-names.md); the
 regex lives in `scripts/commitlint.sh` and the gate is the `commit-lint`
 job in `.github/workflows/ci.yml` (rolled into the required `ci` check
 on `main`). `mise run commitlint` runs the same script locally. Use
@@ -137,12 +127,13 @@ walkthrough, split it. Stage deliberately; never `git add -A` blindly.
 Renovate runs on GitHub runners from `.github/workflows/renovate.yml` — daily,
 on demand, and whenever the Renovate configuration changes. It reads
 `.renovaterc.json5`, which extends the shared `home-operations` preset.
-[ADR 0122](decisions/0122-run-renovate-on-github-runners-behind-our-own-app.md)
+[ADR 0122](../explanation/decisions/0122-run-renovate-on-github-runners-behind-our-own-app.md)
 records why it is self-hosted rather than the hosted app.
 
-It stays inert until a GitHub App is installed, because a pull request opened
-with `GITHUB_TOKEN` starts no workflows and so could never satisfy the required
-`ci` check. Until then the job reports that it is inert and exits.
+The workflow requires a GitHub App because a pull request opened with
+`GITHUB_TOKEN` starts no workflows and could never satisfy the required `ci`
+check. If the app variables are absent, the job reports the missing
+configuration and exits without attempting renovation.
 
 To activate it:
 
@@ -179,15 +170,15 @@ their whole account.
 The shared preset attaches `helm-docs` as a post-upgrade task. Renovate's
 container does not carry it, so `.github/renovate-entrypoint.sh` installs it
 and `RENOVATE_ALLOWED_COMMANDS` permits it. Without that, a Renovate pull
-request that touches the chart leaves `charts/koment/README.md` stale and fails
+request that touches the chart leaves `distribution/helm/koment/README.md` stale and fails
 `mise run generate-check`.
 
 `.renovaterc.json5` also disables npm `engines` updates. `engines.vscode` in
-`editors/vscode/package.json` is the oldest editor the extension supports;
+`integrations/editors/vscode/package.json` is the oldest editor the extension supports;
 tracking it to the newest release drops users without changing the extension.
 
 The preset also attaches `helm-schema`, which this repository does not permit.
-`charts/koment/values.schema.json` is hand-maintained and stricter than a
+`distribution/helm/koment/values.schema.json` is hand-maintained and stricter than a
 generator can infer; helm-schema rewrites it into something permissive, and no
 gate would notice. Do not add it to the allowed commands.
 
@@ -199,7 +190,7 @@ npx --yes --package renovate renovate-config-validator .renovaterc.json5
 
 ## Where to start reading
 
-`DESIGN.md` for the architecture, then `docs/decisions/` in order. Active
+`DESIGN.md` for the architecture, then `docs/explanation/decisions/` in order. Active
 decisions start at ADR 0100; the pre-reset prototype decisions remain in Git
 history.
 

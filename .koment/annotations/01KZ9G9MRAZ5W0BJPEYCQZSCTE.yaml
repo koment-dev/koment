@@ -17,7 +17,7 @@ spec:
     it before a human did, reporting an upgrade collision between v4.37.4 and
     v4.32.5 for one SHA.
 
-    Resolve the concrete tag instead: `gh api repos/OWNER/REPO/commits/v4.37.6
+    Resolve the concrete tag instead: `gh api repos/OWNER/REPO/commits/v4.37.7
     --jq .sha`. That endpoint follows an annotated tag through to its commit,
     which is what `uses:` actually pins. `git/ref/tags/<x>` returns the tag
     *object* for an annotated tag, so the two disagree exactly where it matters.
@@ -27,7 +27,7 @@ spec:
     against `commits/<tag>` is worth re-running after any hand-edited pin.
   anchor:
     scope: excerpt
-    excerpt: '        uses: github/codeql-action/init@5595ccaf912efad79be6eef63a5619ff05969be3 # v4.37.6'
+    excerpt: '        uses: github/codeql-action/init@ff2f1c621b7f889edc0d3c761ac2e6a3f8cdb0dd # v4.37.7'
     before: |2-
                 cache: true
 

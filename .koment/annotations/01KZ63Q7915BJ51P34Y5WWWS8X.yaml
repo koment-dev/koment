@@ -6,7 +6,7 @@ metadata:
   created: "2026-08-04T00:00:00Z"
 spec:
   target:
-    file: charts/koment/templates/tests/service.yaml
+    file: distribution/helm/koment/templates/tests/service.yaml
   type: gotcha
   title: Hook-succeeded is absent; helm test --logs would race deletion
   body: |-

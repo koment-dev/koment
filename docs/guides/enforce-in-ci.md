@@ -41,7 +41,7 @@ Already have a job with koment installed? Add the same three gates:
 ```
 
 To publish the annotations as well as check them, see
-[publishing](publishing.md) — it is the same job with four more lines.
+[publishing](publish-annotations.md) — it is the same job with four more lines.
 
 ## GitLab CI
 

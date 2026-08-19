@@ -32,7 +32,6 @@ the approved destination.
 - [0105 — Authenticate remote access and materialize writes through Git](0105-authenticated-writes-materialize-through-git.md)
 - [0106 — Use konflate as the operational baseline](0106-konflate-is-the-operational-baseline.md)
 - [0107 — Enforce the comment-free thesis on koment itself](0107-dogfood-the-comment-free-thesis.md)
-- [0108 — Layer agent guidance behind an authoritative policy gate](0108-layer-agent-guidance-behind-an-authoritative-policy-gate.md)
 - [0109 — Distribute authenticated artifacts instead of Go invocations](0109-distribute-authenticated-artifacts-instead-of-go-invocations.md)
 - [0110 — Keep editor semantics behind LSP](0110-keep-editor-semantics-behind-lsp.md)
 - [0111 — Ship Windows without letting it gate the pipeline](0111-windows-is-supported-but-not-gating.md)
@@ -50,10 +49,8 @@ the approved destination.
 - [0123 — A published path never begins with a dot](0123-a-published-path-never-begins-with-a-dot.md)
 - [0124 — `koment bootstrap`, a stronger agent contract, and a user-configurable comment allow-list](0124-koment-bootstrap-and-allowed-comment-patterns.md)
 - [0125 — Decouple the `ci` aggregate from the `setup-action` smoke](0125-decouple-ci-aggregate-from-setup-action.md)
-- [0126 — Fix the VS Code extension marketplace name to `koment-dev`](0126-fix-vscode-marketplace-extension-name.md)
 - [0127 — Change the VS Code extension `displayName` to `koment-dev`](0127-fix-vscode-marketplace-display-name.md)
 - [0128 — Enforce Conventional Commits 1.0.0 subjects](0128-enforce-conventional-commit-names.md)
-- [0129 — OpenCode plugin as a first-class installable](0129-opencode-plugin-distribution-surface.md)
 - [0130 — Delete the v1 auto-migrate path and refuse `version: 1`](0130-delete-the-v1-auto-migrate-path.md)
 - [0131 — One registry drives the command help](0131-one-registry-drives-the-command-help.md)
 - [0132 — Comment detection covers every file, with an opinionated catch-all](0132-comment-detection-covers-every-file.md)
@@ -63,6 +60,19 @@ the approved destination.
 - [0136 — Documentation stays in the repository and is served from elsewhere](0136-docs-stay-in-the-repository-and-are-served-elsewhere.md)
 - [0137 — A feature is not done until its documentation is true](0137-a-feature-is-not-done-until-its-documentation-is-true.md)
 - [0138 — Documentation has four sections, and every page belongs to one](0138-documentation-has-four-sections.md)
+- [0139 — Package a Zed extension, and widen what earns a package](0139-package-a-zed-extension.md)
+- [0140 — Generate the language reference from the syntax table](0140-generate-the-language-reference.md)
+- [0141 — Slash commands are the human surface, the skill is the agent's](0141-slash-commands-are-the-human-surface.md)
+- [0142 — The note column carries its own height, and moves to the line on a phone](0142-the-reading-view-carries-its-own-height.md)
+- [0143 — Make the repository tree a closed contract](0143-make-the-repository-tree-a-closed-contract.md)
+- [0144 — Configure the OpenCode plugin and fail closed](0144-configure-opencode-plugin-and-fail-closed.md)
+- [0145 — License only the Zed extension under GPLv3](0145-license-the-zed-extension-under-gplv3.md)
+
+## Superseded decisions
+
+- [0108 — Layer agent guidance behind an authoritative policy gate](0108-layer-agent-guidance-behind-an-authoritative-policy-gate.md) — superseded by 0124
+- [0126 — Fix the VS Code extension marketplace name to `koment-dev`](0126-fix-vscode-marketplace-extension-name.md) — superseded by 0127
+- [0129 — OpenCode plugin as a first-class installable](0129-opencode-plugin-distribution-surface.md) — superseded by 0144
 
 Use [0000-template.md](0000-template.md) for a new decision. A new dependency or
 a structural change still requires its own ADR when these decisions do not

@@ -1,7 +1,7 @@
 # 0129 — OpenCode plugin as a first-class installable
 
 Date: 2026-08-07
-Status: Accepted
+Status: Superseded by 0144
 
 ## Context
 

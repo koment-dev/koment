@@ -17,7 +17,7 @@ spec:
     readable, code pushed apart by a tall note is not.
   anchor:
     scope: excerpt
-    excerpt: '        floor = placed + note.offsetHeight + 12;'
+    excerpt: '        floor = placed + note.offsetHeight + noteGap;'
     before: |2-
               var placed = Math.max(wanted, floor);
 
@@ -25,11 +25,14 @@ spec:
     after: |2-
             });
 
-            gloss.classList.add("aligned");
+            gloss.style.height = floor + "px";
   author:
     name: janpuc
     email: janpuc@proton.me
     kind: agent
     source: git-config
 status:
-  lastSeenLine: 81
+  lastSeenLine: 227
+  resolution: ok
+  resolvedAt: "2026-08-19T11:58:38Z"
+  resolvedCommit: c44fa3fe356b82bd28e785f1387df8b4a62ab91f

@@ -17,8 +17,8 @@ spec:
     surface for a single version, not a product with its own cadence.
   anchor:
     scope: excerpt
-    excerpt: "        {\n          \"type\": \"json\",\n          \"path\": \"plugins/koment/.opencode-plugin/plugin.json\",\n          \"jsonpath\": \"$.version\"\n        },"
-    before: "          \"path\": \"plugins/koment/.claude-plugin/plugin.json\",\n          \"jsonpath\": \"$.version\"\n        },"
+    excerpt: "        {\n          \"type\": \"json\",\n          \"path\": \"integrations/agent-plugins/opencode/plugin.json\",\n          \"jsonpath\": \"$.version\"\n        },"
+    before: "          \"path\": \"integrations/agent-plugins/claude/.claude-plugin/plugin.json\",\n          \"jsonpath\": \"$.version\"\n        },"
     after: "        {\n          \"type\": \"json\",\n          \"path\": \"server.json\","
   author:
     name: opencode

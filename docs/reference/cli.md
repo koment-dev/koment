@@ -179,8 +179,8 @@ koment version
 ## site
 
 Renders a repository snapshot to static HTML — the published tier
-([ADR 0103](decisions/0103-three-tiers-with-human-and-agent-capabilities.md)).
-See [publishing](publishing.md) for the workflow to copy.
+([ADR 0103](../explanation/decisions/0103-three-tiers-with-human-and-agent-capabilities.md)).
+See [publishing](../guides/publish-annotations.md) for the workflow to copy.
 
 ```sh
 koment site --out dist
@@ -203,7 +203,7 @@ how a stale rendering passes for the current tree. Pass `--commit` outside git.
 
 It is a snapshot, not your working tree — use `koment ui` for that, which
 re-resolves on every request. The shared target behaviour is defined by
-[ADR 0102](decisions/0102-one-repository-snapshot-for-every-reader.md). A site
+[ADR 0102](../explanation/decisions/0102-one-repository-snapshot-for-every-reader.md). A site
 renders your source as well as your annotations.
 The output directory is replaced atomically and also contains full
 `annotations.json` and flattened `search.json` projections.
@@ -253,7 +253,7 @@ annotations through the same application service as CLI and MCP.
 
 ## mcp
 
-The MCP server. See [agent setup](agents/).
+The MCP server. See [agent setup](../guides/agents/README.md).
 
 ```sh
 koment mcp                            # stdio, the default

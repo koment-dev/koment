@@ -28,7 +28,7 @@ var versionTokens = strings.NewReplacer(
 
 func repositoryFile(t *testing.T, path string) string {
 	t.Helper()
-	content, err := os.ReadFile(filepath.Join("..", filepath.FromSlash(path)))
+	content, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(path)))
 	if err != nil {
 		t.Fatalf("read %s: %v", path, err)
 	}
@@ -87,9 +87,9 @@ func extensionFor(platform string) string {
 }
 
 var consumers = map[string]string{
-	"the Homebrew tap":  "packaging/homebrew/koment.rb.tmpl",
-	"the Scoop bucket":  "packaging/scoop/koment.json.tmpl",
-	"the WinGet bundle": "packaging/winget/Koment.Koment.installer.yaml.tmpl",
+	"the Homebrew tap":  "distribution/package-managers/homebrew/koment.rb.tmpl",
+	"the Scoop bucket":  "distribution/package-managers/scoop/koment.json.tmpl",
+	"the WinGet bundle": "distribution/package-managers/winget/Koment.Koment.installer.yaml.tmpl",
 }
 
 const setupAction = "action.yml"
@@ -191,9 +191,9 @@ func TestPackagedBinaryNamesMatchWhatTheArchivesContain(t *testing.T) {
 		consumer, path, needle string
 		platform               string
 	}{
-		{"the Homebrew tap", "packaging/homebrew/koment.rb.tmpl", `bin.install "koment"`, "darwin"},
-		{"the WinGet bundle", "packaging/winget/Koment.Koment.installer.yaml.tmpl", "RelativeFilePath: koment.exe", "windows"},
-		{"the Scoop bucket", "packaging/scoop/koment.json.tmpl", `"bin": "koment.exe"`, "windows"},
+		{"the Homebrew tap", "distribution/package-managers/homebrew/koment.rb.tmpl", `bin.install "koment"`, "darwin"},
+		{"the WinGet bundle", "distribution/package-managers/winget/Koment.Koment.installer.yaml.tmpl", "RelativeFilePath: koment.exe", "windows"},
+		{"the Scoop bucket", "distribution/package-managers/scoop/koment.json.tmpl", `"bin": "koment.exe"`, "windows"},
 		{"the setup action", "action.yml", `-C "$target" koment`, "linux"},
 	} {
 		want := archive{os: expectation.platform}.binary()

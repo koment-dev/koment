@@ -149,6 +149,6 @@ pull request, which is the point of storing them side by side.
 
 ## Next
 
-- [Writing good annotations](annotating.md) — the hard part is judgement, not syntax
-- [Agent setup](agents/) — give the reasoning to whatever edits your code
-- [CI](ci.md) — make drift fail the build
+- [Writing good annotations](../guides/write-good-annotations.md) — the hard part is judgement, not syntax
+- [Agent setup](../guides/agents/README.md) — give the reasoning to whatever edits your code
+- [CI](../guides/enforce-in-ci.md) — make drift fail the build

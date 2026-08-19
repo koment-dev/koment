@@ -6,7 +6,7 @@ metadata:
   created: "2026-08-04T00:00:00Z"
 spec:
   target:
-    file: packaging/naming_test.go
+    file: distribution/package-managers/naming_test.go
   type: why
   title: Setup action maps runners onto archive names, not the other way
   body: |-

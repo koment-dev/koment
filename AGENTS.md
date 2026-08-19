@@ -65,11 +65,11 @@ You are working on a tool whose entire purpose is to make code understandable
 without comments. If this codebase needs comments to be understood, the project
 has failed its own thesis. Dogfood it.
 
-**New here? Read [docs/bootstrap.md](docs/bootstrap.md) first** — what this is,
+**New here? Read [docs/start/contributing.md](docs/start/contributing.md) first** — what this is,
 how the data model works, how to run and test it, and the rules below in
 context.
 
-Read `DESIGN.md` before writing code. Read `docs/decisions/` before changing
+Read `DESIGN.md` before writing code. Read `docs/explanation/decisions/` before changing
 anything structural.
 
 **Before you edit any file in this repository, read its annotations.** They hold
@@ -116,7 +116,7 @@ for _, a := range annotations {
 ```
 
 **Rationale that would have been a comment goes in an ADR.** That is the whole
-point of this project. `docs/decisions/`.
+point of this project. `docs/explanation/decisions/`.
 
 Exceptions, and these are the only ones:
 
@@ -128,7 +128,7 @@ Exceptions, and these are the only ones:
 ## 2. Every non-obvious decision gets an ADR
 
 If a future reader could reasonably ask "why is it like this?", write an ADR.
-Use `docs/decisions/NNNN-kebab-title.md`, next free number, and follow the
+Use `docs/explanation/decisions/NNNN-kebab-title.md`, next free number, and follow the
 existing format exactly.
 
 An ADR must record the **alternatives you rejected and why**. An ADR that only
@@ -197,6 +197,24 @@ Configuration is flags with a `KOMENT_` environment fallback, wired through
 `internal/config`. Anything a person might reasonably want to change should be
 settable both ways; adding a flag gets the environment variable for free.
 
+### Technical debt is resolved immediately
+
+The target is zero technical debt. Resolve debt as soon as it is found rather
+than adding it to a backlog. Stale or incorrect documentation is technical
+debt. Files, generated artifacts and abandoned work that clutter the workspace
+are technical debt too; remove or finish them before reporting the work done.
+
+### The repository tree is a closed contract
+
+ADR 0143 and `internal/projectlayout` define every allowed root entry and the
+closed categories below `integrations/`, `distribution/` and `docs/`. Put new
+work in an existing area and run `mise run layout-check`. Changing a boundary
+requires an ADR that supersedes ADR 0143, proves that no existing area can own
+the capability, updates `DESIGN.md` and the executable specification, regenerates
+`docs/reference/repository-layout.md`, and migrates every path and reference in
+the same change. Convenience, file count, implementation language and symmetry
+are not sufficient reasons.
+
 ### Documentation is part of the change (ADR 0137)
 
 A feature is not done until the prose describing it is true. This project
@@ -247,7 +265,7 @@ correctly and do not add to the flat pile.
 - Commit subjects MUST follow
   [Conventional Commits 1.0.0](https://www.conventionalcommits.org/).
   The rule of record is
-  [ADR 0128](docs/decisions/0128-enforce-conventional-commit-names.md).
+  [ADR 0128](docs/explanation/decisions/0128-enforce-conventional-commit-names.md).
   The `commit-lint` job in `.github/workflows/ci.yml` (rolled into the
   required `ci` check on `main`) and the `commit-msg` lefthook hook
   enforce it; the regex lives in `scripts/commitlint.sh`. Types are
@@ -318,7 +336,7 @@ Cutting a release is the one task in this repository with consequences you
 cannot take back. Marketplace and registry versions are permanent — a version
 number cannot be reused, replaced or withdrawn once published.
 
-**[docs/releasing.md](docs/releasing.md) is mandatory and authoritative. Read it
+**[docs/guides/release-koment.md](docs/guides/release-koment.md) is mandatory and authoritative. Read it
 in full before touching a release, and follow its steps in order.**
 
 The parts that are not negotiable:

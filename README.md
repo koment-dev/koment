@@ -48,7 +48,7 @@ service, no account. They review in the same pull request as the change that
 motivated them.
 
 **[See it running →](https://why.koment.dev/)** — koment's own annotations,
-published by [a workflow you can copy](docs/publishing.md).
+published by [a workflow you can copy](docs/guides/publish-annotations.md).
 
 ## For AI agents
 
@@ -63,7 +63,7 @@ both of those fail *immediately*, while the agent is still working:
 
 One MCP server serves Claude Code, Cursor, Codex, opencode, Hermes, Zed and the
 rest, so every agent reads the same reasoning through the same interface.
-[Set yours up →](docs/agents/)
+[Set yours up →](docs/guides/agents/)
 
 Humans get the same loop in the editor: a squiggle under the comment, and a
 quick fix offering *convert to annotation* or *keep it, on the record*.
@@ -164,7 +164,7 @@ so there is nothing to export, import or back up.
 | | you run | you get |
 |---|---|---|
 | **local** | the CLI, `koment ui --write`, and `koment mcp --write` | humans and agents read and write the same checked records. Nothing to host. |
-| **published** | [one workflow file](docs/publishing.md) → GitHub Pages | everyone reads the annotations in a browser. No server, no auth to design, no cost. |
+| **published** | [one workflow file](docs/guides/publish-annotations.md) → GitHub Pages | everyone reads the annotations in a browser. No server, no auth to design, no cost. |
 | **served** | the container or the [Helm chart](#kubernetes) | authenticated, commit-stamped GitHub snapshots for several repositories, cross-repository search, reviewed annotation PRs, metrics |
 
 ## Several repositories
@@ -191,7 +191,7 @@ repositories:
 
 The service starts only when a non-loopback listener has either trusted-proxy
 identity or scoped bearer credentials. Private repositories and reviewed writes
-also require a GitHub token. The [Helm chart documentation](charts/koment/README.md)
+also require a GitHub token. The [Helm chart documentation](distribution/helm/koment/README.md)
 shows the secret formats and boundary.
 
 Local commands need none of this configuration — koment finds the owning
@@ -241,7 +241,7 @@ Git.
 
 ## Work where the code lives
 
-The reference [VS Code extension](editors/vscode/README.md) starts `koment lsp`,
+The reference [VS Code extension](integrations/editors/vscode/README.md) starts `koment lsp`,
 renders annotation bodies as virtual inline text, reports drift and prohibited
 comments as diagnostics, and adds native add, reanchor, convert and explicit
 acknowledgement actions. The prose is never inserted into the source buffer.
@@ -264,11 +264,11 @@ start and runs the policy gate before Claude can finish a turn. Install a
 released `koment` binary and run `koment agents install` in the repository first.
 
 OpenCode ships a parallel plugin at
-[`plugins/koment/.opencode-plugin/`](plugins/koment/.opencode-plugin/). Add
-it to `opencode.json` by Git reference or path, and it installs the same hooks
-— deny ordinary Go comment intent and run the policy gate on session end.
-ADR 0126 records the decision to ship both a generated adapter and a plugin
-directory.
+[`integrations/agent-plugins/opencode/`](integrations/agent-plugins/opencode/).
+Add `@koment/opencode-koment` to the `plugin` array in `opencode.json`; OpenCode
+installs it at startup. It requires the released `koment` binary on `PATH`,
+denies ordinary explanatory comment intent and runs the policy gate on session
+end. ADR 0144 records the package and generated-adapter boundary.
 
 ## Give it to your agents
 
@@ -303,9 +303,9 @@ names the candidates** rather than guessing.
 
 | | | |
 |---|---|---|
-| [Claude Code](docs/agents/claude-code.md) | [Cursor](docs/agents/cursor.md) | [VS Code](docs/agents/vscode.md) |
-| [Zed](docs/agents/zed.md) | [Codex](docs/agents/codex.md) | [opencode](docs/agents/opencode.md) |
-| [Hermes](docs/agents/hermes.md) | [OpenClaw](docs/agents/openclaw.md) | [Anything else](docs/agents/other.md) |
+| [Claude Code](docs/guides/agents/claude-code.md) | [Cursor](docs/guides/agents/cursor.md) | [VS Code](docs/guides/agents/vscode.md) |
+| [Zed](docs/guides/agents/zed.md) | [Codex](docs/guides/agents/codex.md) | [opencode](docs/guides/agents/opencode.md) |
+| [Hermes](docs/guides/agents/hermes.md) | [OpenClaw](docs/guides/agents/openclaw.md) | [Anything else](docs/guides/agents/other.md) |
 
 ## Publish it
 
@@ -325,7 +325,7 @@ Every page names the commit it was rendered from, so a snapshot can never pass
 for the current tree. `koment check` in the same workflow means a build that
 would publish drift fails first.
 
-**[The whole workflow, ready to copy →](docs/publishing.md)**
+**[The whole workflow, ready to copy →](docs/guides/publish-annotations.md)**
 
 A site renders your source as well as your annotations, so publishing one from a
 private repository publishes that source. Grouped publications render one
@@ -334,9 +334,9 @@ switcher; there is no selector landing page.
 
 ## Documentation
 
-- **[Publishing](docs/publishing.md)** — the copy-paste workflow, and moving to a served instance later
-- **[Bootstrap](docs/bootstrap.md)** — what it is, the data model, running it, releases
-- **[Getting started](docs/quickstart.md)** · **[Writing good annotations](docs/annotating.md)** · **[CLI reference](docs/cli.md)** · **[CI](docs/ci.md)**
+- **[Publishing](docs/guides/publish-annotations.md)** — the copy-paste workflow, and moving to a served instance later
+- **[Contributor setup](docs/start/contributing.md)** — establish a verified development checkout
+- **[Getting started](docs/start/quickstart.md)** · **[Writing good annotations](docs/guides/write-good-annotations.md)** · **[CLI reference](docs/reference/cli.md)** · **[CI](docs/guides/enforce-in-ci.md)**
 
 ## What koment is not
 
@@ -358,10 +358,13 @@ invisible layer visible for Flux the way koment tries to for rationale.
 
 ## License
 
-[AGPL-3.0-or-later](LICENSE) for the open-source grant. `LICENSE` is the
-verbatim licence text and nothing else, so that GitHub and every automated
-licence scanner identify it correctly; the terms specific to this project are
-here rather than appended to it.
+[AGPL-3.0-or-later](LICENSE) is the open-source grant for the repository except
+`integrations/editors/zed/`. That extension code alone is
+[GPL-3.0-or-later](integrations/editors/zed/LICENSE) so Zed may build and
+distribute it through its registry; the koment binary it starts remains AGPL.
+Both license files are verbatim texts so automated scanners identify them
+correctly. [ADR 0145](docs/explanation/decisions/0145-license-the-zed-extension-under-gplv3.md)
+records the narrow exception.
 
 The complete corresponding source is this repository,
 <https://github.com/koment-dev/koment>, which satisfies the AGPL §13 obligation
@@ -374,7 +377,7 @@ excludes AGPL, or that want warranty or indemnification — write to
 Releases ≤ v0.6.0 were distributed under the MIT licence and remain MIT in
 perpetuity. The last MIT-tagged source may be forked from
 [`v0.6.0`](https://github.com/koment-dev/koment/tree/v0.6.0) under those terms
-indefinitely. The decision is recorded in [ADR 0117](docs/decisions/0117-relicense-to-agpl-with-commercial-dual-licensing.md).
+indefinitely. The decision is recorded in [ADR 0117](docs/explanation/decisions/0117-relicense-to-agpl-with-commercial-dual-licensing.md).
 
 **Does using koment make my code AGPL?** No. koment is a *tool*; annotations
 it writes are data, not derivative works of the tool. The same legal class

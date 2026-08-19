@@ -6,7 +6,7 @@ metadata:
   created: "2026-08-04T00:00:00Z"
 spec:
   target:
-    file: editors/vscode/panel.js
+    file: integrations/editors/vscode/panel.js
   type: why
   title: Annotation prose goes through escape; webview loads nothing external
   body: |-

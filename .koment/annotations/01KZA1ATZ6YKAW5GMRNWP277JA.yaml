@@ -6,7 +6,7 @@ metadata:
   created: "2026-08-05T22:40:01Z"
 spec:
   target:
-    file: editors/vscode/package.json
+    file: integrations/editors/vscode/package.json
   type: invariant
   title: engines.vscode is the oldest editor supported, not the newest
   body: |-

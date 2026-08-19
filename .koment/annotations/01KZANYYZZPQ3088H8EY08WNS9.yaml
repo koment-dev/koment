@@ -30,7 +30,7 @@ spec:
     excerpt: FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine AS build
     before: |2
 
-      ARG GO_VERSION=1.26.5
+      ARG GO_VERSION=1.26.6
     after: |2-
 
       ARG TARGETOS

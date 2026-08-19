@@ -18,7 +18,8 @@ spec:
 
     It stays pinned rather than resolving `latest` at run time for the same
     reason every action carries a SHA: a post-upgrade task that silently
-    changed behaviour between runs would rewrite `charts/koment/README.md`
+    changed behaviour between runs would rewrite
+    `distribution/helm/koment/README.md`
     differently on two otherwise identical pull requests, and the diff would be
     attributed to the dependency being bumped.
 

@@ -6,7 +6,7 @@ metadata:
   created: "2026-08-09T16:04:08Z"
 spec:
   target:
-    file: editors/vscode/binary.test.js
+    file: integrations/editors/vscode/binary.test.js
   type: gotcha
   body: |-
     A VSIX is a zip, and the extension host is not required to restore the

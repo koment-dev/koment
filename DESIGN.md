@@ -3,7 +3,7 @@
 Status: **approved; product and reference integrations implemented, external catalog acceptance pending.**
 
 This document is the specification. The active architectural decisions start at
-ADR 0100 in `docs/decisions/`. Earlier decisions describe the pre-deployment
+ADR 0100 in `docs/explanation/decisions/`. Earlier decisions describe the pre-deployment
 prototype and remain available in Git history.
 
 ## Thesis
@@ -77,9 +77,69 @@ This table is the honest boundary between implemented and planned behavior.
 | Helm and release | hardened chart, Kind E2E, signed canonical artifacts and SBOM/provenance implemented | implemented |
 | End-user distribution | releases, setup Action, mise, Claude marketplace, MCP metadata, VS Code/Open VSX package, and generated package-manager manifests | external catalog and publisher account acceptance pending |
 | Editor presentation | inline gloss plus a panel carrying full bodies; diagnostics report only what fails `koment check` | implemented |
-| Editor distribution | seven signed packages per release — six carrying the platform's canonical binary, one universal — ordered after the binaries job, with opt-in marketplace publication and LSP configuration for every other editor; the marketplace id is `koment.koment-dev` (VS Code) / `koment/koment-dev` (Open VSX) with `displayName: "koment-dev"` per [ADR 0126](decisions/0126-fix-vscode-marketplace-extension-name.md) and [ADR 0127](decisions/0127-fix-vscode-marketplace-display-name.md) | implemented; marketplace publication awaits publisher accounts |
+| Editor distribution | seven signed packages per release — six carrying the platform's canonical binary, one universal — ordered after the binaries job, with opt-in marketplace publication and LSP configuration for every other editor; the marketplace id is `koment.koment-dev` (VS Code) / `koment/koment-dev` (Open VSX) with `displayName: "koment-dev"` per [ADR 0126](docs/explanation/decisions/0126-fix-vscode-marketplace-extension-name.md) and [ADR 0127](docs/explanation/decisions/0127-fix-vscode-marketplace-display-name.md) | implemented; marketplace publication awaits publisher accounts |
+| Zed | an extension in `integrations/editors/zed/` starting `koment lsp` and registering `koment mcp --write`, published to Zed's registry by a manual submodule pull request; no inline bodies, because Zed exposes no decoration API ([ADR 0139](docs/explanation/decisions/0139-package-a-zed-extension.md)); the extension alone is GPL-3.0-or-later while the binary and repository remain AGPL-3.0-or-later ([ADR 0145](docs/explanation/decisions/0145-license-the-zed-extension-under-gplv3.md)) | implemented; registry publication is a manual release step |
 | Windows | archives, checksums, signatures and package manifests ship; an advisory job installs and runs the published archive | supported and non-gating by decision (ADR 0111) |
 | Maintained workspace | builds, tests, publishes and carries current annotations | implemented |
+| Repository layout | closed capability-oriented tree, generated reference and required local and CI drift checks | implemented |
+
+## Repository layout
+
+ADR 0143 makes the repository tree a closed architectural contract. The layout
+does not rearrange the Go product merely for symmetry: `cmd/`,
+`internal/` and the published `schema/` paths retain their established Go and
+API meanings. It gives everything around that core one unambiguous owner:
+
+```text
+.
+├── cmd/                               Go binary entry points
+├── internal/                          private Go product packages
+├── schema/                            versioned public schemas
+├── integrations/
+│   ├── agent-plugins/
+│   │   ├── claude/
+│   │   ├── hermes/
+│   │   └── opencode/
+│   └── editors/
+│       ├── vscode/
+│       └── zed/
+├── distribution/
+│   ├── helm/
+│   │   └── koment/
+│   └── package-managers/
+│       ├── homebrew/
+│       ├── scoop/
+│       └── winget/
+├── examples/
+│   └── annotated-workspace/
+├── docs/
+│   ├── start/
+│   ├── guides/
+│   │   ├── agents/
+│   │   └── editors/
+│   ├── reference/
+│   └── explanation/
+│       └── decisions/
+├── scripts/                            repository automation
+└── testdata/                           repository-wide fixtures
+```
+
+The root remains reserved for repository entry points, governance and files
+whose consumers require an exact location. Tool-owned discovery directories
+such as `.github/`, `.koment/` and `.mise/` are root-level exceptions for the
+same reason. They are named in the executable layout specification rather than
+treated as permission to add arbitrary root entries.
+
+The accepted layout lives once in an `internal/projectlayout` package. Its
+checker examines every tracked and non-ignored path, rejects unknown root areas
+and legacy locations, and renders `docs/reference/repository-layout.md`. The
+generated reference and the checker therefore cannot disagree. `mise`, local
+hooks and the required CI aggregate run the checker.
+
+Changing a boundary requires an ADR that supersedes ADR 0143. It must identify
+a capability that no existing area can own, reject the existing placements one
+by one and include the complete migration. Convenience, file count and the
+implementation language are not sufficient reasons.
 
 ## Annotation record
 
@@ -534,10 +594,12 @@ Distribution is promoted in layers:
    koment` name and stronger checksum or attestation metadata.
 3. The koment Claude marketplace and official Claude plugin directory package
    the strict instructions, hooks and MCP declaration. An OpenCode plugin at
-   `plugins/koment/.opencode-plugin/` provides the same hooks for OpenCode
-   through a Git-reference path. The official MCP Registry points at
-   koment's labeled OCI artifact or a checksummed MCPB bundle rather than
-   requiring an npm wrapper.
+   `integrations/agent-plugins/opencode/` provides the same hooks for OpenCode
+   through the `@koment/opencode-koment` npm package, configured in
+   `opencode.json`; the generated project-local adapter remains available. The
+   official MCP Registry points at koment's labeled OCI artifact or a
+   checksummed MCPB bundle. The npm package is a policy integration, not a
+   binary wrapper or the MCP Registry's distribution artifact.
 4. The VS Code Marketplace and Open VSX publish the same extension artifact
    when the editor integration exists.
 5. Homebrew core, Nixpkgs, AUR, MacPorts and other community catalogs are

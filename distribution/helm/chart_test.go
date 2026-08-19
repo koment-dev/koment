@@ -1,4 +1,4 @@
-package charts_test
+package helm_test
 
 import (
 	"os/exec"

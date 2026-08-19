@@ -96,7 +96,7 @@ dials — the action wrapper, and the binary it fetches:
 decision: whoever can move the tag can change what runs in your pipeline.
 Auto-updating is the right default for getting started and the wrong default
 for a repository that publishes artifacts. If your organisation requires SHA
-pins, take the form from [koment's own workflows](../.github/workflows/) and
+pins, take the form from [koment's own workflows](../../.github/workflows/) and
 let Renovate keep them current.
 
 ## What each part is doing
