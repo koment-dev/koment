@@ -27,13 +27,14 @@ subdirectory; `mise run layout-check` enforces both files as part of ADR 0145.
 mise run fmt-check && mise run vet && mise run tidy-check && mise run generate-check
 mise run lint && mise run test
 mise run annotations && mise run comments && mise run agent-policy
-mise run workflow-lint && mise run helm-lint && mise run helm-template && mise run vulncheck
+mise run workflow-lint && mise run release-helper-test
+mise run helm-lint && mise run helm-template && mise run vulncheck
 mise run extension-test && mise run layout-check
 mise --cd integrations/editors/zed run check
 mise --cd integrations/editors/zed run build
 ```
 
-All seventeen must pass. `koment check` failing means a release would ship
+All eighteen must pass. `koment check` failing means a release would ship
 annotations that no longer describe the code.
 
 The read-only publication verification in step 6 also needs authenticated
@@ -137,10 +138,11 @@ channels second.
 please ──┬─> binaries ──┬─> editor
          │              ├─> tap
          │              └─> verify ──> alias
-         └─> image ─────┬─> mcp-registry
-                        └─> chart
+         └─> image
 
-binaries + image ──> plugins
+binaries + image ──┬─> plugins
+                   ├─> mcp-registry
+                   └─> chart
 ```
 
 | Job | Publishes |
@@ -159,6 +161,8 @@ binaries + image ──> plugins
 `plugins` waits for both `binaries` and `image`. Its source archives do not
 consume either artifact, but ADRs 0109 and 0129 require canonical artifacts to
 exist before a downstream npm package or agent integration is published.
+The chart and MCP Registry metadata use the same gate so a missing GitHub
+release asset cannot leave them as the only completed distribution channels.
 
 ```sh
 gh run watch "$(gh run list --workflow=release --limit 1 --json databaseId --jq '.[0].databaseId')"
@@ -294,6 +298,7 @@ someone.
 | Symptom | Cause | Action |
 |---|---|---|
 | release pull request checks show `action_required`, 0s | `GITHUB_TOKEN` created the pull request | approve the run (step 3) |
+| `gh release upload` reports `release not found` | the release is not visible to the publishing job yet | do not rerun a published registry version; let the bounded visibility gate fail, fix the cause, and cut the next patch |
 | `editor` job skipped | `binaries` failed | fix the binaries, cut a new patch version |
 | `ovsx publish` fails on the first ever publish | the namespace did not exist | the workflow now creates it; if it still fails, the token lacks the Publisher Agreement |
 | `vsce publish` rejects the version | that version already exists on the marketplace | cut the next version, never reuse one |

@@ -119,6 +119,10 @@ actionlint
 zizmor --strict-collection .github/workflows action.yml
 """
 
+[tasks.release-helper-test]
+description = "Test bounded GitHub release asset publication"
+run = "./scripts/upload-release-assets_test.sh"
+
 [tasks.helm-lint]
 description = "Lint the Helm chart"
 run = "helm lint distribution/helm/koment"

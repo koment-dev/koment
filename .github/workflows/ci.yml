@@ -73,6 +73,9 @@ jobs:
       - name: Lint and audit workflows
         run: mise run workflow-lint
 
+      - name: Test release helpers
+        run: mise run release-helper-test
+
       - name: Run govulncheck
         run: mise run vulncheck
 

@@ -67,6 +67,7 @@ the approved destination.
 - [0143 — Make the repository tree a closed contract](0143-make-the-repository-tree-a-closed-contract.md)
 - [0144 — Configure the OpenCode plugin and fail closed](0144-configure-opencode-plugin-and-fail-closed.md)
 - [0145 — License only the Zed extension under GPLv3](0145-license-the-zed-extension-under-gplv3.md)
+- [0146 — Gate distribution on visible release assets](0146-gate-distribution-on-visible-release-assets.md)
 
 ## Superseded decisions
 
