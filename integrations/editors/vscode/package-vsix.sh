@@ -6,9 +6,16 @@ archives=$(cd "${2:?archive directory}" && pwd)
 output=${3:?output directory}
 
 extension=$(cd "$(dirname "$0")" && pwd)
-repository=$(cd "$extension/../.." && pwd)
+repository=$(cd "$extension/../../.." && pwd)
 vsce="$extension/node_modules/.bin/vsce"
 manifest="$archives/koment_${version}_checksums.txt"
+
+cleanup() {
+  rm -rf "$extension/bin"
+  rm -f "$extension/LICENSE" "$extension/icon.png"
+}
+
+trap cleanup EXIT
 
 mkdir -p "$output"
 output=$(cd "$output" && pwd)
@@ -58,5 +65,4 @@ done
 rm -rf "$extension/bin"
 (cd "$extension" && "$vsce" package --out "$output/koment-vscode_${version}.vsix")
 
-rm -f "$extension/LICENSE" "$extension/icon.png"
 ls -1 "$output"
