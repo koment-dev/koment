@@ -5,4 +5,5 @@ version = "1.97.1"
 backend = "core:rust"
 
 [tools.rust.options]
+components = "clippy,rustfmt"
 targets = "wasm32-wasip2"
