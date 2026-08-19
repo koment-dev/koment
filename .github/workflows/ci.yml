@@ -19,6 +19,9 @@ concurrency:
 permissions:
   contents: read
 
+env:
+  MISE_DISABLE_TOOLS: github:koment-dev/koment
+
 jobs:
   quality:
     name: quality

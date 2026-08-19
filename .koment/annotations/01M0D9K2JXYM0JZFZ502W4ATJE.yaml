@@ -1,0 +1,44 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/koment-dev/koment/main/schema/v1alpha/annotation.schema.json
+apiVersion: koment.dev/v1alpha
+kind: Annotation
+metadata:
+  id: 01M0D9K2JXYM0JZFZ502W4ATJE
+  created: "2026-08-19T15:17:45Z"
+spec:
+  target:
+    file: .github/workflows/ci.yml
+  type: why
+  title: CI never installs the contributor self-pin
+  body: |-
+    The root mise configuration pins a released koment only for contributor
+    editor and MCP sessions. Every repository gate runs the working tree through
+    Go and does not consume that pin. A cold CI cache previously installed and
+    attested the unused binary independently in each job; the concurrent GitHub
+    API calls exhausted the installation rate limit and failed every real gate
+    before it ran. Disabling only this tool keeps the contributor pin active
+    locally while making CI install exactly the tools its jobs can use.
+  anchor:
+    scope: excerpt
+    excerpt: |-
+      env:
+        MISE_DISABLE_TOOLS: github:koment-dev/koment
+    before: |
+      permissions:
+        contents: read
+    after: |2-
+
+      jobs:
+        quality:
+  author:
+    name: codex-mcp-client
+    kind: agent
+    source: session
+  git:
+    commit: b606e797ad159f0fa03983e36d42a6691e43f24a
+    path: .github/workflows/ci.yml
+    line: 22
+status:
+  lastSeenLine: 22
+  resolution: ok
+  resolvedAt: "2026-08-19T15:17:45Z"
+  resolvedCommit: b606e797ad159f0fa03983e36d42a6691e43f24a
