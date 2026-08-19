@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.0](https://github.com/koment-dev/koment/compare/v3.0.0...v3.1.0) (2026-08-19)
+
+
+### Features
+
+* add Zed Editor support ([8635daf](https://github.com/koment-dev/koment/commit/8635daf9430b5cda3f1218601353b7d3fa024487))
+
 ## [3.0.0](https://github.com/koment-dev/koment/compare/v2.2.0...v3.0.0) (2026-08-10)
 
 
