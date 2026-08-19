@@ -1,0 +1,43 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/koment-dev/koment/main/schema/v1alpha/annotation.schema.json
+apiVersion: koment.dev/v1alpha
+kind: Annotation
+metadata:
+  id: 01M0CYSVD38QKHWQ3Q75WZX8Y5
+  created: "2026-08-19T12:09:12Z"
+spec:
+  target:
+    file: integrations/editors/zed/Cargo.toml
+  type: gotcha
+  title: This version is deliberately frozen; extension.toml carries the real one
+  body: |-
+    Do not sync this with the repository version, and do not add
+    `release-please` markers here (ADR 0139).
+
+    `Cargo.lock` repeats the package version, cargo rewrites that file on every
+    build, and it would strip the marker comments `release-please` needs.
+    Bumping the manifest without the lock leaves them disagreeing from the first
+    build after each release, and a `--locked` build fails outright.
+
+    The crate is `publish = false`, so this number has no consumer. The version
+    Zed shows and the registry resolves lives in `extension.toml`, which does
+    carry the markers and is listed in `release-please-config.json`. The `zed`
+    CI job asserts it matches `.release-please-manifest.json`.
+  anchor:
+    scope: excerpt
+    excerpt: version = "0.0.0"
+    before: |-
+      [package]
+      name = "koment_zed"
+    after: |-
+      edition = "2021"
+      license = "AGPL-3.0-or-later"
+      publish = false
+  author:
+    name: claude-code
+    kind: agent
+    source: session
+status:
+  lastSeenLine: 3
+  resolution: ok
+  resolvedAt: "2026-08-19T12:09:12Z"
+  resolvedCommit: c44fa3fe356b82bd28e785f1387df8b4a62ab91f

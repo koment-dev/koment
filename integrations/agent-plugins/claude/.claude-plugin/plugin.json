@@ -16,5 +16,6 @@
     "comments",
     "mcp",
     "code-quality"
-  ]
+  ],
+  "commands": "./commands/"
 }

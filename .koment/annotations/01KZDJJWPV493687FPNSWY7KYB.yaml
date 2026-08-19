@@ -6,7 +6,7 @@ metadata:
   created: "2026-08-07T07:39:14Z"
 spec:
   target:
-    file: plugins/koment/.opencode-plugin/index.js
+    file: integrations/agent-plugins/opencode/index.js
   type: why
   title: Dispose hook shells out; pre-tool uses MCP
   body: |-

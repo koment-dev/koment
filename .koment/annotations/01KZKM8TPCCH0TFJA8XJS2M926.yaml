@@ -6,26 +6,33 @@ metadata:
   created: "2026-08-09T16:04:08Z"
 spec:
   target:
-    file: plugins/koment/.opencode-plugin/index.js
+    file: integrations/agent-plugins/opencode/index.js
   type: why
-  body: 'swallow: child.stdin may already be closed by an earlier exit'
+  title: MCP shutdown errors remain visible
+  body: |-
+    Ending stdin is the intentional shutdown signal for the stdio server. The
+    returned promise makes a stream failure part of the dispose gate instead of
+    swallowing it; a child that exited earlier is already represented by the
+    connection's terminal error.
   anchor:
     scope: excerpt
-    excerpt: |-
-      }
+    excerpt: |2-
+          close() {
+            if (terminalError) return Promise.reject(terminalError);
+            return new Promise((resolve, reject) => {
+              child.stdin.end((error) => {
+                if (error) reject(error);
+                else resolve();
+              });
+            });
           },
+    before: |2-
+                }
+              }
+              return result;
+    after: |2-
         };
       }
-
-      function run(cmd, args, { cwd, stdin } = {}) {
-    before: |2-
-            try {
-              child.stdin.end();
-            } catch {
-    after: |2-
-        return new Promise((resolve, reject) => {
-          const child = spawn(cmd, args, {
-            cwd,
   author:
     name: janpuc
     email: janpuc@proton.me

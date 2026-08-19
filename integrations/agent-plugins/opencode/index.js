@@ -1,16 +1,22 @@
 import { spawn } from "node:child_process";
-import { randomUUID } from "node:crypto";
+import { readFileSync } from "node:fs";
 
-function startMCP(directory) {
-  const child = spawn("koment", ["mcp", "--write"], {
-    cwd: directory,
-    env: process.env,
-    stdio: ["pipe", "pipe", "pipe"],
-  });
+const packageVersion = JSON.parse(
+  readFileSync(new URL("./package.json", import.meta.url), "utf8")
+).version;
 
+export function connectMCP(child) {
   const pending = new Map();
   let nextID = 1;
   let buffer = "";
+  let terminalError;
+
+  function failConnection(error) {
+    if (terminalError) return;
+    terminalError = error;
+    for (const waiter of pending.values()) waiter.reject(error);
+    pending.clear();
+  }
 
   child.stderr.on("data", (chunk) => {
     const text = chunk.toString("utf8");
@@ -29,38 +35,62 @@ function startMCP(directory) {
       let message;
       try {
         message = JSON.parse(line);
-      } catch {
+      } catch (error) {
+        failConnection(new Error("koment MCP emitted invalid JSON", { cause: error }));
+        child.kill();
+        return;
+      }
+      if (!("id" in message)) {
         continue;
       }
       const id = message.id;
       const waiter = pending.get(id);
-      if (!waiter) continue;
+      if (!waiter) {
+        failConnection(new Error(`koment MCP returned unexpected response id ${id}`));
+        child.kill();
+        return;
+      }
       pending.delete(id);
       if (message.error) {
         waiter.reject(new Error(message.error.message || "mcp error"));
       } else {
-        waiter.resolve(message.result || {});
+        waiter.resolve(message.result ?? {});
       }
     }
   });
 
-  child.on("exit", (code) => {
-    for (const waiter of pending.values()) {
-      waiter.reject(new Error(`koment mcp exited (code=${code})`));
-    }
-    pending.clear();
+  child.on("error", failConnection);
+  child.stdin.on("error", failConnection);
+  child.stdout.on("error", failConnection);
+  child.stderr.on("error", failConnection);
+  child.on("exit", (code, signal) => {
+    const outcome = signal ? `signal=${signal}` : `code=${code}`;
+    failConnection(new Error(`koment mcp exited (${outcome})`));
   });
 
   function request(method, params) {
+    if (terminalError) return Promise.reject(terminalError);
     const id = nextID++;
     const payload = JSON.stringify({ jsonrpc: "2.0", id, method, params: params || {} }) + "\n";
     return new Promise((resolve, reject) => {
       pending.set(id, { resolve, reject });
       child.stdin.write(payload, (err) => {
-        if (err) {
-          pending.delete(id);
-          reject(err);
+        if (err) failConnection(err);
+      });
+    });
+  }
+
+  function notify(method, params) {
+    if (terminalError) return Promise.reject(terminalError);
+    const payload = JSON.stringify({ jsonrpc: "2.0", method, params: params || {} }) + "\n";
+    return new Promise((resolve, reject) => {
+      child.stdin.write(payload, (error) => {
+        if (error) {
+          failConnection(error);
+          reject(error);
+          return;
         }
+        resolve();
       });
     });
   }
@@ -72,13 +102,10 @@ function startMCP(directory) {
       return request("initialize", {
         protocolVersion: "2024-11-05",
         capabilities: {},
-        clientInfo: { name: "@koment/opencode-koment", version: "0.1.0" },
+        clientInfo: { name: "@koment/opencode-koment", version: packageVersion },
       });
     },
-    notify(method, params) {
-      const payload = JSON.stringify({ jsonrpc: "2.0", method, params: params || {} }) + "\n";
-      child.stdin.write(payload);
-    },
+    notify,
     async callTool(name, args) {
       const result = await request("tools/call", { name, arguments: args || {} });
       if (Array.isArray(result.content)) {
@@ -91,12 +118,25 @@ function startMCP(directory) {
       return result;
     },
     close() {
-      try {
-        child.stdin.end();
-      } catch {
-      }
+      if (terminalError) return Promise.reject(terminalError);
+      return new Promise((resolve, reject) => {
+        child.stdin.end((error) => {
+          if (error) reject(error);
+          else resolve();
+        });
+      });
     },
   };
+}
+
+function startMCP(directory) {
+  return connectMCP(
+    spawn("koment", ["mcp", "--write"], {
+      cwd: directory,
+      env: process.env,
+      stdio: ["pipe", "pipe", "pipe"],
+    })
+  );
 }
 
 function run(cmd, args, { cwd, stdin } = {}) {
@@ -134,12 +174,11 @@ function deny(reason) {
 }
 
 export default async ({ directory }) => {
-  const sessionID = randomUUID();
   let mcp;
   try {
     mcp = startMCP(directory);
     await mcp.initialize();
-    mcp.notify("notifications/initialized");
+    await mcp.notify("notifications/initialized");
   } catch (err) {
     throw new Error(
       `koment plugin failed to start the MCP server in ${directory}:\n` +
@@ -185,7 +224,11 @@ export default async ({ directory }) => {
           );
         }
       }
-      mcp.close();
+      try {
+        await mcp.close();
+      } catch (err) {
+        failures.push("close koment mcp:\n" + (err.message || String(err)));
+      }
       if (failures.length > 0) {
         deny("koment policy gate failed:\n" + failures.join("\n"));
       }

@@ -2,7 +2,7 @@
 
 [Hermes Agent](https://hermes-agent.nousresearch.com) is Nous Research's
 self-hosted agent. It reads MCP servers from `mcp_servers` in its `config.yaml`,
-typically at `~/.hermes/hermes-agent/config.yaml`.
+typically at `~/.hermes/config.yaml`.
 
 There are two halves, and you want both. The **plugin** enforces the policy:
 it refuses a write that adds an explanatory comment and refuses to let a turn
@@ -12,20 +12,21 @@ read the reasoning that is already recorded. Neither substitutes for the other.
 ## Install the plugin
 
 ```sh
-hermes plugins install koment-dev/koment-hermes
-```
-
-```yaml
-plugins:
-  enabled:
-    - koment
+version=<version>
+plugin_home="${HERMES_HOME:-$HOME/.hermes}/plugins"
+mkdir -p "$plugin_home"
+curl -fsSL \
+  "https://github.com/koment-dev/koment/releases/download/v${version}/koment-plugin-hermes_v${version}.tar.gz" \
+  | tar -xz -C "$plugin_home"
+hermes plugins enable koment
+hermes plugins list
 ```
 
 It hooks `pre_tool_call` and `pre_verify`, shelling out to the `koment` binary
 so that the decision is the same one CI and every other editor integration
 makes. Set `KOMENT_PLUGIN_DISABLED=1` to silence it without uninstalling; it
 also stays quiet when `koment` is not on the `PATH`. See
-[the plugin README](https://github.com/koment-dev/koment/tree/main/plugins/koment/.hermes-plugin).
+[the plugin README](../../../integrations/agent-plugins/hermes/README.md).
 
 ## Configure — local
 
@@ -62,7 +63,7 @@ the port can read every annotation in the repository. It binds loopback unless
 you say otherwise, and warns at startup when you do. If Hermes is on another
 host, put the port behind something that authenticates or restrict it at the
 network level. The approved served tier replaces this behaviour
-([ADR 0105](../decisions/0105-authenticated-writes-materialize-through-git.md)).
+([ADR 0105](../../explanation/decisions/0105-authenticated-writes-materialize-through-git.md)).
 
 ## Filter the tools
 
@@ -97,4 +98,4 @@ project-wide rationale in an ADR.
   eventually forgets, which is the right behaviour for preferences and wrong for
   a verbatim record anchored to a line of code. koment deliberately does not use
   one as a backend. Git remains the exact record
-  ([ADR 0100](../decisions/0100-one-git-record-per-annotation.md)).
+  ([ADR 0100](../../explanation/decisions/0100-one-git-record-per-annotation.md)).

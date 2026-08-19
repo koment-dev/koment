@@ -15,7 +15,7 @@ client. Pick yours:
 | Zed | Zed `settings.json` | [zed.md](zed.md) |
 | Anything else | — | [other.md](other.md) |
 
-See also [allowed-annotations.md](allowed-annotations.md) for the shape and
+See also [allowed comment patterns](../../reference/allowed-comment-patterns.md) for the shape and
 common examples of `spec.comments.allowedAnnotations`, the user-configurable
 extension to the intrinsic comment classes.
 
@@ -73,5 +73,5 @@ boundary: a client can decline trust or write through an unhooked process.
 The authoritative boundary is CI. Require `koment check`, `koment comments
 check` and `koment agents check` on the protected branch. Then an ordinary
 comment or a weakened adapter cannot land regardless of which editor or agent
-created it. [ADR 0108](../decisions/0108-layer-agent-guidance-behind-an-authoritative-policy-gate.md)
+created it. [ADR 0108](../../explanation/decisions/0108-layer-agent-guidance-behind-an-authoritative-policy-gate.md)
 records the layers and their limits.

@@ -1,0 +1,38 @@
+{
+  "name": "@koment/opencode-koment",
+  "version": "3.0.0",
+  "description": "OpenCode plugin for koment: enforce the no-inline-comment policy through the koment MCP server. Configure @koment/opencode-koment in opencode.json.",
+  "type": "module",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/koment-dev/koment.git",
+    "directory": "integrations/agent-plugins/opencode"
+  },
+  "keywords": [
+    "opencode",
+    "koment",
+    "plugin",
+    "mcp",
+    "policy",
+    "code-rationale"
+  ],
+  "author": "koment-dev",
+  "license": "AGPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/koment-dev/koment/issues"
+  },
+  "homepage": "https://github.com/koment-dev/koment/tree/main/integrations/agent-plugins/opencode#readme",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test index.test.js"
+  },
+  "files": [
+    "LICENSE",
+    "index.js",
+    "plugin.json",
+    "README.md"
+  ]
+}

@@ -15,6 +15,9 @@ run = "mise run comments"
 [pre-commit.commands.agent-policy]
 run = "mise run agent-policy"
 
+[pre-commit.commands.layout]
+run = "mise run layout-check"
+
 [commit-msg]
 parallel = true
 

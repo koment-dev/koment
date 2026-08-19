@@ -12,30 +12,44 @@
       "extra-files": [
         {
           "type": "generic",
-          "path": "charts/koment/Chart.yaml"
+          "path": "distribution/helm/koment/Chart.yaml"
         },
         {
           "type": "generic",
-          "path": "plugins/koment/.hermes-plugin/plugin.yaml"
+          "path": "integrations/editors/zed/extension.toml"
+        },
+        {
+          "type": "generic",
+          "path": "integrations/agent-plugins/hermes/plugin.yaml"
         },
         {
           "type": "json",
-          "path": "editors/vscode/package.json",
+          "path": "integrations/editors/vscode/package.json",
           "jsonpath": "$.version"
         },
         {
           "type": "json",
-          "path": "plugins/koment/.claude-plugin/plugin.json",
+          "path": "integrations/editors/vscode/package-lock.json",
           "jsonpath": "$.version"
         },
         {
           "type": "json",
-          "path": "plugins/koment/.opencode-plugin/plugin.json",
+          "path": "integrations/editors/vscode/package-lock.json",
+          "jsonpath": "$['packages'][''].version"
+        },
+        {
+          "type": "json",
+          "path": "integrations/agent-plugins/claude/.claude-plugin/plugin.json",
           "jsonpath": "$.version"
         },
         {
           "type": "json",
-          "path": "plugins/koment/.opencode-plugin/package.json",
+          "path": "integrations/agent-plugins/opencode/plugin.json",
+          "jsonpath": "$.version"
+        },
+        {
+          "type": "json",
+          "path": "integrations/agent-plugins/opencode/package.json",
           "jsonpath": "$.version"
         },
         {

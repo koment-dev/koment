@@ -6,7 +6,7 @@ metadata:
   created: "2026-08-09T21:21:00Z"
 spec:
   target:
-    file: plugins/koment/.hermes-plugin/__init__.py
+    file: integrations/agent-plugins/hermes/__init__.py
   type: why
   body: |-
     Hermes tool name -> (path argument, content arguments in priority order).

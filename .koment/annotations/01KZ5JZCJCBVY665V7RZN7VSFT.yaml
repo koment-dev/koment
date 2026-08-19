@@ -6,7 +6,7 @@ metadata:
   created: "2026-08-04T00:00:00Z"
 spec:
   target:
-    file: charts/koment/values.yaml
+    file: distribution/helm/koment/values.yaml
   type: gotcha
   title: Numeric uids are pinned to the digest of the curlimages/curl image
   body: |-

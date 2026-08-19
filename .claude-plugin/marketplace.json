@@ -8,7 +8,7 @@
   "plugins": [
     {
       "name": "koment",
-      "source": "./plugins/koment",
+      "source": "./integrations/agent-plugins/claude",
       "description": "Strict koment procedure, writable MCP tools, and completion policy checks.",
       "category": "development",
       "tags": [

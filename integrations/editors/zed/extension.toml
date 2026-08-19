@@ -1,0 +1,70 @@
+id = "koment"
+name = "koment"
+# x-release-please-start-version
+version = "3.0.0"
+# x-release-please-end
+schema_version = 1
+authors = ["Jan Pucilowski <janpuc@proton.me>"]
+description = "Read and write out-of-band code annotations. Rationale that lives beside the code instead of inside it."
+repository = "https://github.com/koment-dev/koment"
+
+[language_servers.koment]
+name = "koment"
+languages = [
+  "Bash",
+  "C",
+  "C#",
+  "C++",
+  "Clojure",
+  "CSS",
+  "Dart",
+  "Diff",
+  "Docker",
+  "Elixir",
+  "Elm",
+  "Erlang",
+  "Fish",
+  "Git Commit",
+  "Go",
+  "GraphQL",
+  "Groovy",
+  "Haskell",
+  "Helm",
+  "HTML",
+  "INI",
+  "Java",
+  "JavaScript",
+  "JSON",
+  "Julia",
+  "Justfiles",
+  "Kotlin",
+  "LaTeX",
+  "Lua",
+  "Luau",
+  "Makefile",
+  "Markdown",
+  "Nix",
+  "OCaml",
+  "PHP",
+  "Proto",
+  "Python",
+  "R",
+  "Ruby",
+  "Rust",
+  "Scala",
+  "SCSS",
+  "Shell Script",
+  "Solidity",
+  "SQL",
+  "Svelte",
+  "Swift",
+  "Terraform",
+  "TOML",
+  "TypeScript",
+  "Vue",
+  "XML",
+  "YAML",
+  "Zig",
+]
+
+[context_servers.koment]

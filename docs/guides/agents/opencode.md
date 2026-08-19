@@ -27,15 +27,15 @@ MCP servers are enabled by default; add `"enabled": false` to switch one off
 without deleting it.
 
 The `plugin` entry loads `.opencode/plugins/koment.js`, which mirrors
-`.codex/hooks.json`: it denies ordinary Go comment intent on `edit`/`write`
+`.codex/hooks.json`: it denies ordinary explanatory comment intent on `edit`/`write`
 and re-runs the policy gate at session idle. The plugin shells out to
 `koment`, so `koment` must be on `PATH` (or set up via the project setup
 Action). Skip the `plugin` entry if you only want the read tools.
 
-## OpenCode plugin
+## Published OpenCode plugin
 
-If you prefer a plugin directory over a generated file, the same hooks ship in
-`plugins/koment/.opencode-plugin/` and can be referenced by Git path:
+If you prefer a published package over the generated adapter, configure the npm
+package and remove `./.opencode/plugins/koment.js` from the plugin list:
 
 ```json
 {
@@ -46,13 +46,14 @@ If you prefer a plugin directory over a generated file, the same hooks ship in
       "command": ["koment", "mcp", "--write"]
     }
   },
-  "plugin": ["koment-dev/koment/plugins/koment/.opencode-plugin"]
+  "plugin": ["@koment/opencode-koment"]
 }
 ```
 
-This path form is convenient when several repositories share the plugin from
-one upstream reference. Restart OpenCode after changing either config so the
-hook is reloaded.
+OpenCode installs configured npm plugins on startup. Keep the `mcp` entry so the
+agent can read annotations; the plugin's private MCP connection enforces hooks
+and is not a replacement for the agent-visible server. Restart OpenCode after
+changing either config.
 
 ## Remote
 
@@ -88,5 +89,5 @@ project-wide rationale in an ADR.
 - Commit `opencode.json` and every contributor gets the tools automatically.
 - `koment agents install` regenerates both `opencode.json` and
   `.opencode/plugins/koment.js`; `koment agents check` flags drift on both.
-- The decision to ship both a generated adapter and a plugin directory is
-  recorded in ADR 0126.
+- The decision to ship both a generated adapter and a plugin package is
+  recorded in [ADR 0144](../../explanation/decisions/0144-configure-opencode-plugin-and-fail-closed.md).

@@ -10,23 +10,35 @@ spec:
   type: invariant
   title: Plugin manifests must match release-please version exactly
   body: |-
-    Both plugin manifests must pin the exact value in
-    .release-please-manifest.json rather than drift toward it. A version
-    mismatch would mean the release attaches archives stamped with a version
-    that release-please never wrote to the file, which silently breaks anyone
-    pinning a file:// reference against the tag. This gate fails the build
-    before the release job runs.
+    Every manifest that carries a version must pin the exact value in
+    .release-please-manifest.json rather than drift toward it. A mismatch would
+    mean the release attaches archives stamped with a version release-please
+    never wrote to the file, which silently breaks anyone pinning a file://
+    reference against the tag.
+
+    The `jq -re '.["."]'` is the whole check. This read `jq -r '.version'` until
+    2026-08-19, and that key does not exist — the manifest is `{".":
+    "3.0.0"}`. It returned the string "null", the guard below it was written as
+    `if [ -n "$root_version" ]`, and so the comparison was skipped on every run
+    since the job was written. The gate this annotation described had never once
+    fired.
+
+    `-re` is deliberate: `-e` exits non-zero if the key is missing, so the same
+    mistake now fails the job instead of quietly disabling it. Do not soften it
+    back to a presence check.
   anchor:
     scope: excerpt
-    excerpt: "            root_version=$(jq -r '.version // empty' .release-please-manifest.json)\n            if [ -n \"$root_version\" ] && [ \"$version\" != \"$root_version\" ]; then\n              echo \"::error::$manifest version ($version) does not match root ($root_version)\"\n              exit 1\n            fi"
-    before: '            test -n "$name"    || { echo "::error::$manifest: name is empty";    exit 1; }
-
-            test -n "$version" || { echo "::error::$manifest: version is empty"; exit 1; }'
-    after: '            if [ -n "$entrypoint" ]; then
-
-              dir=$(dirname "$manifest")
-
-              test -f "$dir/$entrypoint" || { echo "::error::$manifest entrypoint $entrypoint not found"; exit 1; }'
+    excerpt: |2-
+                  root_version=$(jq -re '.["."]' .release-please-manifest.json)
+                  if [ "$version" != "$root_version" ]; then
+    before: |2-
+                  entrypoint=$(jq -r '.entrypoint // empty' "$manifest")
+                  test -n "$name"    || { echo "::error::$manifest: name is empty";    exit 1; }
+                  test -n "$version" || { echo "::error::$manifest: version is empty"; exit 1; }
+    after: |2-
+                    echo "::error::$manifest version ($version) does not match root ($root_version)"
+                    exit 1
+                  fi
   author:
     name: opencode
     kind: agent
@@ -36,4 +48,7 @@ spec:
     path: .github/workflows/ci.yml
     line: 482
 status:
-  lastSeenLine: 482
+  lastSeenLine: 539
+  resolution: ok
+  resolvedAt: "2026-08-19T12:09:48Z"
+  resolvedCommit: c44fa3fe356b82bd28e785f1387df8b4a62ab91f

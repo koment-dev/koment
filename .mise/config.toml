@@ -1,10 +1,10 @@
 [tools]
 actionlint = "1.7.12"
 "github:koment-dev/koment" = "2.2.0"
-go = "1.26.5"
-"go:golang.org/x/vuln/cmd/govulncheck" = "1.6.0"
+go = "1.26.6"
+"go:golang.org/x/vuln/cmd/govulncheck" = "1.7.0"
 golangci-lint = "2.12.2"
-helm = "4.2.3"
+helm = "4.2.4"
 helm-docs = "1.14.2"
 lefthook = "2.1.10"
 zizmor = "1.29.0"
@@ -77,7 +77,8 @@ snapshot() {
 }
 snapshot >"$before"
 go generate ./...
-helm-docs --chart-search-root=charts
+go run ./internal/projectlayout/cmd/layout render
+helm-docs --chart-search-root=distribution/helm
 snapshot >"$after"
 if ! cmp -s "$before" "$after"; then
   git status --short
@@ -88,6 +89,14 @@ fi
 [tasks.annotations]
 description = "Verify koment's annotations"
 run = "go run ./cmd/koment check"
+
+[tasks.layout-check]
+description = "Reject paths outside the repository layout contract"
+run = "go run ./internal/projectlayout/cmd/layout check"
+
+[tasks.layout-render]
+description = "Render the repository layout reference"
+run = "go run ./internal/projectlayout/cmd/layout render"
 
 [tasks.comments]
 description = "Reject comments that bypass koment policy"
@@ -112,13 +121,13 @@ zizmor --strict-collection .github/workflows action.yml
 
 [tasks.helm-lint]
 description = "Lint the Helm chart"
-run = "helm lint charts/koment"
+run = "helm lint distribution/helm/koment"
 
 [tasks.helm-template]
 description = "Render the unified server and hardened optional resources"
 run = """
-helm template koment charts/koment >/dev/null
-helm template koment charts/koment \
+helm template koment distribution/helm/koment >/dev/null
+helm template koment distribution/helm/koment \
   --set metrics.enabled=true \
   --set github.existingSecret=koment-provider \
   --set auth.existingSecret=koment-agents \
@@ -129,7 +138,7 @@ helm template koment charts/koment \
 
 [tasks.extension-test]
 description = "Test the dependency-free VS Code protocol client"
-run = "mise --cd editors/vscode run test"
+run = "mise --cd integrations/editors/vscode run test"
 
 [hooks]
 postinstall = "lefthook install"

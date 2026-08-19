@@ -42,7 +42,7 @@ codex mcp list
 ## Make it use them
 
 Codex reads the managed contract in `AGENTS.md`. The generated pre-tool hook
-denies ordinary Go comment intent in `apply_patch`; its stop hook checks
+denies ordinary explanatory comment intent in `apply_patch`; its stop hook checks
 annotations, comments and adapters before the turn can finish. Run `koment
 agents check` in CI because hooks remain a workstation guardrail, not the
 authoritative boundary.

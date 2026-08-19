@@ -15,6 +15,13 @@ guidance and a Stop hook that refuses completion while policy fails:
 Install it at project scope. The completion hook expects a koment-enabled
 repository and should not run in unrelated workspaces.
 
+It also installs eight slash commands — `/koment:check`, `/koment:show`,
+`/koment:search`, `/koment:add`, `/koment:convert`, `/koment:reanchor`,
+`/koment:forget` and `/koment:bootstrap`. Each carries the constraint that makes
+it safe to run, which is why they exist alongside the skill rather than
+duplicating it (ADR 0141). See
+[slash commands](../../reference/slash-commands.md).
+
 `koment agents install` writes this project configuration and the shared agent
 contract. The resulting `.mcp.json` contains:
 
