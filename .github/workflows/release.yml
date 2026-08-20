@@ -547,8 +547,20 @@ jobs:
             echo "::error::marketplace publication is enabled but VSCE_PAT is unset"
             exit 1
           fi
+          publish_with_retry() {
+            attempt=1
+            until "$@"; do
+              if [ "$attempt" -ge 3 ]; then
+                return 1
+              fi
+              echo "::warning::marketplace command failed on attempt ${attempt}; retrying"
+              attempt=$((attempt + 1))
+              sleep 10
+            done
+          }
           for package in dist/koment-vscode_*.vsix; do
-            integrations/editors/vscode/node_modules/.bin/vsce publish --packagePath "$package"
+            publish_with_retry integrations/editors/vscode/node_modules/.bin/vsce publish \
+              --skip-duplicate --packagePath "$package"
           done
 
       - name: publish to Open VSX
@@ -566,6 +578,18 @@ jobs:
             echo "creating Open VSX namespace ${publisher}"
             integrations/editors/vscode/node_modules/.bin/ovsx create-namespace "$publisher"
           fi
+          publish_with_retry() {
+            attempt=1
+            until "$@"; do
+              if [ "$attempt" -ge 3 ]; then
+                return 1
+              fi
+              echo "::warning::marketplace command failed on attempt ${attempt}; retrying"
+              attempt=$((attempt + 1))
+              sleep 10
+            done
+          }
           for package in dist/koment-vscode_*.vsix; do
-            integrations/editors/vscode/node_modules/.bin/ovsx publish "$package"
+            publish_with_retry integrations/editors/vscode/node_modules/.bin/ovsx publish \
+              --skip-duplicate "$package"
           done
