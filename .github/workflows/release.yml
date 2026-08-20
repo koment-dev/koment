@@ -210,13 +210,14 @@ jobs:
 
       - name: take the formula this release published
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_TAG: ${{ needs.please.outputs.tag }}
           SOURCE_REPOSITORY: ${{ github.repository }}
         run: |
           mkdir -p Formula
-          gh release download "$RELEASE_TAG" --repo "$SOURCE_REPOSITORY" \
-            --pattern koment.rb --output Formula/koment.rb --clobber
+          curl --fail --location --silent --show-error \
+            --retry 6 --retry-all-errors --retry-delay 5 \
+            --output Formula/koment.rb \
+            "https://github.com/${SOURCE_REPOSITORY}/releases/download/${RELEASE_TAG}/koment.rb"
 
       - name: reject a formula that does not carry this version
         env:
@@ -294,6 +295,8 @@ jobs:
       - name: Install the release that was just published
         id: setup
         uses: ./
+        with:
+          version: ${{ needs.please.outputs.version }}
 
       - name: Verify it is the release this run produced
         env:
@@ -484,13 +487,27 @@ jobs:
 
       - name: collect the canonical archives
         env:
-          GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ needs.please.outputs.tag }}
+          SOURCE_REPOSITORY: ${{ github.repository }}
+          VERSION: ${{ needs.please.outputs.version }}
         run: |
           set -euo pipefail
           mkdir -p archives
-          gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --dir archives \
-            --pattern 'koment_*.tar.gz' --pattern 'koment_*.zip' --pattern 'koment_*_checksums.txt'
+          base="https://github.com/${SOURCE_REPOSITORY}/releases/download/${RELEASE_TAG}"
+          for target in linux/amd64 linux/arm64 darwin/amd64 darwin/arm64 windows/amd64 windows/arm64; do
+            os=${target%/*}
+            arch=${target#*/}
+            extension=tar.gz
+            [ "$os" = windows ] && extension=zip
+            archive="koment_${VERSION}_${os}_${arch}.${extension}"
+            curl --fail --location --silent --show-error \
+              --retry 6 --retry-all-errors --retry-delay 5 \
+              --output "archives/${archive}" "${base}/${archive}"
+          done
+          curl --fail --location --silent --show-error \
+            --retry 6 --retry-all-errors --retry-delay 5 \
+            --output "archives/koment_${VERSION}_checksums.txt" \
+            "${base}/koment_${VERSION}_checksums.txt"
           ls -l archives
 
       - name: package extension for every platform

@@ -68,8 +68,10 @@ runs:
         work=$(mktemp -d)
 
         echo "installing koment ${version} (${platform}/${arch})"
-        curl -fsSL --retry 3 -o "${work}/${archive}" "${base}/${archive}"
-        curl -fsSL --retry 3 -o "${work}/checksums.txt" "${base}/koment_${version}_checksums.txt"
+        curl -fsSL --retry 6 --retry-all-errors --retry-delay 5 \
+          -o "${work}/${archive}" "${base}/${archive}"
+        curl -fsSL --retry 6 --retry-all-errors --retry-delay 5 \
+          -o "${work}/checksums.txt" "${base}/koment_${version}_checksums.txt"
 
         (
           cd "$work"

@@ -31,6 +31,12 @@ the URI-template suffix and posts each asset as raw binary data to that exact
 endpoint. Asset names are restricted to the portable characters already used
 by every release artifact.
 
+Downstream jobs consume the exact release version from this workflow through
+public asset URLs. Homebrew and editor packaging no longer ask GitHub CLI to
+rediscover the release by tag, and the release verification matrix passes the
+exact version to the setup action instead of resolving `latest`. Those bounded
+downloads retry transient HTTP failures but never choose another release.
+
 The helper performs no tag lookup, visibility retry or replacement upload. A
 create-release response is the authoritative identifier for the release it
 created. A failed or partial write stops the workflow; published versions are
@@ -45,6 +51,8 @@ supersedes only its tag-visibility gate and replacement-upload mechanism.
 - Asset upload no longer depends on cross-job tag lookup becoming consistent.
 - The workflow uses the release identifier returned by the write it is
   continuing, rather than searching for the object it just created.
+- Downstream packaging and verification cannot drift to a different `latest`
+  release or repeat the authenticated tag lookup that failed publication.
 - A malformed or cross-repository upload URL fails before any network write.
 - Duplicate names fail instead of silently replacing bytes in a published
   release.
