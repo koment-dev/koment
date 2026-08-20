@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.1](https://github.com/koment-dev/koment/compare/v3.1.0...v3.1.1) (2026-08-20)
+
+
+### Bug Fixes
+
+* **release:** gate distribution on visible release assets ([#103](https://github.com/koment-dev/koment/issues/103)) ([cb158ad](https://github.com/koment-dev/koment/commit/cb158ade5f8f9d261e096da57bd55fd033207365))
+
 ## [3.1.0](https://github.com/koment-dev/koment/compare/v3.0.0...v3.1.0) (2026-08-19)
 
 
