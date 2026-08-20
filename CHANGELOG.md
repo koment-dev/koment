@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.2](https://github.com/koment-dev/koment/compare/v3.1.1...v3.1.2) (2026-08-20)
+
+
+### Continuous Integration
+
+* restore Go cache before installing tools ([#106](https://github.com/koment-dev/koment/issues/106)) ([1649b21](https://github.com/koment-dev/koment/commit/1649b2189cbc80ee0df9c8db7317c60e2ac8ed06))
+
 ## [3.1.1](https://github.com/koment-dev/koment/compare/v3.1.0...v3.1.1) (2026-08-20)
 
 

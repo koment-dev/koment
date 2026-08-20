@@ -1,6 +1,6 @@
 name: koment
 # x-release-please-start-version
-version: "3.1.1"
+version: "3.1.2"
 # x-release-please-end
 description: "Keep rationale out of source comments and stale annotations out of the tree. Blocks a file write that adds an ordinary explanatory comment, telling the agent to record the reasoning with koment_add instead, and refuses to let a turn finish while koment check, koment comments check or koment agents check is failing."
 author: "koment-dev"
