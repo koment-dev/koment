@@ -88,8 +88,13 @@ dials — the action wrapper, and the binary it fetches:
 ```yaml
       - uses: koment-dev/koment@v3
         with:
-          version: 3.1.0        # pin the CLI exactly; omit for the latest release
+          version: ${{ vars.KOMENT_VERSION }} # pin the CLI exactly; omit for the latest release
 ```
+
+Set the `KOMENT_VERSION` Actions repository variable to the exact `X.Y.Z`
+release your organisation approved. Keeping that choice in repository settings
+lets the guide stay true as new releases appear; remove the `with:` block when
+you want the action's `latest` default instead.
 
 **This is an example, not what koment does to itself.** koment pins every
 `uses:` to a full commit SHA, because a moving tag is a supply-chain trust
