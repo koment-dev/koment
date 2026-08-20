@@ -23,13 +23,13 @@ spec:
     to disagree until this pin moves.
   anchor:
     scope: excerpt
-    excerpt: '"github:koment-dev/koment" = "2.2.0"'
+    excerpt: '"github:koment-dev/koment" = "3.1.1"'
     before: |-
       [tools]
       actionlint = "1.7.12"
     after: |-
       go = "1.26.6"
-      "go:golang.org/x/vuln/cmd/govulncheck" = "1.6.0"
+      "go:golang.org/x/vuln/cmd/govulncheck" = "1.7.0"
       golangci-lint = "2.12.2"
   author:
     name: janpuc
@@ -43,5 +43,5 @@ spec:
 status:
   lastSeenLine: 3
   resolution: ok
-  resolvedAt: "2026-08-09T06:08:59Z"
-  resolvedCommit: f3b11be6187f9922ce35a22562fe2ef4d0592361
+  resolvedAt: "2026-08-20T08:04:15Z"
+  resolvedCommit: 8ca58ef8a2ae7e3698550c1ac70556c7a4dc642c

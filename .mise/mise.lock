@@ -23,23 +23,23 @@ url_api = "https://api.github.com/repos/rhysd/actionlint/releases/assets/3849248
 provenance = "github-attestations"
 
 [[tools."github:koment-dev/koment"]]
-version = "2.2.0"
+version = "3.1.1"
 backend = "github:koment-dev/koment"
 
 [tools."github:koment-dev/koment"."platforms.linux-arm64"]
-checksum = "sha256:a54b921842fdde63d50e3801d49e11a48d90c9e086b0ac9e38c1665b08d865a8"
-url = "https://github.com/koment-dev/koment/releases/download/v2.2.0/koment_2.2.0_linux_arm64.tar.gz"
-url_api = "https://api.github.com/repos/koment-dev/koment/releases/assets/504978665"
+checksum = "sha256:9900cd2035165a318cfc4f23c3f097e4518e968951c8c8127cb9600709c6ec96"
+url = "https://github.com/koment-dev/koment/releases/download/v3.1.1/koment_3.1.1_linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/koment-dev/koment/releases/assets/521941444"
 
 [tools."github:koment-dev/koment"."platforms.linux-x64"]
-checksum = "sha256:d7f7622e48c5b652c7242b286e0d1ca32056b5363e245ab0279b0a4a0e3ad48b"
-url = "https://github.com/koment-dev/koment/releases/download/v2.2.0/koment_2.2.0_linux_amd64.tar.gz"
-url_api = "https://api.github.com/repos/koment-dev/koment/releases/assets/504978667"
+checksum = "sha256:6b1e922f5c95739484b325676c6d69d1a16cbe543592f39654de93278980897d"
+url = "https://github.com/koment-dev/koment/releases/download/v3.1.1/koment_3.1.1_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/koment-dev/koment/releases/assets/521941440"
 
 [tools."github:koment-dev/koment"."platforms.macos-arm64"]
-checksum = "sha256:1ad288e592765ebe5af09c79e92c6e1b8cc32290d1efde144a8c8c5dead9f399"
-url = "https://github.com/koment-dev/koment/releases/download/v2.2.0/koment_2.2.0_darwin_arm64.tar.gz"
-url_api = "https://api.github.com/repos/koment-dev/koment/releases/assets/504978663"
+checksum = "sha256:263078074ffb81e10dbed097ab87f5e1dac208adbec302dd0bc6841075bd0cda"
+url = "https://github.com/koment-dev/koment/releases/download/v3.1.1/koment_3.1.1_darwin_arm64.tar.gz"
+url_api = "https://api.github.com/repos/koment-dev/koment/releases/assets/521941441"
 
 [[tools.go]]
 version = "1.26.6"
