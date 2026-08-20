@@ -67,13 +67,14 @@ the approved destination.
 - [0143 — Make the repository tree a closed contract](0143-make-the-repository-tree-a-closed-contract.md)
 - [0144 — Configure the OpenCode plugin and fail closed](0144-configure-opencode-plugin-and-fail-closed.md)
 - [0145 — License only the Zed extension under GPLv3](0145-license-the-zed-extension-under-gplv3.md)
-- [0146 — Gate distribution on visible release assets](0146-gate-distribution-on-visible-release-assets.md)
+- [0147 — Upload release assets through the creation response](0147-upload-release-assets-through-the-creation-response.md)
 
 ## Superseded decisions
 
 - [0108 — Layer agent guidance behind an authoritative policy gate](0108-layer-agent-guidance-behind-an-authoritative-policy-gate.md) — superseded by 0124
 - [0126 — Fix the VS Code extension marketplace name to `koment-dev`](0126-fix-vscode-marketplace-extension-name.md) — superseded by 0127
 - [0129 — OpenCode plugin as a first-class installable](0129-opencode-plugin-distribution-surface.md) — superseded by 0144
+- [0146 — Gate distribution on visible release assets](0146-gate-distribution-on-visible-release-assets.md) — superseded by 0147
 
 Use [0000-template.md](0000-template.md) for a new decision. A new dependency or
 a structural change still requires its own ADR when these decisions do not

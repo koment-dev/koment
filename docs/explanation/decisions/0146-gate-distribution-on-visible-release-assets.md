@@ -1,7 +1,7 @@
 # 0146 — Gate distribution on visible release assets
 
 Date: 2026-08-19
-Status: Accepted
+Status: Superseded by 0147
 
 ## Context
 
