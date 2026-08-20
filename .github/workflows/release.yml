@@ -89,15 +89,14 @@ jobs:
 
       - name: attach to the release
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ needs.please.outputs.tag }}
         run: |
-          gh release upload "$RELEASE_TAG" \
+          ./scripts/upload-release-assets.sh "$RELEASE_TAG" \
             dist/koment-plugin-*.tar.gz \
             dist/koment-plugin-*.tar.gz.sigstore.json \
             dist/koment-plugins_*_checksums.txt \
-            dist/koment-plugins_*.sigstore.json \
-            --clobber
+            dist/koment-plugins_*.sigstore.json
 
   binaries:
     name: publish binaries
@@ -187,13 +186,12 @@ jobs:
 
       - name: attach to the release
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ needs.please.outputs.tag }}
         run: |
-          gh release upload "$RELEASE_TAG" \
+          ./scripts/upload-release-assets.sh "$RELEASE_TAG" \
             dist/koment_*.tar.gz dist/koment_*.zip dist/koment_*_checksums.txt \
-            dist/koment_*_checksums.sigstore.json dist/koment.rb dist/koment-scoop.json \
-            --clobber
+            dist/koment_*_checksums.sigstore.json dist/koment.rb dist/koment-scoop.json
 
   tap:
     name: publish the homebrew formula
@@ -367,7 +365,7 @@ jobs:
 
   mcp-registry:
     name: publish MCP registry metadata
-    needs: [please, image]
+    needs: [please, binaries, image]
     if: needs.please.outputs.released == 'true'
     runs-on: ubuntu-24.04
     permissions:
@@ -408,7 +406,7 @@ jobs:
 
   chart:
     name: publish chart
-    needs: [please, image]
+    needs: [please, binaries, image]
     if: needs.please.outputs.released == 'true'
     runs-on: ubuntu-24.04
     permissions:
@@ -435,7 +433,7 @@ jobs:
 
       - name: package and push
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ needs.please.outputs.tag }}
         run: |
           helm registry login ghcr.io \
@@ -451,10 +449,9 @@ jobs:
           cosign sign-blob --yes \
             --bundle "/tmp/koment-${CHART_VERSION}.tgz.sigstore.json" \
             "/tmp/koment-${CHART_VERSION}.tgz"
-          gh release upload "$RELEASE_TAG" \
+          ./scripts/upload-release-assets.sh "$RELEASE_TAG" \
             "/tmp/koment-${CHART_VERSION}.tgz" \
-            "/tmp/koment-${CHART_VERSION}.tgz.sigstore.json" \
-            --clobber
+            "/tmp/koment-${CHART_VERSION}.tgz.sigstore.json"
 
   editor:
     name: publish editor extension
@@ -486,12 +483,12 @@ jobs:
 
       - name: collect the canonical archives
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ needs.please.outputs.tag }}
         run: |
           set -euo pipefail
           mkdir -p archives
-          gh release download "$RELEASE_TAG" --dir archives \
+          gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --dir archives \
             --pattern 'koment_*.tar.gz' --pattern 'koment_*.zip' --pattern 'koment_*_checksums.txt'
           ls -l archives
 
@@ -508,16 +505,15 @@ jobs:
 
       - name: sign and attach every extension package
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ needs.please.outputs.tag }}
         run: |
           set -euo pipefail
           for package in dist/koment-vscode_*.vsix; do
             cosign sign-blob --yes --bundle "${package}.sigstore.json" "$package"
           done
-          gh release upload "$RELEASE_TAG" \
-            dist/koment-vscode_*.vsix dist/koment-vscode_*.vsix.sigstore.json \
-            --clobber
+          ./scripts/upload-release-assets.sh "$RELEASE_TAG" \
+            dist/koment-vscode_*.vsix dist/koment-vscode_*.vsix.sigstore.json
 
       - name: report that marketplace publication is off
         if: env.PUBLISH_EDITOR_MARKETPLACES != 'true'
