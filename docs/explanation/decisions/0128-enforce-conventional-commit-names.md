@@ -10,7 +10,7 @@ conventional commit subjects — `release-please-config.json` line 45–83
 maps the type to a changelog section, `release-please-config.json` line 4
 pins `chore(release): ${version}` as the release PR title, and ADR 0120
 records `bump-minor-pre-major: false` so `feat!:` is a major bump.
-`docs/releasing.md` step 3 names the rule and the type set.
+`docs/guides/release-koment.md` step 3 names the rule and the type set.
 
 AGENTS.md §8, the "Code rules" bullet in `CONTRIBUTING.md`,
 `docs/development.md` "Commits" and `docs/bootstrap.md` "Publish a
@@ -71,7 +71,7 @@ Enforcement lives in three places, all wired to one source of truth:
    `merge_group`, and `push` to `main`. The job is added to the
    `needs:` block of the `ci` aggregate in the same file, so the
    existing required-check wiring on `main` (the `ci` status,
-   recorded in `docs/releasing.md` step 0) gates the merge. The job
+   recorded in `docs/guides/release-koment.md` step 0) gates the merge. The job
    lives in `ci.yml` rather than a separate workflow file because
    `actionlint` is per-file and cannot validate cross-workflow
    `needs:` references; the existing `windows-archive` job follows
@@ -111,7 +111,7 @@ What becomes harder:
 
 - The release-please-managed PR (`chore(release): x.y.z`) lands via
   `GITHUB_TOKEN` and its checks sit at `action_required` until approved
-  (`docs/releasing.md` step 3). The `commit-lint` workflow now
+  (`docs/guides/release-koment.md` step 3). The `commit-lint` workflow now
   participates in that approval gate. No new operational step: the
   existing approval step covers it.
 - A future tightening of the spec (e.g. dropping `style` to match
@@ -163,7 +163,7 @@ What this commits us to:
   with the regex. Rejected for the same reason.
 - **Separate required check (`commit-lint`) on `main`, not rolled into
   `ci`.** Splits the aggregate signal documented in
-  `docs/releasing.md` step 0. Two required checks mean two truths to
+  `docs/guides/release-koment.md` step 0. Two required checks mean two truths to
   keep aligned; ADR 0125 records the cost. Rejected.
 - **Separate workflow file for `commit-lint`.** `actionlint` is
   per-file and cannot validate cross-workflow `needs:` references,

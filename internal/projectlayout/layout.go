@@ -82,6 +82,15 @@ var ClosedChildren = map[string][]string{
 
 var LegacyRoots = []string{"charts", "editors", "packaging", "plugins", "workspace"}
 
+type referenceMigration struct {
+	Retired     string
+	Replacement string
+}
+
+var referenceMigrations = []referenceMigration{
+	{Retired: "docs/" + "releasing.md", Replacement: "docs/guides/release-koment.md"},
+}
+
 func RepositoryRoot(start string) (string, error) {
 	root, err := filepath.Abs(start)
 	if err != nil {
@@ -114,6 +123,11 @@ func checkRepository(root string, repositoryRoot *os.Root) error {
 		return err
 	}
 	violations := ValidatePaths(paths)
+	referenceViolations, err := validateRetiredReferences(repositoryRoot, paths)
+	if err != nil {
+		return err
+	}
+	violations = append(violations, referenceViolations...)
 	rootViolations, err := validateLegacyRoots(repositoryRoot)
 	if err != nil {
 		return err
@@ -211,6 +225,7 @@ func Reference() []byte {
 	output.WriteString("# Repository layout\n\n")
 	output.WriteString("Generated from `internal/projectlayout`; edit the executable specification, not this file.\n\n")
 	output.WriteString("The repository root is a closed contract. A tracked or non-ignored path outside the areas and exact root files below fails `mise run layout-check`.\n\n")
+	output.WriteString("The same check rejects repository-controlled references to paths retired by completed migrations. Historical path provenance under `.koment/` is excluded.\n\n")
 	output.WriteString("## Architectural areas\n\n")
 	output.WriteString("| Path | Owner |\n|---|---|\n")
 	for _, area := range Areas {
@@ -267,6 +282,25 @@ func repositoryPaths(root string, repositoryRoot *os.Root) ([]string, error) {
 		}
 	}
 	return paths, nil
+}
+
+func validateRetiredReferences(repositoryRoot *os.Root, paths []string) ([]string, error) {
+	violations := []string{}
+	for _, repositoryPath := range paths {
+		if strings.HasPrefix(filepath.ToSlash(repositoryPath), ".koment/") {
+			continue
+		}
+		content, err := repositoryRoot.ReadFile(filepath.FromSlash(repositoryPath))
+		if err != nil {
+			return nil, fmt.Errorf("inspect references in %s: %w", repositoryPath, err)
+		}
+		for _, migration := range referenceMigrations {
+			if bytes.Contains(content, []byte(migration.Retired)) {
+				violations = append(violations, fmt.Sprintf("%s: retired reference %q must be replaced with %q", repositoryPath, migration.Retired, migration.Replacement))
+			}
+		}
+	}
+	return violations, nil
 }
 
 func validateLegacyRoots(repositoryRoot *os.Root) ([]string, error) {

@@ -7,9 +7,9 @@ mutation actions.
 
 ## Configure
 
-Install the signed VSIX from a koment release, or use the VS Code Marketplace
-or Open VSX after the publisher channel is active. The extension for your
-platform carries its own `koment` binary, so it needs nothing else installed.
+Install the signed VSIX from a koment release, the VS Code Marketplace or Open
+VSX. The extension for your platform carries its own `koment` binary, so it
+needs nothing else installed.
 `koment.binaryPath` overrides it; the universal package carries no binary and
 falls back to `koment` on `PATH` (ADR 0113).
 

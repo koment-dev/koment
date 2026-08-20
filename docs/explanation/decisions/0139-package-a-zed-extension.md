@@ -74,8 +74,8 @@ a deliberate exception to ADR 0109's "the release is canonical" for this one
 channel, because for Zed the source at a tag *is* the artifact.
 
 **Publication stays manual.** The `zed-industries/extensions` pull request is a
-step in `docs/releasing.md`, taken by a person. AGENTS.md §14 already requires
-human approval for anything that publishes.
+step in `docs/guides/release-koment.md`, taken by a person. AGENTS.md §14
+already requires human approval for anything that publishes.
 
 ## Consequences
 
