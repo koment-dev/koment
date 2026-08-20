@@ -6,73 +6,83 @@ trap 'rm -rf "$test_directory"' EXIT HUP INT TERM
 fake_bin="$test_directory/bin"
 mkdir "$fake_bin"
 
-cat >"$fake_bin/gh" <<'EOF'
+cat >"$fake_bin/curl" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
 
-case "${1:-} ${2:-}" in
-  "release view")
-    count=0
-    if [ -f "$GH_TEST_VIEW_COUNT" ]; then
-      read -r count <"$GH_TEST_VIEW_COUNT"
-    fi
-    count=$((count + 1))
-    printf '%s\n' "$count" >"$GH_TEST_VIEW_COUNT"
-    if [ "$GH_TEST_MODE" = eventual ] && [ "$count" -ge 3 ]; then
-      exit 0
-    fi
-    exit 1
-    ;;
-  "release upload")
-    printf '%s\n' "$*" >"$GH_TEST_UPLOAD_LOG"
-    ;;
-  *)
-    exit 2
-    ;;
-esac
+printf '%s\n' "$*" >>"$GH_TEST_UPLOAD_LOG"
+
+output_file=
+while [ "$#" -gt 0 ]; do
+  if [ "$1" = --output ]; then
+    output_file=$2
+    shift 2
+    continue
+  fi
+  shift
+done
+
+if [ "${GH_TEST_CURL_MODE:-success}" = failure ]; then
+  printf '%s\n' '{"message":"upload denied"}' >"$output_file"
+  exit 22
+fi
 EOF
 
-cat >"$fake_bin/sleep" <<'EOF'
-#!/usr/bin/env bash
-set -euo pipefail
-printf '%s\n' "$1" >>"$GH_TEST_SLEEP_LOG"
-EOF
+chmod +x "$fake_bin/curl"
 
-chmod +x "$fake_bin/gh" "$fake_bin/sleep"
-
-eventual_directory="$test_directory/eventual"
-mkdir "$eventual_directory"
+upload_directory="$test_directory/upload"
+mkdir "$upload_directory"
+touch "$upload_directory/first.tar.gz" "$upload_directory/second.json"
 PATH="$fake_bin:$PATH" \
 GH_TOKEN=test-token \
 GITHUB_REPOSITORY=koment-dev/koment \
-GH_TEST_MODE=eventual \
-GH_TEST_VIEW_COUNT="$eventual_directory/view-count" \
-GH_TEST_UPLOAD_LOG="$eventual_directory/upload-log" \
-GH_TEST_SLEEP_LOG="$eventual_directory/sleep-log" \
-  ./scripts/upload-release-assets.sh v3.1.1 first.tar.gz second.json
+GH_TEST_UPLOAD_LOG="$upload_directory/upload-log" \
+  ./scripts/upload-release-assets.sh \
+    'https://uploads.github.com/repos/koment-dev/koment/releases/123/assets{?name,label}' \
+    "$upload_directory/first.tar.gz" "$upload_directory/second.json"
 
-test "$(cat "$eventual_directory/view-count")" = 3
-test "$(cat "$eventual_directory/sleep-log")" = $'10\n20'
-test "$(cat "$eventual_directory/upload-log")" = \
-  "release upload v3.1.1 --repo koment-dev/koment first.tar.gz second.json --clobber"
+test "$(wc -l <"$upload_directory/upload-log" | tr -d ' ')" = 2
+grep -Fq -- '--data-binary @'"$upload_directory"'/first.tar.gz' "$upload_directory/upload-log"
+grep -Fq -- 'https://uploads.github.com/repos/koment-dev/koment/releases/123/assets?name=first.tar.gz' \
+  "$upload_directory/upload-log"
+grep -Fq -- '--data-binary @'"$upload_directory"'/second.json' "$upload_directory/upload-log"
+grep -Fq -- 'https://uploads.github.com/repos/koment-dev/koment/releases/123/assets?name=second.json' \
+  "$upload_directory/upload-log"
 
-bounded_directory="$test_directory/bounded"
-mkdir "$bounded_directory"
+invalid_directory="$test_directory/invalid"
+mkdir "$invalid_directory"
+touch "$invalid_directory/first.tar.gz"
 set +e
 PATH="$fake_bin:$PATH" \
 GH_TOKEN=test-token \
 GITHUB_REPOSITORY=koment-dev/koment \
-GH_TEST_MODE=never \
-GH_TEST_VIEW_COUNT="$bounded_directory/view-count" \
-GH_TEST_UPLOAD_LOG="$bounded_directory/upload-log" \
-GH_TEST_SLEEP_LOG="$bounded_directory/sleep-log" \
-  ./scripts/upload-release-assets.sh v3.1.1 first.tar.gz >/dev/null 2>&1
+GH_TEST_UPLOAD_LOG="$invalid_directory/upload-log" \
+  ./scripts/upload-release-assets.sh \
+    'https://uploads.github.com/repos/another/project/releases/123/assets{?name,label}' \
+    "$invalid_directory/first.tar.gz" >/dev/null 2>&1
+status=$?
+set -e
+
+test "$status" -eq 2
+test ! -e "$invalid_directory/upload-log"
+
+failure_directory="$test_directory/failure"
+mkdir "$failure_directory"
+touch "$failure_directory/first.tar.gz"
+set +e
+failure_output=$(PATH="$fake_bin:$PATH" \
+GH_TOKEN=test-token \
+GITHUB_REPOSITORY=koment-dev/koment \
+GH_TEST_CURL_MODE=failure \
+GH_TEST_UPLOAD_LOG="$failure_directory/upload-log" \
+  ./scripts/upload-release-assets.sh \
+    'https://uploads.github.com/repos/koment-dev/koment/releases/123/assets{?name,label}' \
+    "$failure_directory/first.tar.gz" 2>&1)
 status=$?
 set -e
 
 test "$status" -eq 1
-test "$(cat "$bounded_directory/view-count")" = 6
-test "$(cat "$bounded_directory/sleep-log")" = $'10\n20\n30\n40\n50'
-test ! -e "$bounded_directory/upload-log"
+test "$(wc -l <"$failure_directory/upload-log" | tr -d ' ')" = 1
+printf '%s\n' "$failure_output" | grep -Fq 'upload denied'
 
 echo "release asset upload helper: ok"

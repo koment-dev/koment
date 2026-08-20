@@ -23,6 +23,7 @@ jobs:
     outputs:
       released: ${{ steps.release.outputs.release_created }}
       tag: ${{ steps.release.outputs.tag_name }}
+      upload_url: ${{ steps.release.outputs.upload_url }}
       version: ${{ steps.release.outputs.version }}
     steps:
       - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
@@ -90,9 +91,9 @@ jobs:
       - name: attach to the release
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ needs.please.outputs.tag }}
+          RELEASE_UPLOAD_URL: ${{ needs.please.outputs.upload_url }}
         run: |
-          ./scripts/upload-release-assets.sh "$RELEASE_TAG" \
+          ./scripts/upload-release-assets.sh "$RELEASE_UPLOAD_URL" \
             dist/koment-plugin-*.tar.gz \
             dist/koment-plugin-*.tar.gz.sigstore.json \
             dist/koment-plugins_*_checksums.txt \
@@ -187,9 +188,9 @@ jobs:
       - name: attach to the release
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ needs.please.outputs.tag }}
+          RELEASE_UPLOAD_URL: ${{ needs.please.outputs.upload_url }}
         run: |
-          ./scripts/upload-release-assets.sh "$RELEASE_TAG" \
+          ./scripts/upload-release-assets.sh "$RELEASE_UPLOAD_URL" \
             dist/koment_*.tar.gz dist/koment_*.zip dist/koment_*_checksums.txt \
             dist/koment_*_checksums.sigstore.json dist/koment.rb dist/koment-scoop.json
 
@@ -434,7 +435,7 @@ jobs:
       - name: package and push
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ needs.please.outputs.tag }}
+          RELEASE_UPLOAD_URL: ${{ needs.please.outputs.upload_url }}
         run: |
           helm registry login ghcr.io \
             --username "$REGISTRY_USER" \
@@ -449,7 +450,7 @@ jobs:
           cosign sign-blob --yes \
             --bundle "/tmp/koment-${CHART_VERSION}.tgz.sigstore.json" \
             "/tmp/koment-${CHART_VERSION}.tgz"
-          ./scripts/upload-release-assets.sh "$RELEASE_TAG" \
+          ./scripts/upload-release-assets.sh "$RELEASE_UPLOAD_URL" \
             "/tmp/koment-${CHART_VERSION}.tgz" \
             "/tmp/koment-${CHART_VERSION}.tgz.sigstore.json"
 
@@ -506,13 +507,13 @@ jobs:
       - name: sign and attach every extension package
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ needs.please.outputs.tag }}
+          RELEASE_UPLOAD_URL: ${{ needs.please.outputs.upload_url }}
         run: |
           set -euo pipefail
           for package in dist/koment-vscode_*.vsix; do
             cosign sign-blob --yes --bundle "${package}.sigstore.json" "$package"
           done
-          ./scripts/upload-release-assets.sh "$RELEASE_TAG" \
+          ./scripts/upload-release-assets.sh "$RELEASE_UPLOAD_URL" \
             dist/koment-vscode_*.vsix dist/koment-vscode_*.vsix.sigstore.json
 
       - name: report that marketplace publication is off

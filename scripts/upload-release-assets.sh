@@ -2,27 +2,57 @@
 set -euo pipefail
 
 if [ "$#" -lt 2 ]; then
-  echo "usage: upload-release-assets.sh <tag> <asset> [<asset> ...]" >&2
+  echo "usage: upload-release-assets.sh <upload-url> <asset> [<asset> ...]" >&2
   exit 2
 fi
 
 : "${GH_TOKEN:?GH_TOKEN must be set}"
 : "${GITHUB_REPOSITORY:?GITHUB_REPOSITORY must be set}"
 
-release_tag=$1
+release_upload_url=${1%\{?name,label\}}
 shift
 
-attempt=1
-maximum_attempts=6
-while ! gh release view "$release_tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; do
-  if [ "$attempt" -eq "$maximum_attempts" ]; then
-    echo "release $release_tag was not visible in $GITHUB_REPOSITORY after $maximum_attempts attempts" >&2
+expected_prefix="https://uploads.github.com/repos/${GITHUB_REPOSITORY}/releases/"
+case "$release_upload_url" in
+  "$expected_prefix"*/assets) ;;
+  *)
+    echo "release upload URL does not target $GITHUB_REPOSITORY" >&2
+    exit 2
+    ;;
+esac
+
+release_identifier=${release_upload_url#"$expected_prefix"}
+release_identifier=${release_identifier%/assets}
+case "$release_identifier" in
+  ''|*[!0-9]*)
+    echo "release upload URL does not contain a numeric release identifier" >&2
+    exit 2
+    ;;
+esac
+
+response_file=$(mktemp)
+trap 'rm -f "$response_file"' EXIT HUP INT TERM
+
+for asset in "$@"; do
+  test -f "$asset"
+  asset_name=${asset##*/}
+  case "$asset_name" in
+    *[!A-Za-z0-9._-]*)
+      echo "release asset name contains unsupported characters: $asset_name" >&2
+      exit 2
+      ;;
+  esac
+
+  if ! curl --fail-with-body --location --silent --show-error \
+      --request POST \
+      --header 'Accept: application/vnd.github+json' \
+      --header "Authorization: Bearer $GH_TOKEN" \
+      --header 'X-GitHub-Api-Version: 2026-03-10' \
+      --header 'Content-Type: application/octet-stream' \
+      --data-binary "@$asset" \
+      --output "$response_file" \
+      "${release_upload_url}?name=${asset_name}"; then
+    cat "$response_file" >&2
     exit 1
   fi
-  wait_seconds=$((attempt * 10))
-  echo "release $release_tag is not visible yet; retrying in $wait_seconds seconds" >&2
-  sleep "$wait_seconds"
-  attempt=$((attempt + 1))
 done
-
-gh release upload "$release_tag" --repo "$GITHUB_REPOSITORY" "$@" --clobber

@@ -298,7 +298,7 @@ someone.
 | Symptom | Cause | Action |
 |---|---|---|
 | release pull request checks show `action_required`, 0s | `GITHUB_TOKEN` created the pull request | approve the run (step 3) |
-| `gh release upload` reports `release not found` | the release is not visible to the publishing job yet | do not rerun a published registry version; let the bounded visibility gate fail, fix the cause, and cut the next patch |
+| release asset upload returns an HTTP error | the create-release response or publishing token cannot upload to its exact asset endpoint | do not rerun a published registry version; inspect the response, fix the cause, and cut the next patch |
 | `editor` job skipped | `binaries` failed | fix the binaries, cut a new patch version |
 | `ovsx publish` fails on the first ever publish | the namespace did not exist | the workflow now creates it; if it still fails, the token lacks the Publisher Agreement |
 | `vsce publish` rejects the version | that version already exists on the marketplace | cut the next version, never reuse one |
