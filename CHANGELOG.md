@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.5](https://github.com/koment-dev/koment/compare/v3.1.4...v3.1.5) (2026-08-20)
+
+
+### Bug Fixes
+
+* retry idempotent marketplace publication ([#117](https://github.com/koment-dev/koment/issues/117)) ([0514a79](https://github.com/koment-dev/koment/commit/0514a79fd5aaa9477dd05f4dcf7a4539d89929b7))
+
 ## [3.1.4](https://github.com/koment-dev/koment/compare/v3.1.3...v3.1.4) (2026-08-20)
 
 
