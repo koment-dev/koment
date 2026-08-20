@@ -1,7 +1,7 @@
 id = "koment"
 name = "koment"
 # x-release-please-start-version
-version = "3.1.0"
+version = "3.1.1"
 # x-release-please-end
 schema_version = 1
 authors = ["Jan Pucilowski <janpuc@proton.me>"]
