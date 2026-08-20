@@ -302,6 +302,7 @@ someone.
 | `editor` job skipped | `binaries` failed | fix the binaries, cut a new patch version |
 | `ovsx publish` fails on the first ever publish | the namespace did not exist | the workflow now creates it; if it still fails, the token lacks the Publisher Agreement |
 | `vsce publish` rejects the version | that version already exists on the marketplace | cut the next version, never reuse one |
+| a marketplace publish times out after earlier packages succeeded | the service response is ambiguous and the version may be partial | do not rerun a historical workflow or publish by hand; current releases retry each package three times with `--skip-duplicate`, and an exhausted or older run recovers in the next patch (ADR 0150) |
 | `Windows Archive (advisory)` is red | advisory by decision (ADR 0111) | it does not block; read it and file a task |
 | version files disagree | someone hand-edited one | revert the edit, let release-please own them |
 
