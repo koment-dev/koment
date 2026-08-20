@@ -68,6 +68,7 @@ the approved destination.
 - [0144 — Configure the OpenCode plugin and fail closed](0144-configure-opencode-plugin-and-fail-closed.md)
 - [0145 — License only the Zed extension under GPLv3](0145-license-the-zed-extension-under-gplv3.md)
 - [0147 — Upload release assets through the creation response](0147-upload-release-assets-through-the-creation-response.md)
+- [0148 — Reject references to retired repository paths](0148-reject-references-to-retired-repository-paths.md)
 
 ## Superseded decisions
 

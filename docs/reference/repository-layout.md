@@ -4,6 +4,8 @@ Generated from `internal/projectlayout`; edit the executable specification, not 
 
 The repository root is a closed contract. A tracked or non-ignored path outside the areas and exact root files below fails `mise run layout-check`.
 
+The same check rejects repository-controlled references to paths retired by completed migrations. Historical path provenance under `.koment/` is excluded.
+
 ## Architectural areas
 
 | Path | Owner |

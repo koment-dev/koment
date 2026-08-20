@@ -245,8 +245,8 @@ The reference [VS Code extension](integrations/editors/vscode/README.md) starts 
 renders annotation bodies as virtual inline text, reports drift and prohibited
 comments as diagnostics, and adds native add, reanchor, convert and explicit
 acknowledgement actions. The prose is never inserted into the source buffer.
-Every release attaches a signed VSIX; the same VSIX is published to the VS Code
-Marketplace and Open VSX when the repository publisher tokens are configured.
+Every release attaches a signed VSIX and publishes the same artifact to the VS
+Code Marketplace and Open VSX.
 
 Other editors can use the standard hover, diagnostics, code-lens, code-action
 and execute-command surface from `koment lsp` without reimplementing storage or

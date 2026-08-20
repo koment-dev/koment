@@ -20,7 +20,7 @@ candidate marketplace listings are not present:
     page renders without an extension listing.
 
 The Open VSX API endpoint hardcoded into the release verification command
-(`docs/releasing.md`, step 6) is already wrong: it asks for
+(`docs/guides/release-koment.md`, step 6) is already wrong: it asks for
 `https://open-vsx.org/api/koment-dev/koment`, which would resolve under a
 publisher named `koment-dev`, not the publisher `koment` currently declared in
 `editors/vscode/package.json`. That URL must agree with whatever
@@ -72,7 +72,7 @@ users to migrate. The old `(koment, koment)` slot has no marketplace presence
 that would need to be deprecated in the marketplace dashboards, and there is no
 external surface that needs to be redirected. This is a pre-publication
 correction, not a migration. The release procedure for the first publication
-remains whatever `docs/releasing.md` already says.
+remains whatever `docs/guides/release-koment.md` already says.
 
 ## Consequences
 
@@ -92,8 +92,9 @@ What becomes harder:
   no longer derivable from the GitHub organisation name; the manifest is the
   source of truth and the design records spell out the composition.
 - The first release PR after this change publishes a marketplace listing under
-  the new id. Per `docs/releasing.md`, the human must approve the merge before
-  publication; that explicit conversation is the only irreversible step.
+  the new id. Per `docs/guides/release-koment.md`, the human must approve the
+  merge before publication; that explicit conversation is the only
+  irreversible step.
 - The Open VSX namespace must exist before the first publish. The release
   workflow already creates it from `package.json#publisher`; with the publisher
   unchanged as `koment`, the workflow's existing `ovsx create-namespace` step
@@ -141,8 +142,8 @@ What this commits us to:
   chance to set the identity cleanly.
 - **Hand-edit the version of `editors/vscode/package.json` to `3.0.0` for
   "backwards compatibility".** `release-please` owns every version-bearing
-  field, per `docs/releasing.md` step 2 and AGENTS.md §14. Hand-editing the
-  version would break the equality assertion the editor job performs before
-  packaging and would force a manual re-run of release-please. Rejected
-  because the change does not need a major version bump; there is no installed
-  user base to break.
+  field, per `docs/guides/release-koment.md` step 2 and AGENTS.md §14.
+  Hand-editing the version would break the equality assertion the editor job
+  performs before packaging and would force a manual re-run of release-please.
+  Rejected because the change does not need a major version bump; there is no
+  installed user base to break.

@@ -44,3 +44,46 @@ func TestReferenceIsCurrent(t *testing.T) {
 		t.Fatal("repository layout reference is stale")
 	}
 }
+
+func TestRetiredReferenceIsRejected(t *testing.T) {
+	root := t.TempDir()
+	retired := strings.Join([]string{"docs", "releasing.md"}, "/")
+	if err := os.WriteFile(filepath.Join(root, "guide.md"), []byte(retired), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	repositoryRoot, err := os.OpenRoot(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := repositoryRoot.Close(); err != nil {
+			t.Error(err)
+		}
+	})
+	violations, err := validateRetiredReferences(repositoryRoot, []string{"guide.md"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(violations) != 1 || !strings.Contains(violations[0], "docs/guides/release-koment.md") {
+		t.Fatalf("unexpected violations: %v", violations)
+	}
+}
+
+func TestHistoricalAnnotationReferenceIsAllowed(t *testing.T) {
+	root, err := os.OpenRoot(t.TempDir())
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := root.Close(); err != nil {
+			t.Error(err)
+		}
+	})
+	violations, err := validateRetiredReferences(root, []string{".koment/annotations/history.yaml"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(violations) != 0 {
+		t.Fatalf("unexpected violations: %v", violations)
+	}
+}

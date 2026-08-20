@@ -1,0 +1,35 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/koment-dev/koment/main/schema/v1alpha/annotation.schema.json
+apiVersion: koment.dev/v1alpha
+kind: Annotation
+metadata:
+  id: 01M0F7ZYQDEPY0PNMMQ9YCX8G7
+  created: "2026-08-20T09:28:18Z"
+spec:
+  target:
+    file: internal/projectlayout/layout.go
+  type: gotcha
+  title: The retired literal must not match its own scanner
+  body: |-
+    The retired path is assembled from two string literals so the checker can
+    scan its own source without exempting that file. The replacement remains
+    contiguous because only retired text is forbidden. Historical Git paths
+    under .koment are excluded separately because they are provenance, not live
+    references.
+  anchor:
+    scope: excerpt
+    excerpt: "var referenceMigrations = []referenceMigration{\n\t{Retired: \"docs/\" + \"releasing.md\", Replacement: \"docs/guides/release-koment.md\"},\n}"
+    before: "\tReplacement string\n}\n"
+    after: "\nfunc RepositoryRoot(start string) (string, error) {\n\troot, err := filepath.Abs(start)"
+  author:
+    name: codex-mcp-client
+    kind: agent
+    source: session
+  git:
+    commit: 8941782691792272d4812b373b87eedb5ca99329
+    path: internal/projectlayout/layout.go
+    line: 90
+status:
+  lastSeenLine: 90
+  resolution: ok
+  resolvedAt: "2026-08-20T09:28:18Z"
+  resolvedCommit: 8941782691792272d4812b373b87eedb5ca99329

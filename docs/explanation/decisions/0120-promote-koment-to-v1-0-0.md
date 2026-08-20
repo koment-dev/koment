@@ -44,7 +44,8 @@ Mechanics:
    path, (b) an ADR naming the cutoff version, and (c) a `feat!:` subject when
    either is missing. `koment agents install` regenerates AGENTS.md and the
    per-client adapters; `mise run agent-policy` confirms.
-4. **`docs/releasing.md` is followed exactly.** Steps 0–3 run in this release:
+4. **`docs/guides/release-koment.md` is followed exactly.** Steps 0–3 run in
+   this release:
    preconditions (the 13 `mise run` checks), feature merge, release-please
    opens the release PR, unblock the `action_required` run, wait for the four
    required checks. Steps 4 and 5 (merge the release PR; watch publication)
@@ -56,10 +57,10 @@ Why this release and not the next one:
   project's lifetime. Drawing the v1.0.0 line at any other moment would require
   either rolling back the change and doing it again (worse churn) or shipping
   1.0.0 on a quieter day (false cleanliness).
-- All twelve preconditions in `docs/releasing.md` step 0 are achievable in one
-  PR cycle. The work is large but uniform in shape — schema, struct, consumers,
-  auto-migrate, status writer, examples, AGENTS rule, config flip, single
-  feat.
+- All twelve preconditions in `docs/guides/release-koment.md` step 0 are
+  achievable in one PR cycle. The work is large but uniform in shape — schema,
+  struct, consumers, auto-migrate, status writer, examples, AGENTS rule, config
+  flip, single feat.
 
 ## Consequences
 

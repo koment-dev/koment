@@ -1,6 +1,6 @@
 # koment — design
 
-Status: **approved; product and reference integrations implemented, external catalog acceptance pending.**
+Status: **approved; product and reference integrations implemented, Zed registry acceptance pending.**
 
 This document is the specification. The active architectural decisions start at
 ADR 0100 in `docs/explanation/decisions/`. Earlier decisions describe the pre-deployment
@@ -75,9 +75,9 @@ This table is the honest boundary between implemented and planned behavior.
 | Agent policy | strict policy, generated client adapters, hooks and CI gate implemented | implemented |
 | Operational toolchain | mise, Lefthook, generated chart documentation, security gates and a self-hosted Renovate workflow implemented; Renovate stays inert until its app is installed | implemented |
 | Helm and release | hardened chart, Kind E2E, signed canonical artifacts and SBOM/provenance implemented | implemented |
-| End-user distribution | releases, setup Action, mise, Claude marketplace, MCP metadata, VS Code/Open VSX package, and generated package-manager manifests | external catalog and publisher account acceptance pending |
+| End-user distribution | releases, setup Action, mise, Claude marketplace, MCP metadata, VS Code/Open VSX package, and generated package-manager manifests | implemented and published through directly controlled channels |
 | Editor presentation | inline gloss plus a panel carrying full bodies; diagnostics report only what fails `koment check` | implemented |
-| Editor distribution | seven signed packages per release — six carrying the platform's canonical binary, one universal — ordered after the binaries job, with opt-in marketplace publication and LSP configuration for every other editor; the marketplace id is `koment.koment-dev` (VS Code) / `koment/koment-dev` (Open VSX) with `displayName: "koment-dev"` per [ADR 0126](docs/explanation/decisions/0126-fix-vscode-marketplace-extension-name.md) and [ADR 0127](docs/explanation/decisions/0127-fix-vscode-marketplace-display-name.md) | implemented; marketplace publication awaits publisher accounts |
+| Editor distribution | seven signed packages per release — six carrying the platform's canonical binary, one universal — ordered after the binaries job, with marketplace publication and LSP configuration for every other editor; the marketplace id is `koment.koment-dev` (VS Code) / `koment/koment-dev` (Open VSX) with `displayName: "koment-dev"` per [ADR 0126](docs/explanation/decisions/0126-fix-vscode-marketplace-extension-name.md) and [ADR 0127](docs/explanation/decisions/0127-fix-vscode-marketplace-display-name.md) | implemented and published |
 | Zed | an extension in `integrations/editors/zed/` starting `koment lsp` and registering `koment mcp --write`, published to Zed's registry by a manual submodule pull request; no inline bodies, because Zed exposes no decoration API ([ADR 0139](docs/explanation/decisions/0139-package-a-zed-extension.md)); the extension alone is GPL-3.0-or-later while the binary and repository remain AGPL-3.0-or-later ([ADR 0145](docs/explanation/decisions/0145-license-the-zed-extension-under-gplv3.md)) | implemented; registry publication is a manual release step |
 | Windows | archives, checksums, signatures and package manifests ship; an advisory job installs and runs the published archive | supported and non-gating by decision (ADR 0111) |
 | Maintained workspace | builds, tests, publishes and carries current annotations | implemented |
@@ -132,9 +132,11 @@ treated as permission to add arbitrary root entries.
 
 The accepted layout lives once in an `internal/projectlayout` package. Its
 checker examines every tracked and non-ignored path, rejects unknown root areas
-and legacy locations, and renders `docs/reference/repository-layout.md`. The
-generated reference and the checker therefore cannot disagree. `mise`, local
-hooks and the required CI aggregate run the checker.
+and legacy locations, rejects repository-controlled references to paths retired
+by completed migrations, and renders `docs/reference/repository-layout.md`.
+Historical path provenance under `.koment/` is excluded from the content check.
+The generated reference and the checker therefore cannot disagree. `mise`,
+local hooks and the required CI aggregate run the checker.
 
 Changing a boundary requires an ADR that supersedes ADR 0143. It must identify
 a capability that no existing area can own, reject the existing placements one
@@ -600,8 +602,7 @@ Distribution is promoted in layers:
    official MCP Registry points at koment's labeled OCI artifact or a
    checksummed MCPB bundle. The npm package is a policy integration, not a
    binary wrapper or the MCP Registry's distribution artifact.
-4. The VS Code Marketplace and Open VSX publish the same extension artifact
-   when the editor integration exists.
+4. The VS Code Marketplace and Open VSX publish the same extension artifact.
 5. Homebrew core, Nixpkgs, AUR, MacPorts and other community catalogs are
    pursued after a stable release where their external acceptance and ongoing
    maintenance requirements are met.
@@ -609,8 +610,8 @@ Distribution is promoted in layers:
 Release automation generates Homebrew, Scoop and WinGet metadata from one
 version and checksum manifest and tests the directly controlled installation
 channels. The repository publishes Claude marketplace metadata directly,
-publishes the VSIX to VS Code Marketplace and Open VSX when their owner tokens
-are configured, and uses GitHub OIDC for the MCP Registry. Owner-submitted
+publishes the VSIX to VS Code Marketplace and Open VSX through their configured
+owner tokens, and uses GitHub OIDC for the MCP Registry. Owner-submitted
 external catalogs are never described as available until their submissions are
 accepted. ADR 0109 records the artifact and distribution boundary.
 
@@ -787,7 +788,7 @@ switcher and an idempotent GitHub materializer that returns success only after
 the exact record exists in a branch and pull request. No database or durable
 application outbox is part of this stage.
 
-### 5. Deployment and release — implemented; external catalogs pending acceptance
+### 5. Deployment and release — implemented; community catalogs and Zed registry pending acceptance
 
 Replace the prototype chart modes, add a values schema and E2E coverage, then
 sign and digest-pin all release artifacts. Publish the canonical binaries,
