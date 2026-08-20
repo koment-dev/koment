@@ -24,6 +24,13 @@ Exit codes: `0` fine, `1` drift or failure, `2` misuse.
 koment finds your repository by walking up from the working directory looking
 for `.koment/`, then `.git/`.
 
+`.koment/policy.yaml` activates the automatic policy gates. When neither that
+file nor `.koment/annotations/*.yaml` exists, `koment check`, `koment comments
+check`, `koment agents check` and agent hooks exit `0` without output. A policy
+alone is active. Annotation YAML without a policy is an incomplete repository:
+the gates exit `1` and instruct you to run `koment bootstrap`. Existing invalid
+or unreadable policies also fail.
+
 ---
 
 ## add
@@ -234,7 +241,9 @@ record; omitting the explicit flag is always rejected.
 generates the selected repository instructions, MCP configs and supported
 client hooks while preserving unrelated configuration. Run it again after a
 policy or adapter change. `koment agents check` fails when any managed surface
-is missing or stale.
+is missing or stale. In a repository without policy or annotation records the
+check and generated hooks are silent no-ops, so a global client integration
+does not impose koment on unrelated workspaces.
 
 ## ui
 

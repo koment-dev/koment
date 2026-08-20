@@ -9,6 +9,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/koment-dev/koment/internal/policy"
 	"github.com/koment-dev/koment/internal/store"
 )
 
@@ -23,6 +24,15 @@ type result struct {
 func (r result) output() string { return r.stdout + r.stderr }
 
 func repository(t *testing.T) string {
+	t.Helper()
+	root := unconfiguredRepository(t)
+	if err := policy.Save(root, policy.Default()); err != nil {
+		t.Fatal(err)
+	}
+	return root
+}
+
+func unconfiguredRepository(t *testing.T) string {
 	t.Helper()
 	root := t.TempDir()
 	if err := os.MkdirAll(filepath.Join(root, store.DirName), 0o755); err != nil {
@@ -150,6 +160,46 @@ func TestCheckIsCleanOnARepositoryWithNoAnnotations(t *testing.T) {
 	}
 	if !strings.Contains(got.stdout, "0 annotations") {
 		t.Errorf("want a zero summary, got:\n%s", got.stdout)
+	}
+}
+
+func TestAutomaticPolicyGatesAreSilentWithoutConfiguration(t *testing.T) {
+	unconfiguredRepository(t)
+	for _, args := range [][]string{
+		{"check"},
+		{"comments", "check"},
+		{"agents", "check"},
+	} {
+		got := koment(t, args...)
+		if got.code != ExitOK || got.output() != "" {
+			t.Errorf("koment %v = exit %d, %q", args, got.code, got.output())
+		}
+	}
+}
+
+func TestAutomaticPolicyGatesRejectAnnotationsWithoutConfiguration(t *testing.T) {
+	root := unconfiguredRepository(t)
+	directory := filepath.Join(root, store.DirName, "annotations")
+	if err := os.MkdirAll(directory, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(directory, "record.yaml"), []byte(":"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	for _, args := range [][]string{
+		{"check"},
+		{"comments", "check"},
+		{"agents", "check"},
+	} {
+		got := koment(t, args...)
+		if got.code != ExitFailure {
+			t.Errorf("koment %v = exit %d, want %d", args, got.code, ExitFailure)
+		}
+		for _, wanted := range []string{policy.FileName, "koment bootstrap"} {
+			if !strings.Contains(got.stderr, wanted) {
+				t.Errorf("koment %v error missing %q: %s", args, wanted, got.stderr)
+			}
+		}
 	}
 }
 

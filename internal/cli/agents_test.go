@@ -9,7 +9,7 @@ import (
 )
 
 func TestAgentsInstallAndCheck(t *testing.T) {
-	root := repository(t)
+	root := unconfiguredRepository(t)
 	if err := os.WriteFile(filepath.Join(root, "AGENTS.md"), []byte("# Existing instructions\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
@@ -45,6 +45,44 @@ func TestAgentsPreToolHookGuidesCommentConversion(t *testing.T) {
 	code := Run([]string{"agents", "hook", "pre-tool"}, env, Servers{})
 	if code != ExitOK || !strings.Contains(stdout.String(), "koment_convert_comment") {
 		t.Fatalf("hook exited %d: %s%s", code, stdout.String(), stderr.String())
+	}
+}
+
+func TestAgentsPreToolHookIsSilentWithoutConfiguration(t *testing.T) {
+	unconfiguredRepository(t)
+	input := `{"tool_name":"apply_patch","tool_input":{"command":"*** Begin Patch\n*** Update File: main.go\n@@\n+// Explain the call.\n+serve()\n*** End Patch"}}`
+	var stdout, stderr bytes.Buffer
+	env := Environment{Stdin: strings.NewReader(input), Stdout: &stdout, Stderr: &stderr}
+	code := Run([]string{"agents", "hook", "pre-tool"}, env, Servers{})
+	if code != ExitOK || stdout.String() != "{}\n" || stderr.String() != "" {
+		t.Fatalf("hook exited %d: %q %q", code, stdout.String(), stderr.String())
+	}
+}
+
+func TestAgentsStopHookIsSilentWithoutConfiguration(t *testing.T) {
+	unconfiguredRepository(t)
+	var stdout, stderr bytes.Buffer
+	env := Environment{Stdin: strings.NewReader("not JSON"), Stdout: &stdout, Stderr: &stderr}
+	code := Run([]string{"agents", "hook", "stop"}, env, Servers{})
+	if code != ExitOK || stdout.String() != "{}\n" || stderr.String() != "" {
+		t.Fatalf("hook exited %d: %q %q", code, stdout.String(), stderr.String())
+	}
+}
+
+func TestAgentsStopHookBlocksAnnotationsWithoutConfiguration(t *testing.T) {
+	root := unconfiguredRepository(t)
+	directory := filepath.Join(root, ".koment", "annotations")
+	if err := os.MkdirAll(directory, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(directory, "record.yaml"), []byte(":"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	var stdout, stderr bytes.Buffer
+	env := Environment{Stdin: strings.NewReader(`{"stop_hook_active":false}`), Stdout: &stdout, Stderr: &stderr}
+	code := Run([]string{"agents", "hook", "stop"}, env, Servers{})
+	if code != ExitOK || !strings.Contains(stdout.String(), `"decision":"block"`) || !strings.Contains(stdout.String(), "koment bootstrap") || stderr.String() != "" {
+		t.Fatalf("hook exited %d: %q %q", code, stdout.String(), stderr.String())
 	}
 }
 

@@ -37,6 +37,11 @@ finish. That gate runs `koment check`, `koment comments check` and
 Both decisions come from the koment binary. The Python package only translates
 Hermes lifecycle events into koment's shared policy surface.
 
+The user-level plugin is inert in repositories with neither
+`.koment/policy.yaml` nor annotation records. Annotation records without the
+policy are treated as incomplete configuration and block with a bootstrap
+instruction.
+
 ## Read annotations
 
 Add the writable MCP server to `~/.hermes/config.yaml`:

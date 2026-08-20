@@ -678,12 +678,23 @@ rationale but cannot silently discard it.
 
 ## Agent contract and enforcement
 
-A koment-enabled repository carries `.koment/policy.yaml`. Its format version
-is 1 and it selects strict comment handling, intrinsic comment classes,
-generated and vendored paths, the agent adapters the repository supports, and
-the user-configured `spec.comments.allowedAnnotations` regexp list. This is
-the one machine-readable policy consumed by local checks, hooks and CI. It
-cannot grant an ordinary source comment a path-wide exemption.
+A koment-enabled repository carries `.koment/policy.yaml`. It is a versioned
+`koment.dev/v1alpha` Policy resource that selects strict comment handling,
+intrinsic comment classes, generated and vendored paths, the agent adapters the
+repository supports, and the user-configured
+`spec.comments.allowedAnnotations` regexp list. This is the one
+machine-readable policy consumed by local checks, hooks and CI. It cannot grant
+an ordinary source comment a path-wide exemption.
+
+The policy file is also the activation boundary for automatic enforcement.
+When repository discovery finds neither a policy nor annotation records,
+`koment check`, `koment comments check`, `koment agents check` and the agent
+pre-tool and completion hooks exit successfully without output or instructions.
+That makes a globally installed integration inert in an unrelated workspace.
+An annotation record without the policy is an incomplete koment workspace,
+not an inactive one, and every gate fails with a bootstrap instruction. An
+existing unreadable or invalid policy also fails rather than falling back to a
+different policy. ADR 0149.
 
 `koment bootstrap` is the human-facing onboarding command. It writes the
 strict `.koment/policy.yaml` if absent, resolves which adapters to install

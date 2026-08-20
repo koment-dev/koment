@@ -12,6 +12,7 @@ import (
 )
 
 func TestPreToolOutputFlagsCommentIntentButAllowsPublicDocumentation(t *testing.T) {
+	t.Chdir(withPolicyContaining(t, ""))
 	patch := `*** Begin Patch
 *** Update File: internal/sample.go
 @@
@@ -36,6 +37,7 @@ func TestPreToolOutputFlagsCommentIntentButAllowsPublicDocumentation(t *testing.
 }
 
 func TestPreToolOutputAllowsIntrinsicDirective(t *testing.T) {
+	t.Chdir(withPolicyContaining(t, ""))
 	patch := "*** Begin Patch\n*** Update File: sample.go\n@@\n+//go:generate stringer -type=State\n*** End Patch"
 	output := runPreTool(t, toolHookApplyPatch, toolHookPatch{Command: patch})
 	if string(output) != "{}\n" {
@@ -44,6 +46,7 @@ func TestPreToolOutputAllowsIntrinsicDirective(t *testing.T) {
 }
 
 func TestPreToolOutputOpencodeEditFlagsCommentIntent(t *testing.T) {
+	t.Chdir(withPolicyContaining(t, ""))
 	file := "internal/sample.go"
 	content := "// Exported documents the API.\nfunc Exported() {}\n\nfunc internal() {\n\t// Retry because the peer closes idle connections.\n\tretry()\n}\n"
 	output := runPreTool(t, toolHookOpencodeEdit, toolHookPatch{FilePath: file, Content: content})
@@ -59,6 +62,7 @@ func TestPreToolOutputOpencodeEditFlagsCommentIntent(t *testing.T) {
 }
 
 func TestPreToolOutputOpencodeEditIgnoresNonGo(t *testing.T) {
+	t.Chdir(withPolicyContaining(t, ""))
 	output := runPreTool(t, toolHookOpencodeEdit, toolHookPatch{FilePath: "README.md", Content: "// not Go\n"})
 	if string(output) != "{}\n" {
 		t.Fatalf("output = %s", output)
@@ -66,6 +70,7 @@ func TestPreToolOutputOpencodeEditIgnoresNonGo(t *testing.T) {
 }
 
 func TestPreToolOutputOpencodeEditAllowsIntrinsicDirective(t *testing.T) {
+	t.Chdir(withPolicyContaining(t, ""))
 	output := runPreTool(t, toolHookOpencodeEdit, toolHookPatch{FilePath: "sample.go", Content: "//go:generate stringer -type=State\n"})
 	if string(output) != "{}\n" {
 		t.Fatalf("output = %s", output)
@@ -80,6 +85,33 @@ func TestPreToolOutputAllowsCommentThatMatchesPolicyAnnotation(t *testing.T) {
 	output := runPreTool(t, toolHookApplyPatch, toolHookPatch{Command: patch})
 	if string(output) != "{}\n" {
 		t.Fatalf("output = %s", output)
+	}
+}
+
+func TestPreToolOutputIsSilentWithoutAnActivePolicy(t *testing.T) {
+	t.Chdir(t.TempDir())
+	output, err := PreToolOutput([]byte("not JSON"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(output) != "{}\n" {
+		t.Fatalf("output = %s", output)
+	}
+}
+
+func TestPreToolOutputRejectsAnnotationsWithoutPolicy(t *testing.T) {
+	root := t.TempDir()
+	directory := filepath.Join(root, store.DirName, "annotations")
+	if err := os.MkdirAll(directory, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(directory, "record.yaml"), []byte(":"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	t.Chdir(root)
+	_, err := PreToolOutput([]byte("not JSON"))
+	if err == nil || !strings.Contains(err.Error(), policy.FileName) || !strings.Contains(err.Error(), "koment bootstrap") {
+		t.Fatalf("error = %v", err)
 	}
 }
 
@@ -101,7 +133,9 @@ func withPolicyContaining(t *testing.T, pattern string) string {
 		t.Fatal(err)
 	}
 	configured := policy.Default()
-	configured.Spec.Comments.AllowedAnnotations = []string{pattern}
+	if pattern != "" {
+		configured.Spec.Comments.AllowedAnnotations = []string{pattern}
+	}
 	if err := policy.Save(root, configured); err != nil {
 		t.Fatal(err)
 	}

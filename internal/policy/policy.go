@@ -14,6 +14,7 @@ import (
 	yaml "go.yaml.in/yaml/v3"
 
 	"github.com/koment-dev/koment/internal/api"
+	"github.com/koment-dev/koment/internal/store"
 )
 
 const (
@@ -104,6 +105,12 @@ type AgentsPolicy struct {
 	Principles []Principle `yaml:"principles,omitempty"`
 }
 
+// Activation is the policy and root of a repository that opted into enforcement.
+type Activation struct {
+	Root       string
+	Configured Policy
+}
+
 // Default returns the strict policy installed for a new repository.
 func Default() Policy {
 	return Policy{
@@ -153,6 +160,29 @@ func Load(rootPath string) (configured Policy, returnedError error) {
 		return Policy{}, fmt.Errorf("in %s: %w", FileName, err)
 	}
 	return configured, nil
+}
+
+// Detect returns nil when automatic koment enforcement is inactive at start.
+func Detect(start string) (*Activation, error) {
+	rootPath, err := store.FindRoot(start)
+	if err != nil {
+		return nil, nil
+	}
+	configured, err := Load(rootPath)
+	if err == nil {
+		return &Activation{Root: rootPath, Configured: configured}, nil
+	}
+	if !errors.Is(err, os.ErrNotExist) {
+		return nil, err
+	}
+	hasAnnotations, err := store.Open(rootPath).HasAnnotationRecords()
+	if err != nil {
+		return nil, err
+	}
+	if hasAnnotations {
+		return nil, fmt.Errorf("%s contains annotation records but %s is missing; run `koment bootstrap`", path.Join(store.DirName, "annotations"), FileName)
+	}
+	return nil, nil
 }
 
 type policyShape struct {

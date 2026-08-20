@@ -22,9 +22,10 @@ add this repository's marketplace:
 /plugin install koment@koment-dev
 ```
 
-Install at project scope because the Stop hook enforces the active repository
-and must not run in unrelated workspaces. Restart Claude Code or run
-`/reload-plugins` after installation.
+Project scope is the smallest installation boundary. A user-scoped installation
+is also inert in repositories with neither `.koment/policy.yaml` nor annotation
+records. Annotation records without the policy remain a visible incomplete
+configuration. Restart Claude Code or run `/reload-plugins` after installation.
 
 The package contributes the writable MCP declaration, hooks, the standing
 `koment` skill and the slash commands documented in

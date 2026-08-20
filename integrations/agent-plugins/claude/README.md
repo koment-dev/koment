@@ -7,7 +7,7 @@ code annotations.
 ## Install
 
 Install a released `koment` binary on `PATH`, run `koment bootstrap` in the
-repository, then add the marketplace and install the plugin at project scope:
+repository, then add the marketplace and install the plugin:
 
 ```text
 /plugin marketplace add koment-dev/koment
@@ -15,7 +15,10 @@ repository, then add the marketplace and install the plugin at project scope:
 ```
 
 Restart Claude Code or run `/reload-plugins` after installation. Project scope
-keeps the Stop hook confined to the repository whose policy it enforces.
+is the smallest boundary. A user-scoped installation stays silent in
+repositories with neither `.koment/policy.yaml` nor annotation records; records
+without the policy are treated as incomplete configuration and request
+bootstrap.
 
 ## Use
 

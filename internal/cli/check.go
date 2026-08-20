@@ -12,11 +12,14 @@ func runCheck(args []string, env Environment) int {
 		return code
 	}
 
-	service, annotations, err := openApplication()
+	active, err := openActiveRepository()
 	if err != nil {
 		return fail(env, err)
 	}
-	resolved, err := resolveEverything(service, annotations, flags.Args())
+	if active == nil {
+		return ExitOK
+	}
+	resolved, err := resolveEverything(active.service, active.annotations, flags.Args())
 	if err != nil {
 		return fail(env, err)
 	}

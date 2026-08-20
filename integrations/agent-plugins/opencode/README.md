@@ -21,7 +21,8 @@ Restart it after changing the configuration.
 ## Requirements
 
 - A released `koment` binary on `PATH`
-- A repository bootstrapped with `.koment/policy.yaml`
+- `.koment/policy.yaml` in every repository where the plugin should enforce
+  koment policy
 
 Bootstrap a repository with:
 
@@ -38,6 +39,9 @@ koment bootstrap --agents opencode --non-interactive
    `koment agents check`.
 
 The package does not duplicate comment detection or annotation resolution.
+Without a policy or annotation records, its policy calls are silent no-ops.
+Annotation records without the policy are treated as incomplete configuration
+and fail with a bootstrap instruction.
 
 ## Verify
 
