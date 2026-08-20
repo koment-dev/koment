@@ -1,7 +1,7 @@
 {
   "name": "koment-opencode",
   "displayName": "koment",
-  "version": "3.1.3",
+  "version": "3.1.4",
   "description": "Keep code rationale outside source comments and enforce the repository's koment procedure.",
   "author": {
     "name": "Jan Pucilowski",

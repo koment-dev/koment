@@ -1,5 +1,18 @@
 # Changelog
 
+## [3.1.4](https://github.com/koment-dev/koment/compare/v3.1.3...v3.1.4) (2026-08-20)
+
+
+### Bug Fixes
+
+* keep policy gates inactive outside koment repositories ([#116](https://github.com/koment-dev/koment/issues/116)) ([19b8962](https://github.com/koment-dev/koment/commit/19b896262366787edd02a14749ecbf01c9c1e9f2))
+* reject retired documentation references ([#113](https://github.com/koment-dev/koment/issues/113)) ([fd2e0e7](https://github.com/koment-dev/koment/commit/fd2e0e7c7665d140165a8f2fb3a22909f39cd2a4))
+
+
+### Documentation
+
+* avoid stale release pin examples ([#111](https://github.com/koment-dev/koment/issues/111)) ([8941782](https://github.com/koment-dev/koment/commit/8941782691792272d4812b373b87eedb5ca99329))
+
 ## [3.1.3](https://github.com/koment-dev/koment/compare/v3.1.2...v3.1.3) (2026-08-20)
 
 
