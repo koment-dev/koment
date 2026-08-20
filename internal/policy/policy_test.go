@@ -5,7 +5,90 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/koment-dev/koment/internal/store"
 )
+
+func TestDetectTreatsRepositoriesWithoutPolicyOrAnnotationsAsInactive(t *testing.T) {
+	for name, configure := range map[string]func(string) error{
+		"no repository markers": func(string) error { return nil },
+		"git repository": func(root string) error {
+			return os.Mkdir(filepath.Join(root, ".git"), 0o755)
+		},
+		"empty koment directory": func(root string) error {
+			return os.Mkdir(filepath.Join(root, store.DirName), 0o755)
+		},
+		"empty annotations directory": func(root string) error {
+			return os.MkdirAll(filepath.Join(root, store.DirName, "annotations"), 0o755)
+		},
+		"unrelated annotations file": func(root string) error {
+			directory := filepath.Join(root, store.DirName, "annotations")
+			if err := os.MkdirAll(directory, 0o755); err != nil {
+				return err
+			}
+			return os.WriteFile(filepath.Join(directory, "notes.txt"), []byte("not an annotation"), 0o644)
+		},
+	} {
+		t.Run(name, func(t *testing.T) {
+			root := t.TempDir()
+			if err := configure(root); err != nil {
+				t.Fatal(err)
+			}
+			activation, err := Detect(root)
+			if err != nil || activation != nil {
+				t.Fatalf("Detect() = %#v, %v", activation, err)
+			}
+		})
+	}
+}
+
+func TestDetectActivatesAValidPolicyWithoutAnnotations(t *testing.T) {
+	root := t.TempDir()
+	if err := Save(root, Default()); err != nil {
+		t.Fatal(err)
+	}
+	activation, err := Detect(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if activation == nil || activation.Root != root || activation.Configured.APIVersion != APIVersion {
+		t.Fatalf("Detect() = %#v", activation)
+	}
+}
+
+func TestDetectRejectsAnnotationRecordsWithoutPolicy(t *testing.T) {
+	root := t.TempDir()
+	directory := filepath.Join(root, store.DirName, "annotations")
+	if err := os.MkdirAll(directory, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(directory, "broken.yaml"), []byte(":"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	activation, err := Detect(root)
+	if activation != nil || err == nil {
+		t.Fatalf("Detect() = %#v, %v", activation, err)
+	}
+	for _, wanted := range []string{".koment/annotations", FileName, "koment bootstrap"} {
+		if !strings.Contains(err.Error(), wanted) {
+			t.Errorf("error missing %q: %v", wanted, err)
+		}
+	}
+}
+
+func TestDetectRejectsAnInvalidExistingPolicy(t *testing.T) {
+	root := t.TempDir()
+	if err := os.MkdirAll(filepath.Join(root, store.DirName), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(root, FileName), []byte("apiVersion: invalid\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	activation, err := Detect(root)
+	if activation != nil || err == nil || !strings.Contains(err.Error(), "incompatible") {
+		t.Fatalf("Detect() = %#v, %v", activation, err)
+	}
+}
 
 func TestDefaultRoundTripsAndMatchesExcludedPaths(t *testing.T) {
 	root := t.TempDir()

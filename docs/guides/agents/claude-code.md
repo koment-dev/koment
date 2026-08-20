@@ -12,8 +12,10 @@ guidance and a Stop hook that refuses completion while policy fails:
 /plugin install koment@koment-dev
 ```
 
-Install it at project scope. The completion hook expects a koment-enabled
-repository and should not run in unrelated workspaces.
+Project scope is the smallest installation boundary and remains the default.
+A user-scoped installation is also safe: without `.koment/policy.yaml` or
+annotation records, its guidance and policy hooks produce no output. Annotation
+records without the policy still block completion and request bootstrap.
 
 It also installs eight slash commands — `/koment:check`, `/koment:show`,
 `/koment:search`, `/koment:add`, `/koment:convert`, `/koment:reanchor`,
@@ -69,5 +71,6 @@ quietly drift.
 - The server is launched with your workspace as its working directory, which is
   what koment needs to find `.koment/`.
 - `.mcp.json` is project-scoped. For a personal, all-projects setup use
-  `claude mcp add --scope user koment -- koment mcp --write`, but note that the server
-  then resolves the repository from wherever Claude Code happens to launch it.
+  `claude mcp add --scope user koment -- koment mcp --write`. The server then
+  resolves the repository from wherever Claude Code launches it; automatic
+  gates stay inactive when that repository has no koment state.

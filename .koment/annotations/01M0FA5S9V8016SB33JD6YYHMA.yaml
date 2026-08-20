@@ -1,0 +1,35 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/koment-dev/koment/main/schema/v1alpha/annotation.schema.json
+apiVersion: koment.dev/v1alpha
+kind: Annotation
+metadata:
+  id: 01M0FA5S9V8016SB33JD6YYHMA
+  created: "2026-08-20T10:06:27Z"
+spec:
+  target:
+    file: internal/agentpolicy/hooks.go
+  type: gotcha
+  body: |-
+    Automatic hooks ask policy.Detect whether this repository opted in before
+    parsing a client request. No policy and no annotation YAML means the hook
+    returns its empty protocol response; annotation YAML without policy and any
+    invalid existing policy remain errors. This keeps global integrations inert
+    without hiding damage in a real koment workspace (ADR 0149).
+  anchor:
+    scope: excerpt
+    excerpt: func activePolicy() (*policy.Activation, error) {
+    before: "\treturn append(encoded, '\\n'), nil\n}\n"
+    after: "\tworkingDirectory, err := os.Getwd()\n\tif err != nil {\n\t\treturn nil, fmt.Errorf(\"finding the working directory: %w\", err)"
+  author:
+    name: janpuc
+    email: janpuc@proton.me
+    kind: agent
+    source: git-config
+  git:
+    commit: fd2e0e7c7665d140165a8f2fb3a22909f39cd2a4
+    path: internal/agentpolicy/hooks.go
+    line: 67
+status:
+  lastSeenLine: 67
+  resolution: ok
+  resolvedAt: "2026-08-20T10:06:27Z"
+  resolvedCommit: fd2e0e7c7665d140165a8f2fb3a22909f39cd2a4

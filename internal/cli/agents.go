@@ -67,15 +67,14 @@ func runAgentsCheck(args []string, env Environment) int {
 	if flags.NArg() != 0 {
 		return misuse(env, "agents check takes no arguments")
 	}
-	annotations, err := openStore()
+	active, err := openActiveRepository()
 	if err != nil {
 		return fail(env, err)
 	}
-	configured, err := policy.Load(annotations.Root())
-	if err != nil {
-		return fail(env, err)
+	if active == nil {
+		return ExitOK
 	}
-	drift, err := agentpolicy.Check(annotations.Root(), configured)
+	drift, err := agentpolicy.Check(active.annotations.Root(), active.configured)
 	if err != nil {
 		return fail(env, err)
 	}
@@ -116,11 +115,14 @@ func runAgentsHook(args []string, env Environment) int {
 }
 
 func runAgentsStopHook(input []byte, env Environment) int {
+	reason, active := completionFailure()
+	if !active {
+		return writeStopResponse(env, map[string]any{})
+	}
 	continued, err := agentpolicy.StopWasContinued(input)
 	if err != nil {
 		return fail(env, err)
 	}
-	reason := completionFailure()
 	response := map[string]any{}
 	if reason != "" {
 		if continued {
@@ -132,34 +134,37 @@ func runAgentsStopHook(input []byte, env Environment) int {
 			response["reason"] = reason
 		}
 	}
+	return writeStopResponse(env, response)
+}
+
+func writeStopResponse(env Environment, response map[string]any) int {
 	if err := json.NewEncoder(env.Stdout).Encode(response); err != nil {
 		return fail(env, fmt.Errorf("writing Stop output: %w", err))
 	}
 	return ExitOK
 }
 
-func completionFailure() string {
-	service, annotations, err := openApplication()
+func completionFailure() (string, bool) {
+	active, err := openActiveRepository()
 	if err != nil {
-		return "koment could not open the repository: " + err.Error()
+		return "koment could not activate the repository: " + err.Error(), true
 	}
-	snapshot, err := service.Snapshot()
+	if active == nil {
+		return "", false
+	}
+	snapshot, err := active.service.Snapshot()
 	if err != nil {
-		return "koment could not resolve annotations: " + err.Error()
+		return "koment could not resolve annotations: " + err.Error(), true
 	}
 	counts := snapshot.Counts()
 	annotationFailures := counts[anchor.StatusAmbiguous] + counts[anchor.StatusDrifted] + counts[anchor.StatusOrphaned]
-	violations, err := service.CheckComments(nil)
+	violations, err := active.service.CheckComments(nil)
 	if err != nil {
-		return "koment could not check comments: " + err.Error()
+		return "koment could not check comments: " + err.Error(), true
 	}
-	configured, err := policy.Load(annotations.Root())
+	drift, err := agentpolicy.Check(active.annotations.Root(), active.configured)
 	if err != nil {
-		return "koment could not load agent policy: " + err.Error()
-	}
-	drift, err := agentpolicy.Check(annotations.Root(), configured)
-	if err != nil {
-		return "koment could not check agent adapters: " + err.Error()
+		return "koment could not check agent adapters: " + err.Error(), true
 	}
 	var failures []string
 	if annotationFailures > 0 {
@@ -171,5 +176,5 @@ func completionFailure() string {
 	if len(drift) > 0 {
 		failures = append(failures, fmt.Sprintf("%d agent adapters drifted; run `koment agents install`", len(drift)))
 	}
-	return strings.Join(failures, "; ")
+	return strings.Join(failures, "; "), true
 }

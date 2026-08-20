@@ -2,6 +2,9 @@
 set -eu
 
 if policy_status=$(koment agents check 2>&1); then
+  if [ -z "$policy_status" ]; then
+    exit 0
+  fi
   printf '%s\n' "$policy_status"
 else
   printf 'koment policy needs attention before editing:\n%s\n' "$policy_status"

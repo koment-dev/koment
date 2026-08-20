@@ -3,12 +3,12 @@ package agentpolicy
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
 
 	"github.com/koment-dev/koment/internal/policy"
-	"github.com/koment-dev/koment/internal/store"
 )
 
 type toolHookInput struct {
@@ -25,6 +25,13 @@ const toolHookOpencodeEdit = "opencode_edit"
 
 // PreToolOutput blocks a Go patch that adds ordinary comment intent.
 func PreToolOutput(input []byte) ([]byte, error) {
+	activation, err := activePolicy()
+	if err != nil {
+		return nil, err
+	}
+	if activation == nil {
+		return []byte("{}\n"), nil
+	}
 	var request toolHookInput
 	if err := json.Unmarshal(input, &request); err != nil {
 		return nil, fmt.Errorf("parsing PreToolUse input: %w", err)
@@ -38,8 +45,7 @@ func PreToolOutput(input []byte) ([]byte, error) {
 	default:
 		return []byte("{}\n"), nil
 	}
-	configured := hookPolicy()
-	comments := addedCommentIntent(body, configured)
+	comments := addedCommentIntent(body, activation.Configured)
 	if len(comments) == 0 {
 		return []byte("{}\n"), nil
 	}
@@ -58,20 +64,12 @@ func PreToolOutput(input []byte) ([]byte, error) {
 	return append(encoded, '\n'), nil
 }
 
-func hookPolicy() policy.Policy {
-	workingDirectory, err := filepath.Abs(".")
+func activePolicy() (*policy.Activation, error) {
+	workingDirectory, err := os.Getwd()
 	if err != nil {
-		return policy.Default()
+		return nil, fmt.Errorf("finding the working directory: %w", err)
 	}
-	root, err := store.FindRoot(workingDirectory)
-	if err != nil {
-		return policy.Default()
-	}
-	configured, err := policy.Load(root)
-	if err != nil {
-		return policy.Default()
-	}
-	return configured
+	return policy.Detect(workingDirectory)
 }
 
 func syntheticPatchFromEdit(filePath, content string) string {

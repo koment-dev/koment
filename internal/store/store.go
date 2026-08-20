@@ -393,6 +393,29 @@ func (s *Store) All() (_ []Annotation, returnedError error) {
 	return annotations, nil
 }
 
+// HasAnnotationRecords reports whether the store contains any annotation YAML.
+func (s *Store) HasAnnotationRecords() (_ bool, returnedError error) {
+	root, err := os.OpenRoot(s.root)
+	if err != nil {
+		return false, fmt.Errorf("opening repository root %s: %w", s.root, err)
+	}
+	defer closeRepositoryRoot(root, &returnedError)
+	directory := path.Join(DirName, annotationsDir)
+	entries, err := fs.ReadDir(root.FS(), directory)
+	if errorsIsNotExist(err) {
+		return false, nil
+	}
+	if err != nil {
+		return false, fmt.Errorf("reading %s: %w", directory, err)
+	}
+	for _, entry := range entries {
+		if !entry.IsDir() && strings.HasSuffix(entry.Name(), recordSuffix) {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
 func (s *Store) ForFile(file string) ([]Annotation, error) {
 	clean, err := validSourcePath(file)
 	if err != nil {

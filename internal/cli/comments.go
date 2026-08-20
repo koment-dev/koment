@@ -28,15 +28,18 @@ func runCommentsCheck(args []string, env Environment) int {
 	if code, ok := parse(flags, args); !ok {
 		return code
 	}
-	service, annotations, err := openApplication()
+	active, err := openActiveRepository()
 	if err != nil {
 		return fail(env, err)
 	}
-	requested, err := relativePrefixes(annotations, flags.Args())
+	if active == nil {
+		return ExitOK
+	}
+	requested, err := relativePrefixes(active.annotations, flags.Args())
 	if err != nil {
 		return fail(env, err)
 	}
-	violations, err := service.CheckComments(requested)
+	violations, err := active.service.CheckComments(requested)
 	if err != nil {
 		return fail(env, err)
 	}

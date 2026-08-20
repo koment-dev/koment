@@ -467,6 +467,32 @@ func TestAnnotatedFilesIsEmptyBeforeAnythingIsAnnotated(t *testing.T) {
 	}
 }
 
+func TestHasAnnotationRecordsDetectsYAMLWithoutParsingIt(t *testing.T) {
+	annotations := newTestStore(t)
+	present, err := annotations.HasAnnotationRecords()
+	if err != nil || present {
+		t.Fatalf("empty store = %v, %v", present, err)
+	}
+	directory := filepath.Join(annotations.Root(), DirName, annotationsDir)
+	if err := os.MkdirAll(directory, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(directory, "notes.txt"), []byte("not a record"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	present, err = annotations.HasAnnotationRecords()
+	if err != nil || present {
+		t.Fatalf("non-YAML file = %v, %v", present, err)
+	}
+	if err := os.WriteFile(filepath.Join(directory, "broken.yaml"), []byte(":"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	present, err = annotations.HasAnnotationRecords()
+	if err != nil || !present {
+		t.Fatalf("YAML record = %v, %v", present, err)
+	}
+}
+
 func TestFindRootPrefersKomentOverGit(t *testing.T) {
 	outer := t.TempDir()
 	if err := os.MkdirAll(filepath.Join(outer, ".git"), 0o755); err != nil {

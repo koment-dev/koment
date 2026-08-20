@@ -31,6 +31,11 @@ client supports project configuration. Existing unrelated configuration is
 preserved. Commit the generated files so the procedure starts with the
 repository, not a person's workstation.
 
+The policy file activates automatic enforcement. Globally installed hooks are
+silent in a repository with neither a policy nor annotation records. If
+annotation YAML exists without the policy, the repository is incomplete and
+the hooks instruct the agent to run `koment bootstrap` instead of ignoring it.
+
 ## What your agent gets
 
 Every local server has three read tools:

@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/koment-dev/koment/internal/application"
+	"github.com/koment-dev/koment/internal/policy"
 	repositorymodel "github.com/koment-dev/koment/internal/repository"
 	"github.com/koment-dev/koment/internal/store"
 )
@@ -177,4 +178,31 @@ func openApplication() (*application.Service, *store.Store, error) {
 	}
 	entry := repositorymodel.Repository{ID: "local", Name: "Local repository", Root: annotations.Root()}
 	return application.NewService(entry), annotations, nil
+}
+
+type activeRepository struct {
+	service     *application.Service
+	annotations *store.Store
+	configured  policy.Policy
+}
+
+func openActiveRepository() (*activeRepository, error) {
+	workingDirectory, err := os.Getwd()
+	if err != nil {
+		return nil, fmt.Errorf("finding the working directory: %w", err)
+	}
+	activation, err := policy.Detect(workingDirectory)
+	if err != nil {
+		return nil, err
+	}
+	if activation == nil {
+		return nil, nil
+	}
+	annotations := store.Open(activation.Root)
+	entry := repositorymodel.Repository{ID: "local", Name: "Local repository", Root: activation.Root}
+	return &activeRepository{
+		service:     application.NewService(entry),
+		annotations: annotations,
+		configured:  activation.Configured,
+	}, nil
 }
