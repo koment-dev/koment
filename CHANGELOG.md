@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.3](https://github.com/koment-dev/koment/compare/v3.1.2...v3.1.3) (2026-08-20)
+
+
+### Bug Fixes
+
+* upload assets through release creation response ([#108](https://github.com/koment-dev/koment/issues/108)) ([c227859](https://github.com/koment-dev/koment/commit/c227859c9c6518cdcb371fc318f143d066f58611))
+
 ## [3.1.2](https://github.com/koment-dev/koment/compare/v3.1.1...v3.1.2) (2026-08-20)
 
 
