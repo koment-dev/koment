@@ -18,8 +18,13 @@ Run it from the repository root:
 
 ```sh
 go test ./examples/annotated-workspace/...
-cd workspace && go run ../cmd/koment check   # expected: 5 ok, 1 ambiguous, 1 drifted, 1 orphaned
+cd examples/annotated-workspace
+go run ../../cmd/koment check
 ```
+
+The second command exits 1 after it reports
+`8 annotations across 3 files: 5 ok, 1 ambiguous, 1 drifted, 1 orphaned`.
+The committed policy activates this fixture as its own koment repository.
 
 The published koment site exposes this workspace through the normal repository
 switcher. It uses the same source, records, resolver and rendering path as any

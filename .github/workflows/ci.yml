@@ -67,6 +67,18 @@ jobs:
       - name: Check annotations
         run: mise run annotations
 
+      - name: Check maintained workspace
+        working-directory: examples/annotated-workspace
+        env:
+          EXPECTED: "8 annotations across 3 files: 5 ok, 1 ambiguous, 1 drifted, 1 orphaned"
+        run: |
+          tally="$(go run ../../cmd/koment check | tail -1)"
+          echo "$tally"
+          test "$tally" = "$EXPECTED"
+          for kind in why gotcha invariant anti-pattern; do
+            grep -q "^  type: $kind\$" .koment/annotations/*.yaml
+          done
+
       - name: Check comment policy
         run: mise run comments
 
