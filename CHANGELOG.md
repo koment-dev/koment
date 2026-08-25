@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.2.0](https://github.com/koment-dev/koment/compare/v3.1.5...v3.2.0) (2026-08-25)
+
+
+### Features
+
+* package a Codex agent plugin ([#121](https://github.com/koment-dev/koment/issues/121)) ([2fbbfe8](https://github.com/koment-dev/koment/commit/2fbbfe8b7b550dc9ae51eac0c5d41aae151b8d44))
+
+
+### Bug Fixes
+
+* activate the maintained demo workspace ([#123](https://github.com/koment-dev/koment/issues/123)) ([db85a00](https://github.com/koment-dev/koment/commit/db85a0066d0c135350029826350d24d8f2a7162a))
+
 ## [3.1.5](https://github.com/koment-dev/koment/compare/v3.1.4...v3.1.5) (2026-08-20)
 
 
