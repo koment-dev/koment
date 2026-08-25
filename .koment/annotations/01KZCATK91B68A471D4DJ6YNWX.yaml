@@ -19,7 +19,7 @@ spec:
     non-interactive runner.
   anchor:
     scope: excerpt
-    excerpt: '| `plugins` | Three self-contained plugin archives (Claude, Hermes and OpenCode), per-archive cosign signatures, a combined `koment-plugins_<version>_checksums.txt`, and its cosign signature; the OpenCode package also goes to npm |'
+    excerpt: '| `plugins` | Four self-contained plugin archives (Claude, Codex, Hermes and OpenCode), per-archive cosign signatures, a combined `koment-plugins_<version>_checksums.txt`, and its cosign signature; the OpenCode package also goes to npm |'
     before: |-
       | Job | Publishes |
       |---|---|
@@ -37,7 +37,7 @@ spec:
     path: docs/releasing.md
     line: 123
 status:
-  lastSeenLine: 123
+  lastSeenLine: 151
   resolution: ok
-  resolvedAt: "2026-08-07T07:22:55Z"
-  resolvedCommit: 2ce32806b279ebe9eabcce6c4353f095c5aee0a4
+  resolvedAt: "2026-08-25T13:40:28Z"
+  resolvedCommit: 2aa2e7b9980662f45180ffc4728fcb46172a42e4

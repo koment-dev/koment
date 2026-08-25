@@ -44,6 +44,11 @@
         },
         {
           "type": "json",
+          "path": "integrations/agent-plugins/codex/plugins/koment/.codex-plugin/plugin.json",
+          "jsonpath": "$.version"
+        },
+        {
+          "type": "json",
           "path": "integrations/agent-plugins/opencode/plugin.json",
           "jsonpath": "$.version"
         },

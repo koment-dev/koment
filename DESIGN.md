@@ -72,10 +72,10 @@ This table is the honest boundary between implemented and planned behavior.
 | HTTP serving | authenticated UI and MCP share one service and snapshot catalog | implemented |
 | Database index | local prototype removed | none; served snapshots and search remain rebuildable in memory |
 | Remote authoring | authenticated creation materializes exact records through reviewed Git pull requests | implemented for creation; source-mutating operations remain local |
-| Agent policy | strict policy, generated client adapters, hooks and CI gate implemented | implemented |
+| Agent policy | strict policy, generated client adapters, installable Claude, OpenCode and Codex plugins, hooks and CI gate implemented | implemented |
 | Operational toolchain | mise, Lefthook, generated chart documentation, security gates and a self-hosted Renovate workflow implemented; Renovate stays inert until its app is installed | implemented |
 | Helm and release | hardened chart, Kind E2E, signed canonical artifacts and SBOM/provenance implemented | implemented |
-| End-user distribution | releases, setup Action, mise, Claude marketplace, MCP metadata, VS Code/Open VSX package, and generated package-manager manifests | implemented and published through directly controlled channels |
+| End-user distribution | releases, setup Action, mise, Claude marketplace, OpenCode plugin, Codex local marketplace, MCP metadata, VS Code/Open VSX package, and generated package-manager manifests | implemented; existing controlled channels are published, while the Codex archive first ships with the next release and public directory submission remains external |
 | Editor presentation | inline gloss plus a panel carrying full bodies; diagnostics report only what fails `koment check` | implemented |
 | Editor distribution | seven signed packages per release — six carrying the platform's canonical binary, one universal — ordered after the binaries job, with marketplace publication and LSP configuration for every other editor; the marketplace id is `koment.koment-dev` (VS Code) / `koment/koment-dev` (Open VSX) with `displayName: "koment-dev"` per [ADR 0126](docs/explanation/decisions/0126-fix-vscode-marketplace-extension-name.md) and [ADR 0127](docs/explanation/decisions/0127-fix-vscode-marketplace-display-name.md) | implemented and published |
 | Zed | an extension in `integrations/editors/zed/` starting `koment lsp` and registering `koment mcp --write`, published to Zed's registry by a manual submodule pull request; no inline bodies, because Zed exposes no decoration API ([ADR 0139](docs/explanation/decisions/0139-package-a-zed-extension.md)); the extension alone is GPL-3.0-or-later while the binary and repository remain AGPL-3.0-or-later ([ADR 0145](docs/explanation/decisions/0145-license-the-zed-extension-under-gplv3.md)) | implemented; registry publication is a manual release step |
@@ -98,6 +98,7 @@ API meanings. It gives everything around that core one unambiguous owner:
 ├── integrations/
 │   ├── agent-plugins/
 │   │   ├── claude/
+│   │   ├── codex/
 │   │   ├── hermes/
 │   │   └── opencode/
 │   └── editors/
@@ -596,12 +597,14 @@ Distribution is promoted in layers:
    koment` name and stronger checksum or attestation metadata.
 3. The koment Claude marketplace and official Claude plugin directory package
    the strict instructions, hooks and MCP declaration. An OpenCode plugin at
-   `integrations/agent-plugins/opencode/` provides the same hooks for OpenCode
-   through the `@koment/opencode-koment` npm package, configured in
-   `opencode.json`; the generated project-local adapter remains available. The
+   `integrations/agent-plugins/opencode/` provides the same hooks through the
+   `@koment/opencode-koment` npm package. A Codex plugin at
+   `integrations/agent-plugins/codex/` packages the writable MCP declaration,
+   standing skill and lifecycle hooks in a signed local-marketplace archive.
+   Generated project-local adapters remain available for both clients. The
    official MCP Registry points at koment's labeled OCI artifact or a
-   checksummed MCPB bundle. The npm package is a policy integration, not a
-   binary wrapper or the MCP Registry's distribution artifact.
+   checksummed MCPB bundle. Policy plugins do not wrap the binary or replace
+   the MCP Registry artifact.
 4. The VS Code Marketplace and Open VSX publish the same extension artifact.
 5. Homebrew core, Nixpkgs, AUR, MacPorts and other community catalogs are
    pursued after a stable release where their external acceptance and ongoing
@@ -609,11 +612,12 @@ Distribution is promoted in layers:
 
 Release automation generates Homebrew, Scoop and WinGet metadata from one
 version and checksum manifest and tests the directly controlled installation
-channels. The repository publishes Claude marketplace metadata directly,
-publishes the VSIX to VS Code Marketplace and Open VSX through their configured
-owner tokens, and uses GitHub OIDC for the MCP Registry. Owner-submitted
-external catalogs are never described as available until their submissions are
-accepted. ADR 0109 records the artifact and distribution boundary.
+channels. It signs self-contained agent plugin archives for Claude, Codex,
+Hermes and OpenCode. The repository publishes Claude marketplace metadata
+directly, publishes the VSIX to VS Code Marketplace and Open VSX through their
+configured owner tokens, and uses GitHub OIDC for the MCP Registry.
+Owner-submitted external catalogs are never described as available until their
+submissions are accepted. ADRs 0109 and 0151 record these boundaries.
 
 ## Maintained workspace
 
@@ -914,5 +918,7 @@ The approved design is complete when:
   independently maintained binary distribution metadata.
 - [Claude plugin marketplaces](https://code.claude.com/docs/en/plugin-marketplaces)
   — distribution for instructions, hooks, MCP and LSP integrations.
+- [OpenAI plugin packaging](https://developers.openai.com/plugins/build/plugins)
+  — Codex plugin manifests, skills, MCP configuration and local marketplaces.
 - [MCP Registry package types](https://modelcontextprotocol.io/registry/package-types)
   — OCI and MCPB-backed MCP discovery without a language wrapper.

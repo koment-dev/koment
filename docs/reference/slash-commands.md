@@ -41,7 +41,8 @@ cannot take the shortcut that destroys the record:
 
 ## Other runtimes
 
-OpenCode, Codex and Cursor get the same behaviour through the generated
-adapters and the MCP tools rather than through slash commands; see
+OpenCode and Codex get the same behaviour through installable plugins or
+generated adapters. Cursor uses its generated adapter. None use Claude's slash
+commands; see
 [agent setup](../guides/agents/README.md). The commands directory is Claude Code's
 format and is not portable.

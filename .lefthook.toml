@@ -22,4 +22,4 @@ run = "mise run layout-check"
 parallel = true
 
 [commit-msg.commands.commit-fmt]
-run = "./scripts/commitlint.sh <<< \"$(head -n1 {1})\""
+run = "head -n1 {1} | ./scripts/commitlint.sh"

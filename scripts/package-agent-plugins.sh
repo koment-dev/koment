@@ -16,15 +16,20 @@ trap 'rm -r "$staging_directory"' EXIT
 
 mkdir -p "$output_directory"
 
-for plugin in claude hermes opencode; do
+for plugin in claude codex hermes opencode; do
   source_directory=$plugin_root/$plugin
-  packaged_directory=$staging_directory/$plugin
+  archive_root=$plugin
   archive=$output_directory/koment-plugin-${plugin}_v${version}.tar.gz
 
   case $plugin in
     claude)
       source_entries=".claude-plugin .mcp.json README.md commands hooks scripts skills"
       required_files=".claude-plugin/plugin.json .mcp.json README.md hooks/hooks.json scripts/session-start.sh skills/koment/SKILL.md"
+      ;;
+    codex)
+      archive_root=koment-codex-marketplace
+      source_entries=".agents README.md plugins"
+      required_files=".agents/plugins/marketplace.json README.md plugins/koment/.codex-plugin/plugin.json plugins/koment/.mcp.json plugins/koment/hooks/hooks.json plugins/koment/scripts/session-start.sh plugins/koment/skills/koment/SKILL.md plugins/koment/LICENSE"
       ;;
     hermes)
       source_entries="README.md __init__.py plugin.yaml"
@@ -36,6 +41,7 @@ for plugin in claude hermes opencode; do
       ;;
   esac
 
+  packaged_directory=$staging_directory/$archive_root
   mkdir -p "$packaged_directory"
   for source_entry in $source_entries; do
     test -e "$source_directory/$source_entry" || {
@@ -45,16 +51,19 @@ for plugin in claude hermes opencode; do
     cp -R "$source_directory/$source_entry" "$packaged_directory/"
   done
   cp LICENSE "$packaged_directory/LICENSE"
+  if [[ $plugin == codex ]]; then
+    cp LICENSE "$packaged_directory/plugins/koment/LICENSE"
+  fi
 
   if [[ $plugin == claude ]] && ! compgen -G "$source_directory/commands/*.md" >/dev/null; then
     printf '%s contains no slash commands\n' "$source_directory" >&2
     exit 1
   fi
 
-  tar -czf "$archive" -C "$staging_directory" "$plugin"
+  tar -czf "$archive" -C "$staging_directory" "$archive_root"
 
   for required_file in $required_files LICENSE; do
-    tar -tzf "$archive" "$plugin/$required_file" >/dev/null
+    tar -tzf "$archive" "$archive_root/$required_file" >/dev/null
   done
 
   printf '%s\n' "$archive"
