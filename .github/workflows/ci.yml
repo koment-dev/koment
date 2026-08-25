@@ -535,10 +535,16 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Setup Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+          cache: true
+
       - name: Validate plugin manifests
         run: |
           set -euo pipefail
-          for manifest in integrations/agent-plugins/claude/.claude-plugin/plugin.json integrations/agent-plugins/opencode/plugin.json; do
+          for manifest in integrations/agent-plugins/claude/.claude-plugin/plugin.json integrations/agent-plugins/codex/plugins/koment/.codex-plugin/plugin.json integrations/agent-plugins/opencode/plugin.json; do
             jq empty "$manifest"
             name=$(jq -r '.name' "$manifest")
             version=$(jq -r '.version' "$manifest")
@@ -556,6 +562,16 @@ jobs:
             fi
             echo "$manifest: $name@$version OK"
           done
+
+      - name: Validate the Codex marketplace
+        run: |
+          set -euo pipefail
+          marketplace=integrations/agent-plugins/codex/.agents/plugins/marketplace.json
+          plugin=integrations/agent-plugins/codex/plugins/koment
+          jq -e '.name == "koment-dev" and .plugins == [{"name":"koment","source":{"source":"local","path":"./plugins/koment"},"policy":{"installation":"AVAILABLE","authentication":"ON_INSTALL"},"category":"Productivity"}]' "$marketplace"
+          jq -e '.mcpServers == "./.mcp.json" and .skills == "./skills/"' "$plugin/.codex-plugin/plugin.json"
+          jq -e '.mcpServers.koment.command == "koment" and .mcpServers.koment.args == ["mcp", "--write"]' "$plugin/.mcp.json"
+          jq -e '.hooks.PreToolUse[0].hooks[0].command == "koment agents hook pre-tool" and .hooks.Stop[0].hooks[0].command == "koment agents hook stop"' "$plugin/hooks/hooks.json"
 
       - name: Validate declared slash commands
         run: |
@@ -587,6 +603,9 @@ jobs:
 
       - name: Test the OpenCode plugin protocol client
         run: npm --prefix integrations/agent-plugins/opencode test
+
+      - name: Test inactive plugin behavior
+        run: ./scripts/agent-plugins-smoke.sh
 
   zed:
     name: zed

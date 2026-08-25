@@ -71,6 +71,7 @@ the approved destination.
 - [0148 — Reject references to retired repository paths](0148-reject-references-to-retired-repository-paths.md)
 - [0149 — A policy activates automatic enforcement](0149-a-policy-activates-automatic-enforcement.md)
 - [0150 — Retry idempotent marketplace publication](0150-retry-idempotent-marketplace-publication.md)
+- [0151 — Package a Codex agent plugin](0151-package-a-codex-agent-plugin.md)
 
 ## Superseded decisions
 

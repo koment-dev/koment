@@ -36,7 +36,7 @@ The same check rejects repository-controlled references to paths retired by comp
 - `docs/`: `README.md`, `explanation`, `guides`, `reference`, `start`
 - `examples/`: `annotated-workspace`
 - `integrations/`: `agent-plugins`, `editors`
-- `integrations/agent-plugins/`: `README.md`, `claude`, `hermes`, `opencode`
+- `integrations/agent-plugins/`: `README.md`, `claude`, `codex`, `hermes`, `opencode`
 - `integrations/editors/`: `vscode`, `zed`
 
 ## Exact root files

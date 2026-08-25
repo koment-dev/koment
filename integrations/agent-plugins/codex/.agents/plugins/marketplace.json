@@ -1,0 +1,20 @@
+{
+  "name": "koment-dev",
+  "interface": {
+    "displayName": "Koment Dev"
+  },
+  "plugins": [
+    {
+      "name": "koment",
+      "source": {
+        "source": "local",
+        "path": "./plugins/koment"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

@@ -76,7 +76,7 @@ var ClosedChildren = map[string][]string{
 	"docs":                          {"README.md", "explanation", "guides", "reference", "start"},
 	"examples":                      {"annotated-workspace"},
 	"integrations":                  {"agent-plugins", "editors"},
-	"integrations/agent-plugins":    {"README.md", "claude", "hermes", "opencode"},
+	"integrations/agent-plugins":    {"README.md", "claude", "codex", "hermes", "opencode"},
 	"integrations/editors":          {"vscode", "zed"},
 }
 

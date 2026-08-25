@@ -1,0 +1,34 @@
+{
+  "name": "koment",
+  "version": "3.1.5",
+  "description": "Keep code rationale outside source comments and enforce the repository's koment procedure.",
+  "author": {
+    "name": "Jan Pucilowski",
+    "url": "https://github.com/koment-dev"
+  },
+  "homepage": "https://github.com/koment-dev/koment",
+  "repository": "https://github.com/koment-dev/koment",
+  "license": "AGPL-3.0-or-later",
+  "keywords": [
+    "annotations",
+    "comments",
+    "codex",
+    "mcp",
+    "code-quality"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "koment",
+    "shortDescription": "Keep code rationale outside inline comments.",
+    "longDescription": "Read and write attributed code rationale through koment, block ordinary comment intent, and verify repository policy before completion.",
+    "developerName": "koment-dev",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/koment-dev/koment",
+    "defaultPrompt": "Show the koment rationale for the code I am changing."
+  }
+}

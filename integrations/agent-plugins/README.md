@@ -6,10 +6,11 @@ from the others.
 | Runtime | Installable root | Distribution |
 |---|---|---|
 | Claude Code | [`claude/`](claude/) | koment Claude marketplace and signed release archive |
+| Codex | [`codex/`](codex/) | local marketplace and signed release archive |
 | Hermes | [`hermes/`](hermes/) | signed release archive |
 | OpenCode | [`opencode/`](opencode/) | npm and signed release archive |
 
-All three delegate policy decisions to koment rather than implementing a second
+All four delegate policy decisions to koment rather than implementing a second
 comment classifier.
 
 ## Claude Code
@@ -64,6 +65,23 @@ writable MCP process for the session and applies the same pre-tool and
 completion policy as the generated repository adapter.
 
 See [the OpenCode package](opencode/README.md).
+
+## Codex
+
+Add the local marketplace from a koment checkout and install the plugin:
+
+```sh
+codex plugin marketplace add ./integrations/agent-plugins/codex
+codex plugin add koment@koment-dev
+```
+
+Releases that contain the plugin also provide a signed marketplace archive.
+
+The plugin contributes writable MCP configuration, the standing `koment`
+skill, a pre-tool hook and a completion hook. It stays silent in repositories
+with neither `.koment/policy.yaml` nor annotation records.
+
+See [the Codex package](codex/README.md).
 
 ## Generated repository adapters
 

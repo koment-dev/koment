@@ -270,6 +270,13 @@ installs it at startup. It requires the released `koment` binary on `PATH`,
 denies ordinary explanatory comment intent and runs the policy gate on session
 end. ADR 0144 records the package and generated-adapter boundary.
 
+Codex ships the same policy surface as a local marketplace at
+[`integrations/agent-plugins/codex/`](integrations/agent-plugins/codex/).
+Install that checkout path with `codex plugin marketplace add`, then run
+`codex plugin add koment@koment-dev`. The release workflow also produces a
+signed archive. The plugin provides writable MCP tools, a standing skill and
+trusted lifecycle hooks. ADR 0151 records the package boundary.
+
 ## Give it to your agents
 
 ```bash

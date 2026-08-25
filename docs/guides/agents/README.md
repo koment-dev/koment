@@ -9,7 +9,7 @@ client. Pick yours:
 | Hermes Agent | `config.yaml` + plugin | [hermes.md](hermes.md) |
 | OpenClaw | OpenClaw config (JSON5) | [openclaw.md](openclaw.md) |
 | opencode | `opencode.json` | [opencode.md](opencode.md) |
-| Codex CLI | `~/.codex/config.toml` | [codex.md](codex.md) |
+| Codex | plugin or `.codex/config.toml` | [codex.md](codex.md) |
 | Cursor | `.cursor/mcp.json` | [cursor.md](cursor.md) |
 | VS Code | `.vscode/mcp.json` | [vscode.md](vscode.md) |
 | Zed | Zed `settings.json` | [zed.md](zed.md) |

@@ -148,7 +148,7 @@ binaries + image ──┬─> plugins
 | Job | Publishes |
 |---|---|
 | `binaries` | six archives, `koment_<version>_checksums.txt`, a cosign signature, and rendered Homebrew/Scoop/WinGet metadata |
-| `plugins` | Three self-contained plugin archives (Claude, Hermes and OpenCode), per-archive cosign signatures, a combined `koment-plugins_<version>_checksums.txt`, and its cosign signature; the OpenCode package also goes to npm |
+| `plugins` | Four self-contained plugin archives (Claude, Codex, Hermes and OpenCode), per-archive cosign signatures, a combined `koment-plugins_<version>_checksums.txt`, and its cosign signature; the OpenCode package also goes to npm |
 | `image` | `ghcr.io/koment-dev/koment:<version>`, multi-arch, SBOM and provenance, cosign-signed |
 | `editor` | seven VSIX — six carrying that platform's released binary, one universal — signed, attached, then pushed to both marketplaces |
 | `tap` | the rendered formula in `koment-dev/homebrew-tap` after the binary assets exist |
