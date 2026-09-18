@@ -1,5 +1,5 @@
 [tools]
-rust = { version = "1.97.1", components = [
+rust = { version = "1.98.1", components = [
   "clippy",
   "rustfmt",
 ], targets = "wasm32-wasip2" }
