@@ -25,7 +25,7 @@ env:
 jobs:
   quality:
     name: quality
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     steps:
@@ -96,7 +96,7 @@ jobs:
 
   lint:
     name: lint
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     steps:
@@ -131,7 +131,7 @@ jobs:
 
   test:
     name: test
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     steps:
@@ -168,7 +168,7 @@ jobs:
 
   container:
     name: container
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     steps:
@@ -306,7 +306,7 @@ jobs:
 
   commit-lint:
     name: commit-lint
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     steps:
@@ -413,7 +413,7 @@ jobs:
 
   helm:
     name: helm
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     steps:
@@ -436,7 +436,7 @@ jobs:
 
   editor:
     name: editor
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     steps:
@@ -538,7 +538,7 @@ jobs:
 
   plugins:
     name: plugins
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     steps:
@@ -621,7 +621,7 @@ jobs:
 
   zed:
     name: zed
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     steps:
@@ -674,7 +674,7 @@ jobs:
       - quality
       - test
       - zed
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions: {}
     steps:
       - name: Reject failed, cancelled, or skipped jobs
